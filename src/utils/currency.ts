@@ -90,3 +90,36 @@ export function formatPrice(amount: number, currency: CurrencyCode): string {
     return `${symbols[currency] || "$"}${amount}`;
   }
 }
+
+/**
+ * Mappings to convert dynamic INR prices configured from Remote Config to standard equivalents.
+ * US: $19 -> $9, India: ₹599 -> ₹299, EU: €18 -> €8, UK: £15 -> £7
+ * Enterprise: ₹2999 -> ₹1499, US: $99 -> $49, EU: €89 -> €45, UK: £79 -> £39
+ */
+export function convertInrToCurrency(inrAmount: number, currency: CurrencyCode): number {
+  if (currency === "INR") return inrAmount;
+
+  if (currency === "USD") {
+    if (inrAmount <= 350) return 9;     // Pro Discounted (299)
+    if (inrAmount <= 700) return 19;    // Pro Original (599)
+    if (inrAmount <= 1800) return 49;   // Enterprise Discounted (1499)
+    if (inrAmount <= 3500) return 99;   // Enterprise Original (2999)
+    return Math.round(inrAmount / 30);  // Dynamic fallback scaling
+  }
+  if (currency === "EUR") {
+    if (inrAmount <= 350) return 8;     // Pro Discounted (299)
+    if (inrAmount <= 700) return 18;    // Pro Original (599)
+    if (inrAmount <= 1800) return 45;   // Enterprise Discounted (1499)
+    if (inrAmount <= 3500) return 89;   // Enterprise Original (2999)
+    return Math.round(inrAmount / 33);  // Dynamic fallback scaling
+  }
+  if (currency === "GBP") {
+    if (inrAmount <= 350) return 7;     // Pro Discounted (299)
+    if (inrAmount <= 700) return 15;    // Pro Original (599)
+    if (inrAmount <= 1800) return 39;   // Enterprise Discounted (1499)
+    if (inrAmount <= 3500) return 79;   // Enterprise Original (2999)
+    return Math.round(inrAmount / 38);  // Dynamic fallback scaling
+  }
+
+  return inrAmount;
+}

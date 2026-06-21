@@ -34,13 +34,13 @@ export default function BlogCatalogPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://utool.com",
+        "item": "https://utool.in",
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://utool.com/blog",
+        "item": "https://utool.in/blog",
       },
     ],
   };

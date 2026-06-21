@@ -69,7 +69,7 @@ export default function URLShortenerPage({ hideHeader = false }: { hideHeader?: 
     if (typeof window !== "undefined") {
       return `${window.location.protocol}//${window.location.host}`;
     }
-    return "https://utool.com";
+    return "https://utool.in";
   };
 
   // Load user's links

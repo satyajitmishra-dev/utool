@@ -37,25 +37,32 @@ export default function HistoryPage() {
     try {
       const q = query(
         collection(db, "usage_transactions"),
-        where("userId", "==", identifier),
-        orderBy("timestamp", "desc")
+        where("userId", "==", identifier)
       );
       const snapshot = await getDocs(q);
       
       if (!snapshot.empty) {
-        const fetchedLogs: LogEntry[] = [];
+        const fetchedLogs: { log: LogEntry; rawTime: number }[] = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
+          const rawTime = data.timestamp?.toDate?.()?.getTime() || 0;
           const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "Just now";
           fetchedLogs.push({
-            id: docSnap.id,
-            tool: data.toolName || data.toolId || "Unknown Tool",
-            time: date,
-            status: data.status === "success" ? "Success" : "Failed",
-            cost: `${data.creditsUsed || 1} credit${(data.creditsUsed || 1) === 1 ? "" : "s"}`,
+            log: {
+              id: docSnap.id,
+              tool: data.toolName || data.toolId || "Unknown Tool",
+              time: date,
+              status: data.status === "success" ? "Success" : "Failed",
+              cost: `${data.creditsUsed || 1} credit${(data.creditsUsed || 1) === 1 ? "" : "s"}`,
+            },
+            rawTime,
           });
         });
-        setLogs(fetchedLogs);
+
+        // Sort in memory to avoid requiring a composite index
+        fetchedLogs.sort((a, b) => b.rawTime - a.rawTime);
+
+        setLogs(fetchedLogs.map((item) => item.log));
       } else {
         setLogs(defaultLogs);
       }

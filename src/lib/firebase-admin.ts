@@ -1,6 +1,40 @@
 import { getApps, initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
+import fs from "fs";
+import path from "path";
+
+const loadServiceAccountKeyFromEnvFile = (): string | null => {
+  try {
+    const envPath = path.join(process.cwd(), ".env");
+    if (!fs.existsSync(envPath)) return null;
+
+    const content = fs.readFileSync(envPath, "utf8");
+    const lines = content.split(/\r?\n/);
+    const startIndex = lines.findIndex((l) => l.trim().startsWith("FIREBASE_SERVICE_ACCOUNT_KEY="));
+    if (startIndex === -1) return null;
+
+    const firstLine = lines[startIndex].trim();
+    let jsonStr = firstLine.substring("FIREBASE_SERVICE_ACCOUNT_KEY=".length);
+
+    if (!jsonStr.endsWith("}")) {
+      for (let i = startIndex + 1; i < lines.length; i++) {
+        const nextLine = lines[i];
+        if (nextLine.trim() === "" || (nextLine.includes("=") && !nextLine.includes(":"))) {
+          break;
+        }
+        jsonStr += "\n" + nextLine;
+        if (nextLine.trim().endsWith("}")) {
+          break;
+        }
+      }
+    }
+    return jsonStr;
+  } catch (e) {
+    console.warn("Failed to self-heal service account key from .env file:", e);
+    return null;
+  }
+};
 
 const initializeFirebaseAdmin = () => {
   const apps = getApps();
@@ -8,8 +42,11 @@ const initializeFirebaseAdmin = () => {
     return apps[0];
   }
 
-  const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-
+  // Try self-healing from .env file first, then fall back to process.env
+  let serviceAccountKey = loadServiceAccountKeyFromEnvFile();
+  if (!serviceAccountKey) {
+    serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || null;
+  }
 
   if (serviceAccountKey) {
     try {
@@ -20,6 +57,7 @@ const initializeFirebaseAdmin = () => {
           .replace(/\\n/g, "\n")
           .replace(/^"|"$/g, "");
       }
+      console.log("Initializing Firebase Admin with Service Account Key. Project ID:", parsedKey.project_id);
       return initializeApp({
         credential: cert(parsedKey),
         databaseURL: process.env.FIREBASE_DATABASE_URL,
@@ -40,6 +78,8 @@ const initializeFirebaseAdmin = () => {
     const cleanProjectId = projectId.replace(/^"|"$/g, "");
     const cleanClientEmail = clientEmail.replace(/^"|"$/g, "");
 
+    console.log("Initializing Firebase Admin with individual env variables. Project ID:", cleanProjectId, "Client Email:", cleanClientEmail);
+
     return initializeApp({
       credential: cert({
         projectId: cleanProjectId,
@@ -51,6 +91,7 @@ const initializeFirebaseAdmin = () => {
     });
   }
 
+  console.log("Initializing Firebase Admin with default application credentials.");
   // If no explicit credentials, try default credentials (runs on GCP/Firebase environments natively)
   return initializeApp();
 };

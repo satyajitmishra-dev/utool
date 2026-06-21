@@ -16,7 +16,10 @@ export function constructMetadata({
   icons = "/favicon.ico",
   noIndex = false,
 }: ConstructMetadataProps = {}): Metadata {
-  const fullTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+  const suffix = ` | ${siteConfig.name}`;
+  const fullTitle = title
+    ? (title.toLowerCase().endsWith(suffix.toLowerCase()) ? title : `${title}${suffix}`)
+    : siteConfig.name;
 
   return {
     title: fullTitle,

@@ -8,7 +8,8 @@ import { PricingCard } from "@/components/ui/pricing-card";
 import { Section, SectionHeading, Container, fadeUp, stagger } from "@/components/ui/section";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
-import { detectCurrency, formatPrice, CurrencyCode } from "@/utils/currency";
+import { detectCurrency, formatPrice, CurrencyCode, convertInrToCurrency } from "@/utils/currency";
+import { useRemoteConfig } from "@/services/remote-config.service";
 import {
   ArrowRight,
   ChevronDown,
@@ -383,21 +384,30 @@ function SocialProofSection() {
 /* ─── PRICING ─── */
 function PricingSection() {
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
+  const { pricingConfig, timeRemaining } = useRemoteConfig();
 
   useEffect(() => {
     setCurrency(detectCurrency());
   }, []);
 
-  const getPrice = (usd: number, inr: number, eur: number, gbp: number) => {
-    const amount =
-      currency === "INR" ? inr : currency === "EUR" ? eur : currency === "GBP" ? gbp : usd;
-    return formatPrice(amount, currency);
-  };
+  const freePrice = formatPrice(0, currency);
+  
+  // Pro pricing values
+  const proPriceVal = convertInrToCurrency(pricingConfig.pro.price, currency);
+  const proOriginalPriceVal = convertInrToCurrency(pricingConfig.pro.originalPrice, currency);
+  const proPrice = formatPrice(proPriceVal, currency);
+  const proOriginalPrice = pricingConfig.pro.discountEnabled ? formatPrice(proOriginalPriceVal, currency) : undefined;
+  
+  // Enterprise pricing values
+  const entPriceVal = convertInrToCurrency(pricingConfig.enterprise.price, currency);
+  const entOriginalPriceVal = convertInrToCurrency(pricingConfig.enterprise.originalPrice, currency);
+  const entPrice = formatPrice(entPriceVal, currency);
+  const entOriginalPrice = pricingConfig.enterprise.discountEnabled ? formatPrice(entOriginalPriceVal, currency) : undefined;
 
   const tiers = [
     {
       name: "Starter",
-      price: getPrice(0, 0, 0, 0),
+      price: freePrice,
       period: "forever",
       desc: "For casual users exploring the toolkit.",
       features: [
@@ -412,7 +422,11 @@ function PricingSection() {
     },
     {
       name: "Pro",
-      price: getPrice(9, 299, 8, 7),
+      price: proPrice,
+      originalPrice: proOriginalPrice,
+      discountPercentage: pricingConfig.pro.discountEnabled ? pricingConfig.pro.discountPercentage : undefined,
+      launchOffer: pricingConfig.pro.discountEnabled ? "Launch Offer" : undefined,
+      timerText: pricingConfig.pro.discountEnabled && timeRemaining ? timeRemaining : undefined,
       period: "per month",
       desc: "For professionals who ship every day.",
       features: [
@@ -429,7 +443,11 @@ function PricingSection() {
     },
     {
       name: "Enterprise",
-      price: getPrice(49, 1499, 45, 39),
+      price: entPrice,
+      originalPrice: entOriginalPrice,
+      discountPercentage: pricingConfig.enterprise.discountEnabled ? pricingConfig.enterprise.discountPercentage : undefined,
+      launchOffer: pricingConfig.enterprise.discountEnabled ? "Early Supporter" : undefined,
+      timerText: pricingConfig.enterprise.discountEnabled && timeRemaining ? timeRemaining : undefined,
       period: "per month",
       desc: "For teams that need scale and control.",
       features: [
@@ -459,13 +477,17 @@ function PricingSection() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.15 }}
         variants={stagger}
-        className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start"
+        className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-stretch max-w-5xl mx-auto"
       >
         {tiers.map((tier, i) => (
           <motion.div key={tier.name} variants={fadeUp} custom={i}>
             <PricingCard
               name={tier.name}
               price={tier.price}
+              originalPrice={tier.originalPrice}
+              discountPercentage={tier.discountPercentage}
+              launchOffer={tier.launchOffer}
+              timerText={tier.timerText}
               period={tier.period}
               description={tier.desc}
               features={tier.features}

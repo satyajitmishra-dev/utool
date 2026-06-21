@@ -12,7 +12,6 @@ export async function GET() {
     const snapshot = await adminDb
       .collection("billing_history")
       .where("uid", "==", user.uid)
-      .orderBy("createdAt", "desc")
       .get();
 
     const invoices = snapshot.docs.map((doc) => {
@@ -29,7 +28,15 @@ export async function GET() {
         invoiceMonth: data.invoiceMonth,
         date: data.date,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        rawCreatedAt: data.createdAt,
       };
+    });
+
+    // Sort in memory to avoid requiring a composite index
+    invoices.sort((a, b) => {
+      const aTime = a.rawCreatedAt?.toDate?.()?.getTime() || 0;
+      const bTime = b.rawCreatedAt?.toDate?.()?.getTime() || 0;
+      return bTime - aTime;
     });
 
     return NextResponse.json({ invoices });

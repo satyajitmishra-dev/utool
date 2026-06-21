@@ -1,12 +1,38 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { razorpay } from "@/lib/razorpay";
 import { getAuthUser } from "@/lib/auth-server";
+import { adminApp } from "@/lib/firebase-admin";
+import { getRemoteConfig } from "firebase-admin/remote-config";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const user = await getAuthUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const clientPrice = Number(body.price);
+
+    // Dynamic price validation against Firebase Remote Config
+    let verifiedPrice = 299; // Default fallback
+    try {
+      const rc = getRemoteConfig(adminApp);
+      const template = await rc.getTemplate();
+      const rcProPrice = Number((template.parameters["toolzy_pro_price"]?.defaultValue as any)?.value || 299);
+      const rcProOriginalPrice = Number((template.parameters["toolzy_pro_original_price"]?.defaultValue as any)?.value || 599);
+
+      if (clientPrice === rcProPrice || clientPrice === rcProOriginalPrice) {
+        verifiedPrice = clientPrice;
+      } else {
+        console.warn(`Price mismatch: client sent ${clientPrice}, Remote Config pro_price is ${rcProPrice}. Using Remote Config price.`);
+        verifiedPrice = rcProPrice;
+      }
+    } catch (rcError) {
+      console.warn("Failed to fetch Remote Config on server, validating against defaults:", rcError);
+      if (clientPrice === 299 || clientPrice === 599) {
+        verifiedPrice = clientPrice;
+      }
     }
 
     let planId = process.env.RAZORPAY_PRO_PLAN_ID;
@@ -17,7 +43,7 @@ export async function POST() {
         const plansResponse = await razorpay.plans.all();
         const existingPlan = plansResponse.items.find(
           (p: { id: string; item: { name: string; amount: string | number } }) =>
-            p.item.name === "Pro Utility Plan" && Number(p.item.amount) === 29900
+            p.item.name === "Pro Utility Plan" && Number(p.item.amount) === (verifiedPrice * 100)
         );
 
         if (existingPlan) {
@@ -28,9 +54,9 @@ export async function POST() {
             interval: 1,
             item: {
               name: "Pro Utility Plan",
-              amount: 29900, // ₹299.00 in paise
+              amount: verifiedPrice * 100, // in paise
               currency: "INR",
-              description: "Unlimited access to utool Pro features",
+              description: `Unlimited access to Toolzy Pro features at ₹${verifiedPrice}/mo`,
             },
           });
           planId = newPlan.id;

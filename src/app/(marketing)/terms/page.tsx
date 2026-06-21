@@ -83,7 +83,7 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">6. Contact Us</h2>
             <p>
-              If you have any questions or require legal clarifications, please email us at <span className="text-primary font-semibold">legal@utool.com</span>.
+              If you have any questions or require legal clarifications, please email us at <span className="text-primary font-semibold">legal@utool.in</span>.
             </p>
           </section>
         </div>

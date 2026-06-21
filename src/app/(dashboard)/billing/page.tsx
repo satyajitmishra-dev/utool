@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CreditCard, Check, ShieldCheck, Loader2, Sparkles, AlertCircle } from "lucide-react";
-import { detectCurrency, formatPrice, CurrencyCode } from "@/utils/currency";
+import { CreditCard, Check, ShieldCheck, Loader2, Sparkles, AlertCircle, Clock } from "lucide-react";
+import { detectCurrency, formatPrice, CurrencyCode, convertInrToCurrency } from "@/utils/currency";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
 import { db } from "@/config/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+import { useToolLimit } from "@/hooks/use-tool-limit";
+import { cn } from "@/utils/cn";
+import { useRemoteConfig } from "@/services/remote-config.service";
 
 interface Invoice {
   id: string;
@@ -24,6 +27,8 @@ interface Invoice {
 
 export default function BillingPage() {
   const { user, loading: authLoading } = useAuth();
+  const { limitStatus } = useToolLimit();
+  const { pricingConfig, timeRemaining, loading: configLoading } = useRemoteConfig();
   const [loading, setLoading] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
@@ -105,7 +110,7 @@ export default function BillingPage() {
 
   const handleUpgrade = async (planId: string) => {
     if (planId !== "pro") {
-      toast.info("Please contact sales at sales@utool.com for Enterprise plan inquiry.");
+      toast.info("Please contact sales at sales@utool.in for Enterprise plan inquiry.");
       return;
     }
 
@@ -122,6 +127,8 @@ export default function BillingPage() {
 
       const response = await fetch("/api/razorpay/create-subscription", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price: pricingConfig.pro.price }),
       });
 
       if (!response.ok) {
@@ -221,17 +228,6 @@ export default function BillingPage() {
     }
   };
 
-  const getProPrice = () => {
-    const amount = currency === "INR" ? 299 : currency === "EUR" ? 8 : currency === "GBP" ? 7 : 9;
-    const formatted = formatPrice(amount, currency);
-    return currency === "INR" ? formatted : `${formatted} (INR 299 approx)`;
-  };
-
-  const getEnterprisePrice = () => {
-    const amount = currency === "INR" ? 1499 : currency === "EUR" ? 45 : currency === "GBP" ? 39 : 49;
-    return formatPrice(amount, currency);
-  };
-
   // Determine current display info
   const isPro = subscriptionTier === "pro";
   const isCancelledPending = isPro && subscriptionStatus === "cancelled";
@@ -273,122 +269,215 @@ export default function BillingPage() {
     );
   };
 
-  if (authLoading || dbLoading) {
+  if (authLoading || dbLoading || configLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-400">Loading your billing details...</p>
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground animate-pulse">Loading your billing details...</p>
       </div>
     );
   }
 
+  const usageCount = limitStatus?.count || 0;
+  const usageMax = limitStatus?.max || 3;
+  const usagePercent = Math.min(100, Math.round((usageCount / usageMax) * 100));
+  const isProOrEnterprise = isPro || subscriptionTier === "pro" || subscriptionTier === "enterprise";
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 pb-16">
       {/* 1. Header */}
-      <div className="border-b border-slate-900 pb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Billing & Plans</h1>
-        <p className="text-sm text-slate-400 mt-1">
+      <div className="border-b border-border pb-6">
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Billing & Plans</h1>
+        <p className="text-body-s text-muted-foreground mt-1">
           Manage your subscription plans, credits, and review billing statements.
         </p>
       </div>
 
-      {/* 2. Current Subscription Status */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
-              Current Plan
-            </span>
-            {getStatusBadge()}
+      {/* 2. Current Subscription Status & Usage Meter */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Status Info */}
+        <div className="lg:col-span-2 rounded-3xl border border-border bg-card/25 p-6 md:p-8 flex flex-col justify-between space-y-4 hover:border-primary/10 transition-all duration-300">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-2xs font-bold uppercase tracking-wider text-primary bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10">
+                Current Plan
+              </span>
+              {getStatusBadge()}
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mt-2">{getPlanName()}</h3>
+            <p className="text-body-s text-muted-foreground leading-relaxed max-w-xl">
+              {isCancelledPending
+                ? "Your subscription is cancelled but you maintain access to all premium features until your billing cycle ends. You can renew by upgrading again when your access expires."
+                : isProOrEnterprise
+                  ? "You have unlimited daily tool actions and unrestricted access to all 60+ tools. Thank you for supporting Toolzy!"
+                  : "You are currently on the free tier. Upgrading lifts daily limits and unlocks premium utilities."}
+            </p>
           </div>
-          <h3 className="text-2xl font-bold text-white">{getPlanName()}</h3>
-          <p className="text-sm text-slate-400 max-w-xl">
-            {isCancelledPending
-              ? "Your subscription is cancelled but you maintain access to all premium features until your billing cycle ends. You can renew by upgrading again when your access expires."
-              : isPro
-                ? "You have unlimited daily tool actions and unrestricted access to all 60+ tools. Thank you for supporting utool!"
-                : "You are currently on the free tier. Upgrading lifts daily limits and unlocks premium utilities."}
-          </p>
-          {isPro && !isCancelledPending && (
-            <button
-              onClick={handleCancel}
-              disabled={cancelling}
-              className="mt-2 text-xs font-semibold text-rose-400 hover:text-rose-300 disabled:opacity-50 transition flex items-center gap-1"
-            >
-              {cancelling ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-              Cancel Subscription
-            </button>
+          
+          {isProOrEnterprise && !isCancelledPending && (
+            <div>
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="text-xs font-semibold text-rose-500 hover:text-rose-400 disabled:opacity-50 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                {cancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                Cancel Subscription
+              </button>
+            </div>
           )}
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 min-w-[200px] text-center">
-          <p className="text-xs text-slate-500 font-semibold uppercase">Daily Free Actions</p>
-          <p className="text-3xl font-extrabold text-white mt-1">
-            {isPro ? "Unlimited" : "3"}
-          </p>
-          <span className="text-2xs text-slate-500 block mt-1">Resets every 24 hours</span>
+
+        {/* Visual Usage Meter */}
+        <div className="rounded-3xl border border-border bg-card/30 p-6 md:p-8 flex flex-col justify-between hover:border-primary/10 transition-all duration-300 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 h-24 w-24 rounded-full bg-primary/2 blur-xl" />
+          <div className="space-y-4 relative z-10 w-full">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Usage Today</span>
+              <span className="text-xs font-semibold text-foreground">
+                {isProOrEnterprise ? "Unlimited" : `${usageCount} / ${usageMax} actions`}
+              </span>
+            </div>
+
+            {/* Progress Bar Container */}
+            <div className="h-3 w-full bg-muted rounded-full overflow-hidden border border-border/50 relative">
+              <div
+                style={{ width: isProOrEnterprise ? "100%" : `${usagePercent}%` }}
+                className={cn(
+                  "h-full rounded-full transition-all duration-500 ease-out shadow-sm",
+                  isProOrEnterprise
+                    ? "bg-gradient-to-r from-primary via-secondary to-accent animate-pulse-glow"
+                    : usagePercent < 66
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                      : usagePercent < 100
+                        ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                        : "bg-gradient-to-r from-rose-500 to-red-500"
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between items-center text-[11px] text-muted-foreground">
+              <span>{isProOrEnterprise ? "Premium Active" : `${usagePercent}% used`}</span>
+              <span>Resets daily</span>
+            </div>
+          </div>
+
+          <div className="border-t border-border/60 pt-4 mt-6 w-full flex items-center justify-between">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Rate Limits</span>
+            <span className="text-[11px] font-semibold text-foreground">
+              {isProOrEnterprise ? "60 req/min" : "10 req/min"}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* 3. Upgrade Tiers Grid */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <CreditCard className="h-5 w-5 text-indigo-400" />
-          Subscription Plans
-        </h2>
+      <div className="space-y-6 pt-4">
+        <div className="flex items-center gap-2 border-b border-border/60 pb-3">
+          <CreditCard className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">Subscription Plans</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Pro Card */}
           <div
-            className={`rounded-2xl border p-6 flex flex-col justify-between transition ${isPro && !isCancelledPending
-                ? "border-emerald-500/20 bg-emerald-950/5"
-                : "border-indigo-500/30 bg-slate-900/20 hover:border-indigo-500/50"
-              }`}
+            className={cn(
+              "rounded-3xl border p-8 flex flex-col justify-between transition-all duration-300 relative overflow-hidden",
+              isProOrEnterprise && !isCancelledPending
+                ? "border-emerald-500/30 bg-emerald-950/5 shadow-[0_0_30px_rgba(16,185,129,0.03)]"
+                : "border-border bg-card/20 hover:border-primary/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.08)] hover:-translate-y-0.5"
+            )}
           >
-            <div>
+            {isProOrEnterprise && !isCancelledPending && (
+              <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl border-l border-b border-emerald-600/30 shadow-sm z-10">
+                Active Plan
+              </div>
+            )}
+            
+            <div className="space-y-6">
               <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-xl text-white">Pro Utility</h3>
-                    {isPro && !isCancelledPending && (
-                      <span className="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-semibold text-emerald-400 border border-emerald-500/15">
-                        Current Plan
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-xl text-foreground">Pro Utility</h3>
+                    {isProOrEnterprise && !isCancelledPending && (
+                      <span className="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-500 border border-emerald-500/20">
+                        Current
+                      </span>
+                    )}
+                    {pricingConfig.pro.discountEnabled && (
+                      <span className="inline-flex rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 shadow-sm">
+                        Launch Offer
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-400 mt-1">
+                  <p className="text-body-s text-muted-foreground">
                     For developers, creators, and power users.
                   </p>
                 </div>
-                <span className="text-2xl font-black text-white">
-                  {getProPrice()}
-                  <span className="text-xs font-medium text-slate-500">/mo</span>
-                </span>
+                <div className="text-right space-y-1">
+                  {pricingConfig.pro.discountEnabled && (
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span className="text-xs line-through text-muted-foreground font-medium">
+                        {formatPrice(convertInrToCurrency(pricingConfig.pro.originalPrice, currency), currency)}
+                      </span>
+                      <span className="inline-flex rounded bg-rose-500/10 px-1 py-0.5 text-[9px] font-extrabold uppercase text-rose-500 tracking-wider border border-rose-500/25">
+                        {pricingConfig.pro.discountPercentage}% OFF
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline justify-end gap-0.5">
+                    <span className="text-2xl font-extrabold text-foreground">
+                      {formatPrice(convertInrToCurrency(pricingConfig.pro.price, currency), currency)}
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground">/mo</span>
+                  </div>
+                </div>
               </div>
-              <ul className="mt-6 space-y-2.5 text-sm text-slate-300">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Unlimited daily tool actions
+
+              {pricingConfig.pro.discountEnabled && timeRemaining && (
+                <div className="flex items-center gap-2 text-xs font-semibold rounded-2xl px-3.5 py-2.5 bg-primary/5 border border-primary/20 text-foreground transition-all">
+                  <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
+                  <span>Offer ends in: <span className="text-primary font-bold font-mono">{timeRemaining}</span></span>
+                </div>
+              )}
+
+              <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border/60 pt-5">
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">Unlimited daily actions</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Access to all 60+ tools (including premium ones)
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">All 60+ tools included</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Rate limits: 60 requests / min
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">60 requests / minute rate limit</span>
                 </li>
               </ul>
             </div>
+
             <button
               onClick={() => handleUpgrade("pro")}
-              disabled={loading !== null || (isPro && !isCancelledPending)}
-              className={`mt-6 w-full flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition ${isPro && !isCancelledPending
-                  ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-indigo-500 to-violet-600 shadow shadow-indigo-500/10 hover:from-indigo-600 hover:to-violet-700"
-                }`}
+              disabled={loading !== null || (isProOrEnterprise && !isCancelledPending)}
+              className={cn(
+                "mt-8 w-full flex justify-center items-center gap-2 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer shadow-sm",
+                isProOrEnterprise && !isCancelledPending
+                  ? "bg-muted text-muted-foreground border border-border cursor-not-allowed"
+                  : "bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:from-primary-hover hover:to-secondary hover:shadow-[0_4px_20px_rgba(99,102,241,0.25)] hover:scale-[1.01]"
+              )}
             >
               {loading === "pro" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Connecting Razorpay...
                 </>
-              ) : isPro && !isCancelledPending ? (
+              ) : isProOrEnterprise && !isCancelledPending ? (
                 "Subscribed to Pro"
               ) : isExpired ? (
                 "Renew Subscription"
@@ -399,36 +488,75 @@ export default function BillingPage() {
           </div>
 
           {/* Enterprise Card */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/10 p-6 flex flex-col justify-between hover:border-slate-700 transition">
-            <div>
+          <div className="rounded-3xl border border-border bg-card/20 p-8 flex flex-col justify-between hover:border-primary/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.08)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden">
+            <div className="space-y-6">
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-xl text-white">Enterprise Plan</h3>
-                  <p className="text-sm text-slate-400 mt-1">
-                    For high-throughput requirements and scaling teams.
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-xl text-foreground">Enterprise Plan</h3>
+                    {pricingConfig.enterprise.discountEnabled && (
+                      <span className="inline-flex rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 shadow-sm">
+                        Early Supporter
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-body-s text-muted-foreground">
+                    For high-throughput scaling teams.
                   </p>
                 </div>
-                <span className="text-2xl font-black text-white">
-                  {getEnterprisePrice()}
-                  <span className="text-xs font-medium text-slate-500">/mo</span>
-                </span>
+                <div className="text-right space-y-1">
+                  {pricingConfig.enterprise.discountEnabled && (
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span className="text-xs line-through text-muted-foreground font-medium">
+                        {formatPrice(convertInrToCurrency(pricingConfig.enterprise.originalPrice, currency), currency)}
+                      </span>
+                      <span className="inline-flex rounded bg-rose-500/10 px-1 py-0.5 text-[9px] font-extrabold uppercase text-rose-500 tracking-wider border border-rose-500/25">
+                        {pricingConfig.enterprise.discountPercentage}% OFF
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline justify-end gap-0.5">
+                    <span className="text-2xl font-extrabold text-foreground">
+                      {formatPrice(convertInrToCurrency(pricingConfig.enterprise.price, currency), currency)}
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground">/mo</span>
+                  </div>
+                </div>
               </div>
-              <ul className="mt-6 space-y-2.5 text-sm text-slate-300">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Dedicated rate limits: 300 requests / min
+
+              {pricingConfig.enterprise.discountEnabled && timeRemaining && (
+                <div className="flex items-center gap-2 text-xs font-semibold rounded-2xl px-3.5 py-2.5 bg-muted/40 border border-border text-muted-foreground transition-all">
+                  <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
+                  <span>Offer ends in: <span className="text-primary font-bold font-mono">{timeRemaining}</span></span>
+                </div>
+              )}
+
+              <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border/60 pt-5">
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">300 requests / minute rate limit</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Dedicated custom configurations
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">Dedicated configurations</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4.5 w-4.5 text-indigo-400" /> Enterprise-level SLA support
+                <li className="flex items-center gap-2.5">
+                  <div className="rounded-full bg-primary/10 p-0.5">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-foreground/90 font-medium">Enterprise SLA & Email support</span>
                 </li>
               </ul>
             </div>
+
             <button
               onClick={() => handleUpgrade("enterprise")}
               disabled={loading !== null}
-              className="mt-6 w-full flex justify-center items-center gap-2 rounded-xl border border-slate-700 hover:border-white px-4 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition"
+              className="mt-8 w-full flex justify-center items-center gap-2 rounded-2xl border border-border bg-card/50 hover:bg-muted/80 hover:text-foreground px-4 py-3.5 text-sm font-semibold text-muted-foreground transition-all duration-200 cursor-pointer"
             >
               Contact Sales
             </button>
@@ -437,20 +565,21 @@ export default function BillingPage() {
       </div>
 
       {/* 4. Invoices Table */}
-      <div className="space-y-4 pt-6 border-t border-slate-900">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-indigo-400" />
-          Billing Statements
-        </h2>
+      <div className="space-y-6 pt-8 border-t border-border/80">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">Billing Statements</h2>
+        </div>
+        
         {invoices.length === 0 ? (
-          <div className="rounded-2xl border border-slate-800 p-8 text-center bg-slate-900/5">
-            <p className="text-sm text-slate-500">No invoices or billing transactions found for this account.</p>
+          <div className="rounded-3xl border border-border p-12 text-center bg-card/10 border-dashed">
+            <p className="text-body-s text-muted-foreground">No invoices or billing statements found for this account.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/10">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-card/30 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-400 font-semibold bg-slate-950/20">
+                <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px] bg-muted/40">
                   <th className="p-4">Invoice ID</th>
                   <th className="p-4">Plan Name</th>
                   <th className="p-4">Billing Month</th>
@@ -459,16 +588,27 @@ export default function BillingPage() {
                   <th className="p-4">Payment Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-850 text-slate-300">
+              <tbody className="divide-y divide-border text-foreground/80">
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-900/10">
-                    <td className="p-4 font-mono font-medium text-white">{inv.id}</td>
-                    <td className="p-4">{inv.planName || "Pro Utility"}</td>
-                    <td className="p-4">{inv.invoiceMonth || "—"}</td>
-                    <td className="p-4">{inv.date}</td>
-                    <td className="p-4">{formatPrice(inv.amount, (inv.currency || "INR") as CurrencyCode)}</td>
+                  <tr key={inv.id} className="hover:bg-muted/30 transition-colors duration-150">
+                    <td className="p-4 font-mono font-semibold text-foreground text-xs">{inv.id}</td>
+                    <td className="p-4 font-medium">{inv.planName || "Pro Utility"}</td>
+                    <td className="p-4 text-muted-foreground">{inv.invoiceMonth || "—"}</td>
+                    <td className="p-4 font-mono text-xs text-muted-foreground">{inv.date}</td>
+                    <td className="p-4 font-bold text-foreground">
+                      {formatPrice(inv.amount, (inv.currency || "INR") as CurrencyCode)}
+                    </td>
                     <td className="p-4">
-                      <span className="inline-flex rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-semibold text-emerald-400 border border-emerald-500/15">
+                      <span
+                        className={cn(
+                          "inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border",
+                          inv.status?.toLowerCase() === "paid" || inv.status?.toLowerCase() === "captured"
+                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                            : inv.status?.toLowerCase() === "pending"
+                              ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                              : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        )}
+                      >
                         {inv.status}
                       </span>
                     </td>

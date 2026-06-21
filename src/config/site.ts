@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "utool",
   description: "The ultimate multi-tool workspace for creators, developers, and power users.",
-  url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  ogImage: "https://utool.com/og.jpg",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://utool.in",
+  ogImage: "https://utool.in/og.jpg",
   links: {
     twitter: "https://twitter.com/utool",
     github: "https://github.com/utool",

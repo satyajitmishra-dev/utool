@@ -82,7 +82,7 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">5. Contact Our Privacy Officer</h2>
             <p>
-              If you have any questions, suggestions, or concerns regarding our privacy configurations, please contact us directly at <span className="text-primary font-semibold">privacy@utool.com</span>.
+              If you have any questions, suggestions, or concerns regarding our privacy configurations, please contact us directly at <span className="text-primary font-semibold">privacy@utool.in</span>.
             </p>
           </section>
         </div>

@@ -131,21 +131,21 @@ export function ToolCard({
         {...wrapperProps}
         className={cn(
           "glass-card relative rounded-2xl p-6 flex flex-col justify-between h-full",
-          "transition-all duration-300 group",
+          "transition-all duration-300 ease-out group border-border bg-card/40",
           isComingSoon
             ? "cursor-not-allowed opacity-60"
-            : "cursor-pointer hover:border-[hsl(var(--ring)_/_0.3)] hover:shadow-lg"
+            : "cursor-pointer hover:border-primary/40 hover:shadow-[0_0_30px_rgba(99,102,241,0.12)] hover:bg-card/75 hover:-translate-y-0.5"
         )}
       >
         {/* Top: Tag + Status */}
         <div>
           <div className="flex justify-between items-center mb-5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-[hsl(var(--ring)_/_0.08)] border border-[hsl(var(--ring)_/_0.15)] rounded-lg px-2.5 py-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-[hsl(var(--ring)_/_0.06)] border border-[hsl(var(--ring)_/_0.12)] rounded-lg px-2.5 py-1">
               {tag}
             </span>
             <div className="flex items-center gap-1.5">
               {isPremium && (
-                <Badge variant="pro">
+                <Badge variant="pro" className="shadow-[0_0_10px_rgba(245,158,11,0.15)]">
                   <Sparkles className="h-2.5 w-2.5" />
                   Pro
                 </Badge>
@@ -157,7 +157,7 @@ export function ToolCard({
           </div>
 
           {/* Icon */}
-          <div className="inline-flex rounded-2xl bg-muted border border-border p-3.5 text-muted-foreground mb-5 group-hover:bg-[hsl(var(--ring)_/_0.08)] group-hover:border-[hsl(var(--ring)_/_0.2)] group-hover:text-primary transition-colors duration-300">
+          <div className="inline-flex rounded-2xl bg-muted border border-border p-3.5 text-muted-foreground mb-5 transition-all duration-350 ease-out group-hover:scale-110 group-hover:bg-[hsl(var(--ring)_/_0.12)] group-hover:border-primary/30 group-hover:text-primary group-hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]">
             <Icon className="h-6 w-6" />
           </div>
 
@@ -171,7 +171,7 @@ export function ToolCard({
         </div>
 
         {/* Bottom */}
-        <div className="mt-6 pt-4 border-t border-border flex justify-between items-center">
+        <div className="mt-6 pt-4 border-t border-border/80 flex justify-between items-center">
           <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1">
             {isPremium ? (
               <>
@@ -185,7 +185,7 @@ export function ToolCard({
           {!isComingSoon ? (
             <span className="inline-flex items-center text-xs font-bold text-primary group-hover:text-primary/80 transition-colors">
               Open Tool
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5 group-hover:translate-x-1 transition-transform duration-200" />
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5 group-hover:translate-x-1.5 transition-transform duration-200" />
             </span>
           ) : (
             <span className="text-xs font-bold text-muted-foreground">

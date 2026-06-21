@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl =
     siteConfig.url && !siteConfig.url.includes("localhost")
       ? siteConfig.url
-      : "https://utool.com";
+      : "https://utool.in";
 
   // 1. Core and E-E-A-T pages
   const staticRoutes = [

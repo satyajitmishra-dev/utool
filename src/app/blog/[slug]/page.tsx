@@ -44,7 +44,7 @@ export default async function BlogPostReaderPage({ params }: Props) {
     "@type": "Article",
     "headline": post.h1,
     "description": post.description,
-    "image": "https://utool.com/favicon.ico",
+    "image": "https://utool.in/favicon.ico",
     "datePublished": new Date(post.date).toISOString(),
     "author": {
       "@type": "Person",
@@ -55,12 +55,12 @@ export default async function BlogPostReaderPage({ params }: Props) {
       "name": "utool",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://utool.com/apple-touch-icon.png",
+        "url": "https://utool.in/apple-touch-icon.png",
       },
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://utool.com/blog/${post.slug}`,
+      "@id": `https://utool.in/blog/${post.slug}`,
     },
   };
 
@@ -73,19 +73,19 @@ export default async function BlogPostReaderPage({ params }: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://utool.com",
+        "item": "https://utool.in",
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://utool.com/blog",
+        "item": "https://utool.in/blog",
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.h1,
-        "item": `https://utool.com/blog/${post.slug}`,
+        "item": `https://utool.in/blog/${post.slug}`,
       },
     ],
   };

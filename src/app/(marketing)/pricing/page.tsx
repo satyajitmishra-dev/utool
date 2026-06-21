@@ -5,28 +5,38 @@ import { motion } from "framer-motion";
 import { Section, SectionHeading, fadeUp, stagger } from "@/components/ui/section";
 import { PricingCard } from "@/components/ui/pricing-card";
 import { GlassCard } from "@/components/ui/glass-card";
-import { detectCurrency, formatPrice, CurrencyCode } from "@/utils/currency";
+import { detectCurrency, formatPrice, CurrencyCode, convertInrToCurrency } from "@/utils/currency";
 import { Check, X as XIcon } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { useRemoteConfig } from "@/services/remote-config.service";
 
 export default function PricingPage() {
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
   const { user } = useAuth();
+  const { pricingConfig, timeRemaining } = useRemoteConfig();
 
   useEffect(() => {
     setCurrency(detectCurrency());
   }, []);
 
-  const getPrice = (usd: number, inr: number, eur: number, gbp: number) => {
-    const amount =
-      currency === "INR" ? inr : currency === "EUR" ? eur : currency === "GBP" ? gbp : usd;
-    return formatPrice(amount, currency);
-  };
+  const freePrice = formatPrice(0, currency);
+  
+  // Pro pricing values
+  const proPriceVal = convertInrToCurrency(pricingConfig.pro.price, currency);
+  const proOriginalPriceVal = convertInrToCurrency(pricingConfig.pro.originalPrice, currency);
+  const proPrice = formatPrice(proPriceVal, currency);
+  const proOriginalPrice = pricingConfig.pro.discountEnabled ? formatPrice(proOriginalPriceVal, currency) : undefined;
+  
+  // Enterprise pricing values
+  const entPriceVal = convertInrToCurrency(pricingConfig.enterprise.price, currency);
+  const entOriginalPriceVal = convertInrToCurrency(pricingConfig.enterprise.originalPrice, currency);
+  const entPrice = formatPrice(entPriceVal, currency);
+  const entOriginalPrice = pricingConfig.enterprise.discountEnabled ? formatPrice(entOriginalPriceVal, currency) : undefined;
 
   const tiers = [
     {
       name: "Free Starter",
-      price: getPrice(0, 0, 0, 0),
+      price: freePrice,
       period: "forever",
       description: "Perfect for casual users testing the waters.",
       features: [
@@ -42,7 +52,11 @@ export default function PricingPage() {
     },
     {
       name: "Pro Utility",
-      price: getPrice(9, 299, 8, 7),
+      price: proPrice,
+      originalPrice: proOriginalPrice,
+      discountPercentage: pricingConfig.pro.discountEnabled ? pricingConfig.pro.discountPercentage : undefined,
+      launchOffer: pricingConfig.pro.discountEnabled ? "Launch Offer" : undefined,
+      timerText: pricingConfig.pro.discountEnabled && timeRemaining ? timeRemaining : undefined,
       period: "per month",
       description: "Ideal for developers, creators, and power users.",
       features: [
@@ -58,7 +72,11 @@ export default function PricingPage() {
     },
     {
       name: "Enterprise",
-      price: getPrice(49, 1499, 45, 39),
+      price: entPrice,
+      originalPrice: entOriginalPrice,
+      discountPercentage: pricingConfig.enterprise.discountEnabled ? pricingConfig.enterprise.discountPercentage : undefined,
+      launchOffer: pricingConfig.enterprise.discountEnabled ? "Early Supporter" : undefined,
+      timerText: pricingConfig.enterprise.discountEnabled && timeRemaining ? timeRemaining : undefined,
       period: "per month",
       description: "Built for teams needing robust capacity and custom tooling.",
       features: [
@@ -69,11 +87,10 @@ export default function PricingPage() {
         "24/7 dedicated Slack support",
       ],
       cta: "Contact Sales",
-      href: "mailto:sales@utool.com?subject=Enterprise%20Plan%20Inquiry",
+      href: "mailto:sales@utool.in?subject=Enterprise%20Plan%20Inquiry",
       highlighted: false,
     },
   ];
-
 
   const comparisonFeatures = [
     { name: "Daily actions", free: "3", pro: "Unlimited", enterprise: "Unlimited" },
@@ -101,13 +118,17 @@ export default function PricingPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.15 }}
           variants={stagger}
-          className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start max-w-5xl mx-auto"
+          className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-stretch max-w-5xl mx-auto"
         >
           {tiers.map((tier, i) => (
             <motion.div key={tier.name} variants={fadeUp} custom={i}>
               <PricingCard
                 name={tier.name}
                 price={tier.price}
+                originalPrice={tier.originalPrice}
+                discountPercentage={tier.discountPercentage}
+                launchOffer={tier.launchOffer}
+                timerText={tier.timerText}
                 period={tier.period}
                 description={tier.description}
                 features={tier.features}

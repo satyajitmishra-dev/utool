@@ -27,7 +27,6 @@ export default function ContactPage() {
           </p>
         </div>
 
-        {/* Contact Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <GlassCard className="p-6 space-y-4">
             <div className="h-8 w-8 items-center justify-center rounded-xl bg-primary/5 text-primary flex">
@@ -35,7 +34,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">General Support</h4>
-              <p className="text-xs text-primary font-bold mt-1.5">support@utool.com</p>
+              <p className="text-xs text-primary font-bold mt-1.5">support@utool.in</p>
               <p className="text-4xs text-muted-foreground mt-1">For account help, billing, and cancellations.</p>
             </div>
           </GlassCard>
@@ -47,7 +46,7 @@ export default function ContactPage() {
             <div>
               <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Typical Response Time</h4>
               <p className="text-xs text-foreground font-bold mt-1.5">Under 24 Hours</p>
-              <p className="text-4xs text-muted-foreground mt-1">We answer all developer and user support requests promptly.</p>
+              <p className="text-4xs text-muted-foreground mt-1"> We answer all developer and user support requests promptly.</p>
             </div>
           </GlassCard>
 
@@ -57,7 +56,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Enterprise & Dev</h4>
-              <p className="text-xs text-primary font-bold mt-1.5">partners@utool.com</p>
+              <p className="text-xs text-primary font-bold mt-1.5">partners@utool.in</p>
               <p className="text-4xs text-muted-foreground mt-1">For custom features or local deployment licenses.</p>
             </div>
           </GlassCard>
