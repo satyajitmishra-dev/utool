@@ -87,13 +87,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Failed to create subscription:", error);
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Razorpay subscription creation failed. Falling back to mock subscription ID for local testing.");
-      return NextResponse.json({
-        subscriptionId: "sub_mock_" + Math.random().toString(36).substring(2, 10),
-        keyId: "rzp_test_mockkey",
-      });
-    }
     const message = error instanceof Error ? error.message : "Failed to create subscription";
     return NextResponse.json(
       { error: message },
