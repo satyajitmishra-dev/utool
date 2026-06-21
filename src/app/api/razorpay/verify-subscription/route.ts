@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify signature securely
-    const isValid = verifyRazorpaySubscriptionSignature(subscriptionId, paymentId, signature);
+    const isMock = subscriptionId.startsWith("sub_mock_") && process.env.NODE_ENV === "development";
+    const isValid = isMock || verifyRazorpaySubscriptionSignature(subscriptionId, paymentId, signature);
     if (!isValid) {
       return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
     }

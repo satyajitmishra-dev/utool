@@ -2,6 +2,7 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
+import { toolsSeoData } from "@/config/tools-seo-data";
 
 // Client-side tools loaded dynamically (ssr: false) to prevent hydration mismatches
 const MergeTool = dynamic(
@@ -21,7 +22,10 @@ const URLShortenerPage = dynamic(() => import("@/app/(tools)/url-shortener/page"
 const ResumeBuilderPage = dynamic(() => import("@/app/(tools)/resume-builder/page"), { ssr: false });
 
 export function ToolWorkspaceClient({ slug }: { slug: string }) {
-  switch (slug) {
+  const tool = toolsSeoData[slug];
+  const targetTool = tool?.baseTool || slug;
+
+  switch (targetTool) {
     case "merge-pdf":
       return <MergeTool />;
     case "split-pdf":

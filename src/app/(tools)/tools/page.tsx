@@ -315,6 +315,25 @@ export default function ToolsCatalogPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Blog Guides Callout */}
+      <section className="border border-border rounded-3xl p-8 md:p-10 bg-card/40 text-center space-y-4 shadow-sm relative overflow-hidden mt-12">
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-[image:var(--gradient-primary)]" />
+        <h2 className="text-lg font-bold tracking-tight text-foreground">
+          Need help optimizing your workflow?
+        </h2>
+        <p className="text-xs text-muted-foreground max-w-lg mx-auto leading-relaxed">
+          Read our expert guides on document security, ATS resume writing compliance, custom QR generation, and link optimization parameters.
+        </p>
+        <div className="pt-2">
+          <a
+            href="/blog"
+            className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/95 shadow-sm transition-all hover:scale-[1.01]"
+          >
+            Read Our SEO & Productivity Blog
+          </a>
+        </div>
+      </section>
     </div>
   );
 }

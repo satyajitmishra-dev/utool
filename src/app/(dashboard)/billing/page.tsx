@@ -138,6 +138,38 @@ export default function BillingPage() {
 
       const { subscriptionId: subId, keyId } = await response.json();
 
+      // If it's a local mock subscription, bypass the Razorpay modal checkout and verify directly
+      if (subId.startsWith("sub_mock_")) {
+        toast.loading("Simulating payment verification locally...", { id: toastId });
+        try {
+          const verifyRes = await fetch("/api/razorpay/verify-subscription", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              subscriptionId: subId,
+              paymentId: "pay_mock_" + Math.random().toString(36).substring(2, 10),
+              signature: "mock_signature_for_development",
+            }),
+          });
+
+          if (verifyRes.ok) {
+            toast.success("Local mock subscription activated successfully!", { id: toastId });
+            // Refresh invoice history immediately
+            fetchInvoices();
+            // Force reload to sync premium UI
+            window.location.reload();
+          } else {
+            toast.error("Mock verification failed.", { id: toastId });
+          }
+        } catch (verifyError) {
+          console.error("Local mock verification error:", verifyError);
+          toast.error("Mock verification failed.", { id: toastId });
+        } finally {
+          setLoading(null);
+        }
+        return;
+      }
+
       const options = {
         key: keyId,
         subscription_id: subId,
