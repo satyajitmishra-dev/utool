@@ -5,8 +5,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { ShieldCheck, Lock, Key, ServerOff } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "Security Architecture — Zero Cloud Exposure | Toolzy",
-  description: "Learn about Toolzy's local-first security architecture. Explore browser sandboxing, HTTPS delivery, Firebase JWT integration, and zero file upload designs.",
+  title: "Security Architecture — Zero Cloud Exposure | utool",
+  description: "Learn about utool's local-first security architecture. Explore browser sandboxing, HTTPS delivery, Firebase JWT integration, and zero file upload designs.",
 });
 
 export default function SecurityPage() {
@@ -23,7 +23,7 @@ export default function SecurityPage() {
             Security by architectural design.
           </h1>
           <p className="text-body-sm text-muted-foreground leading-relaxed">
-            Unlike traditional platforms that secure documents by trying to protect their servers, Toolzy secures your documents by eliminating the servers entirely.
+            Unlike traditional platforms that secure documents by trying to protect their servers, utool secures your documents by eliminating the servers entirely.
           </p>
         </div>
 

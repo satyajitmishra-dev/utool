@@ -140,7 +140,7 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
     toast.success("Your QR Code is ready to download.");
     const a = document.createElement("a");
     a.href = qrCodeUrl;
-    a.download = `toolzy-qr-${Date.now()}.png`;
+    a.download = `utool-qr-${Date.now()}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -158,7 +158,7 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
                   <QrCode className="h-[18px] w-[18px] text-white" />
                 </div>
                 <span>
-                  Toolzy{" "}
+                  utool{" "}
                   <Badge variant="primary" className="ml-1 align-middle text-[9px]">
                     Workspace
                   </Badge>
@@ -234,7 +234,7 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
                 100% Client-Side Generator
               </Badge>
               <h1 className="text-display-md font-extrabold tracking-tight text-foreground">
-                Toolzy QR Workstation
+                utool QR Workstation
               </h1>
               <p className="text-body-sm text-muted-foreground leading-relaxed">
                 Instantly compile clean, customizable QR codes inside your browser. Pick colors, configure content types, and export at 600px print density.
@@ -276,11 +276,10 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
                       <button
                         key={t.id}
                         onClick={() => { setType(t.id as QRType); setQrCodeUrl(null); }}
-                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all text-center gap-2 ${
-                          type === t.id
+                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all text-center gap-2 ${type === t.id
                             ? "border-primary bg-primary/5 text-primary font-bold shadow-sm"
                             : "border-border hover:border-foreground/30 hover:bg-muted/30 text-muted-foreground"
-                        }`}
+                          }`}
                       >
                         <CurrentIcon className="h-4.5 w-4.5 text-foreground" />
                         <span className="text-[10px] tracking-wide uppercase font-semibold">{t.label}</span>
@@ -302,7 +301,7 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
                       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Target URL Link</label>
                       <input
                         type="text"
-                        placeholder="e.g. www.toolzy.com"
+                        placeholder="e.g. www.utool.com"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         className="block w-full rounded-xl border border-border bg-card text-foreground px-3.5 py-2.5 text-xs font-semibold focus:border-primary focus:outline-none transition-colors"
@@ -329,7 +328,7 @@ export default function QRGeneratorPage({ hideHeader = false }: { hideHeader?: b
                         <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Recipient Email</label>
                         <input
                           type="email"
-                          placeholder="e.g. hello@toolzy.com"
+                          placeholder="e.g. hello@utool.com"
                           value={emailTo}
                           onChange={(e) => setEmailTo(e.target.value)}
                           className="block w-full rounded-xl border border-border bg-card text-foreground px-3.5 py-2.5 text-xs font-semibold focus:border-primary focus:outline-none transition-colors"

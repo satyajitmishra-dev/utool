@@ -30,7 +30,7 @@ export async function POST() {
               name: "Pro Utility Plan",
               amount: 29900, // ₹299.00 in paise
               currency: "INR",
-              description: "Unlimited access to Toolzy Pro features",
+              description: "Unlimited access to utool Pro features",
             },
           });
           planId = newPlan.id;

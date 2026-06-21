@@ -24,8 +24,8 @@ function getLocalUsage(identifier: string): LocalUsageData {
     startOfNextDay.setUTCHours(24, 0, 0, 0);
     return { count: 0, resetAt: startOfNextDay.toISOString() };
   }
-  
-  const key = `toolzy_usage_${identifier}`;
+
+  const key = `utool_usage_${identifier}`;
   try {
     const stored = localStorage.getItem(key);
     if (stored) {
@@ -37,19 +37,19 @@ function getLocalUsage(identifier: string): LocalUsageData {
   } catch (e) {
     console.warn("Failed to read local usage storage:", e);
   }
-  
+
   const startOfNextDay = new Date();
   startOfNextDay.setUTCHours(24, 0, 0, 0);
   const defaultData = { count: 0, resetAt: startOfNextDay.toISOString() };
   try {
     localStorage.setItem(key, JSON.stringify(defaultData));
-  } catch (e) {}
+  } catch (e) { }
   return defaultData;
 }
 
 function saveLocalUsage(identifier: string, data: LocalUsageData) {
   if (typeof window === "undefined") return;
-  const key = `toolzy_usage_${identifier}`;
+  const key = `utool_usage_${identifier}`;
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (e) {
@@ -152,15 +152,15 @@ export async function checkUsage(identifier: string): Promise<ToolLimitStatus> {
     };
   } catch (error) {
     console.error("Error in checkUsage service:", error);
-    
+
     // Fallback to client-side local storage usage limits check
     const localData = getLocalUsage(identifier);
     const now = new Date();
     const localResetDate = new Date(localData.resetAt);
-    
+
     let count = localData.count;
     let resetAt = localResetDate;
-    
+
     if (localResetDate < now) {
       const startOfNextDay = new Date();
       startOfNextDay.setUTCHours(24, 0, 0, 0);
@@ -168,9 +168,9 @@ export async function checkUsage(identifier: string): Promise<ToolLimitStatus> {
       resetAt = startOfNextDay;
       saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
     }
-    
+
     const max = isGuest ? LIMIT_GUEST : LIMIT_FREE_USER;
-    
+
     return {
       count,
       max,

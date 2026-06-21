@@ -50,7 +50,7 @@ export default function ShortIdRedirectPage() {
           let localRedirected = false;
           try {
             const keys = Object.keys(localStorage);
-            const userUrlKey = keys.find(k => k.startsWith("toolzy_local_urls_"));
+            const userUrlKey = keys.find(k => k.startsWith("utool_local_urls_"));
             if (userUrlKey) {
               const localUrls = JSON.parse(localStorage.getItem(userUrlKey) || "[]");
               const matching = localUrls.find((l: any) => l.id === shortId);
@@ -60,7 +60,7 @@ export default function ShortIdRedirectPage() {
                 localRedirected = true;
               }
             }
-          } catch (e) {}
+          } catch (e) { }
 
           if (!localRedirected) {
             setStatus("error");
@@ -121,7 +121,7 @@ export default function ShortIdRedirectPage() {
             </div>
             <Link href="/" className="w-full">
               <Button className="w-full">
-                Back to Toolzy Home
+                Back to utool Home
               </Button>
             </Link>
           </>
@@ -131,7 +131,7 @@ export default function ShortIdRedirectPage() {
           <div className="flex h-5 w-5 items-center justify-center rounded bg-[image:var(--gradient-primary)]">
             <Wrench className="h-2.5 w-2.5 text-white" />
           </div>
-          <span>Toolzy Link Router</span>
+          <span>utool Link Router</span>
         </div>
       </div>
     </div>

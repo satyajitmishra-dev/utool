@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Scale, FileText } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "Terms of Service — Toolzy Utility Agreement",
-  description: "Read the Toolzy Terms of Service. Understand subscription plans, usage quotas, local client-side performance conditions, and user legal obligations.",
+  title: "Terms of Service — utool Utility Agreement",
+  description: "Read the utool Terms of Service. Understand subscription plans, usage quotas, local client-side performance conditions, and user legal obligations.",
 });
 
 export default function TermsPage() {
@@ -34,14 +34,14 @@ export default function TermsPage() {
               1. Acceptance of Terms
             </h2>
             <p>
-              By accessing or using Toolzy, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, you may not use our services or catalog.
+              By accessing or using utool, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, you may not use our services or catalog.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">2. Usage Licenses & Local Scope</h2>
             <p>
-              Toolzy grants you a personal, non-exclusive, non-transferable, and revocable license to utilize our client-side developer, PDF, and design utilities for both personal and commercial operations. Because processing happens locally on your computer, you retain full ownership, responsibility, and copyright of all input parameters, data, and files processed.
+              utool grants you a personal, non-exclusive, non-transferable, and revocable license to utilize our client-side developer, PDF, and design utilities for both personal and commercial operations. Because processing happens locally on your computer, you retain full ownership, responsibility, and copyright of all input parameters, data, and files processed.
             </p>
             <p>
               You represent and warrant that you own or have the necessary legal authorization to edit, compile, compress, or restructure any files loaded into our workstation.
@@ -69,21 +69,21 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">4. Prohibited Behaviors</h2>
             <p>
-              You agree not to bypass, hack, or exploit our daily rate limit counters, subscription gates, or server APIs. Creation of short redirection links containing malicious scripts, phishing attacks, malware distribution, or spam campaigns is strictly prohibited. Toolzy reserves the right to deactivate any short link and terminate accounts violating these terms without notice.
+              You agree not to bypass, hack, or exploit our daily rate limit counters, subscription gates, or server APIs. Creation of short redirection links containing malicious scripts, phishing attacks, malware distribution, or spam campaigns is strictly prohibited. utool reserves the right to deactivate any short link and terminate accounts violating these terms without notice.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">5. Disclaimer of Warranties & Limitation of Liability</h2>
             <p>
-              Toolzy and all its utilities are provided "as is" and "as available" without any warranty, express or implied. Since documents are processed locally, Toolzy does not warrant that files will convert without structural error or that execution will be uninterrupted. Under no circumstances shall Toolzy be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our tools.
+              utool and all its utilities are provided "as is" and "as available" without any warranty, express or implied. Since documents are processed locally, utool does not warrant that files will convert without structural error or that execution will be uninterrupted. Under no circumstances shall utool be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our tools.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">6. Contact Us</h2>
             <p>
-              If you have any questions or require legal clarifications, please email us at <span className="text-primary font-semibold">legal@toolzy.com</span>.
+              If you have any questions or require legal clarifications, please email us at <span className="text-primary font-semibold">legal@utool.com</span>.
             </p>
           </section>
         </div>

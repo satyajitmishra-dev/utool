@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, EyeOff, Lock } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "Privacy Policy — Zero-Data Retention Guarantee | Toolzy",
-  description: "Read Toolzy's privacy policy. We process all document modifications locally inside your web browser. Zero server uploads, zero logs, complete privacy.",
+  title: "Privacy Policy — Zero-Data Retention Guarantee | utool",
+  description: "Read utool's privacy policy. We process all document modifications locally inside your web browser. Zero server uploads, zero logs, complete privacy.",
 });
 
 export default function PrivacyPage() {
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
               1. Zero-Data Retention (Our Core Promise)
             </h2>
             <p>
-              Toolzy does not upload, save, or transmit your utility inputs, files, documents, or data to any server. When you merge, split, or compress PDF files, all processing is performed locally inside your web browser sandbox using JavaScript and WebAssembly compiled binaries.
+              utool does not upload, save, or transmit your utility inputs, files, documents, or data to any server. When you merge, split, or compress PDF files, all processing is performed locally inside your web browser sandbox using JavaScript and WebAssembly compiled binaries.
             </p>
             <p>
               Your financial sheets, agreements, images, and text variables never leave your computer. Once you close your browser tab, all active states are completely erased from your system's volatile memory.
@@ -75,14 +75,14 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">4. Compliance & Security Standards</h2>
             <p>
-              Because Toolzy operates client-side, we bypass the compliance bottlenecks typical of cloud-based document platforms. We do not act as a data processor or data controller for your uploaded documents, ensuring compliance with the General Data Protection Regulation (GDPR), Health Insurance Portability and Accountability Act (HIPAA), and California Consumer Privacy Act (CCPA).
+              Because utool operates client-side, we bypass the compliance bottlenecks typical of cloud-based document platforms. We do not act as a data processor or data controller for your uploaded documents, ensuring compliance with the General Data Protection Regulation (GDPR), Health Insurance Portability and Accountability Act (HIPAA), and California Consumer Privacy Act (CCPA).
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-foreground">5. Contact Our Privacy Officer</h2>
             <p>
-              If you have any questions, suggestions, or concerns regarding our privacy configurations, please contact us directly at <span className="text-primary font-semibold">privacy@toolzy.com</span>.
+              If you have any questions, suggestions, or concerns regarding our privacy configurations, please contact us directly at <span className="text-primary font-semibold">privacy@utool.com</span>.
             </p>
           </section>
         </div>

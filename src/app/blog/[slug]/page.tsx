@@ -44,7 +44,7 @@ export default async function BlogPostReaderPage({ params }: Props) {
     "@type": "Article",
     "headline": post.h1,
     "description": post.description,
-    "image": "https://toolzy.com/favicon.ico",
+    "image": "https://utool.com/favicon.ico",
     "datePublished": new Date(post.date).toISOString(),
     "author": {
       "@type": "Person",
@@ -52,15 +52,15 @@ export default async function BlogPostReaderPage({ params }: Props) {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Toolzy",
+      "name": "utool",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://toolzy.com/apple-touch-icon.png",
+        "url": "https://utool.com/apple-touch-icon.png",
       },
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://toolzy.com/blog/${post.slug}`,
+      "@id": `https://utool.com/blog/${post.slug}`,
     },
   };
 
@@ -73,19 +73,19 @@ export default async function BlogPostReaderPage({ params }: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://toolzy.com",
+        "item": "https://utool.com",
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://toolzy.com/blog",
+        "item": "https://utool.com/blog",
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.h1,
-        "item": `https://toolzy.com/blog/${post.slug}`,
+        "item": `https://utool.com/blog/${post.slug}`,
       },
     ],
   };

@@ -60,10 +60,10 @@ export function MergeTool() {
 
       setDownloadBytes(mergedPdfBytes);
       setProcessingState("success");
-      
+
       toast.dismiss(toastId);
       toast.success("Your PDF is ready.");
-      
+
       // Log successful transaction
       await recordUsage("pdf-merge", "success");
     } catch (err) {
@@ -87,7 +87,7 @@ export function MergeTool() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `toolzy-merged-${Date.now()}.pdf`;
+    a.download = `utool-merged-${Date.now()}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

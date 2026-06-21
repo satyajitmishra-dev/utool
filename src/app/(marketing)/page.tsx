@@ -72,7 +72,7 @@ function HeroSection() {
           custom={2}
           className="mt-6 text-body-l text-muted-foreground max-w-2xl mx-auto"
         >
-          Stop juggling ten different apps. Toolzy brings file converters,
+          Stop juggling ten different apps. utool brings file converters,
           code formatters, image tools, and productivity utilities together in
           a workspace that&apos;s fast, clean, and delightful to use.
         </motion.p>
@@ -239,7 +239,7 @@ function FeaturesSection() {
   return (
     <Section id="features" className="section-divider">
       <SectionHeading
-        badge="Why Toolzy"
+        badge="Why utool"
         title="Built for people who care about craft"
         subtitle="Enterprise performance meets consumer-grade design. Every detail is intentional."
       />
@@ -331,7 +331,7 @@ function SocialProofSection() {
           {[
             {
               quote:
-                "Toolzy replaced five different bookmarks for me. It's faster and just looks better than anything else out there.",
+                "utool replaced five different bookmarks for me. It's faster and just looks better than anything else out there.",
               name: "Sarah Chen",
               role: "Frontend Developer",
             },
@@ -492,7 +492,7 @@ function FAQSection() {
       a: "Each tool execution costs 1–5 credits depending on complexity. Credits reset monthly. Pro plan users get unlimited credits.",
     },
     {
-      q: "Can I use Toolzy for my team?",
+      q: "Can I use utool for my team?",
       a: "Absolutely. The Enterprise plan includes team management, shared workspaces, and dedicated infrastructure.",
     },
     {
@@ -514,7 +514,7 @@ function FAQSection() {
       <SectionHeading
         badge="FAQ"
         title="Questions? Answers."
-        subtitle="Everything you need to know about Toolzy. Can't find what you're looking for? Reach out to our team."
+        subtitle="Everything you need to know about utool. Can't find what you're looking for? Reach out to our team."
       />
 
       <motion.div
@@ -545,9 +545,8 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
           {q}
         </span>
         <ChevronDown
-          className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""
+            }`}
         />
       </button>
       <motion.div

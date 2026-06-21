@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "Toolzy Blog — Document Guides, QR Customization & Career Hacks",
+  title: "utool Blog — Document Guides, QR Customization & Career Hacks",
   description: "Expert tips on PDF workflows, ATS-friendly resumes, QR code marketing, and links optimization to improve your daily digital workflows.",
 });
 
@@ -34,13 +34,13 @@ export default function BlogCatalogPage() {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://toolzy.com",
+        "item": "https://utool.com",
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://toolzy.com/blog",
+        "item": "https://utool.com/blog",
       },
     ],
   };
@@ -71,7 +71,7 @@ export default function BlogCatalogPage() {
               Resource Hub
             </Badge>
             <h1 className="text-display-sm font-extrabold tracking-tight text-foreground leading-tight">
-              Toolzy Blog & Guides
+              utool Blog & Guides
             </h1>
             <p className="text-body-sm text-muted-foreground leading-relaxed">
               Explore step-by-step guides, technical analysis, and developer hacks to optimize document rendering, career building, and marketing redirection structures.

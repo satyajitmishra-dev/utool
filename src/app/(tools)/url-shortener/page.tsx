@@ -69,7 +69,7 @@ export default function URLShortenerPage({ hideHeader = false }: { hideHeader?: 
     if (typeof window !== "undefined") {
       return `${window.location.protocol}//${window.location.host}`;
     }
-    return "https://toolzy.com";
+    return "https://utool.com";
   };
 
   // Load user's links
@@ -103,11 +103,11 @@ export default function URLShortenerPage({ hideHeader = false }: { hideHeader?: 
       console.warn("Failed to fetch links from Firestore, trying local storage:", e);
       // Local storage fallback
       try {
-        const stored = localStorage.getItem(`toolzy_local_urls_${identifier}`);
+        const stored = localStorage.getItem(`utool_local_urls_${identifier}`);
         if (stored) {
           setMyLinks(JSON.parse(stored) as ShortLink[]);
         }
-      } catch (err) {}
+      } catch (err) { }
     } finally {
       setLoadingLinks(false);
     }
@@ -184,7 +184,7 @@ export default function URLShortenerPage({ hideHeader = false }: { hideHeader?: 
           createdAt: new Date().toISOString(),
         };
         localList.unshift(newLinkObj);
-        localStorage.setItem(`toolzy_local_urls_${identifier}`, JSON.stringify(localList));
+        localStorage.setItem(`utool_local_urls_${identifier}`, JSON.stringify(localList));
         setMyLinks(localList);
 
         toast.dismiss(toastId);
@@ -220,7 +220,7 @@ export default function URLShortenerPage({ hideHeader = false }: { hideHeader?: 
                   <LinkIcon className="h-[18px] w-[18px] text-white" />
                 </div>
                 <span>
-                  Toolzy{" "}
+                  utool{" "}
                   <Badge variant="primary" className="ml-1 align-middle text-[9px]">
                     Workspace
                   </Badge>

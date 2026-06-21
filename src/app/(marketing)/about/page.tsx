@@ -5,8 +5,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { ShieldCheck, Sparkles, Cpu, Lock } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "About Toolzy — Privacy-First Document & Development Utilities",
-  description: "Learn about Toolzy's mission to rebuild online utilities from scratch using 100% browser-only client-side computation for absolute compliance.",
+  title: "About utool — Privacy-First Document & Development Utilities",
+  description: "Learn about utool's mission to rebuild online utilities from scratch using 100% browser-only client-side computation for absolute compliance.",
 });
 
 export default function AboutPage() {
@@ -23,7 +23,7 @@ export default function AboutPage() {
             We believe your data belongs to you.
           </h1>
           <p className="text-body-sm text-muted-foreground leading-relaxed">
-            Toolzy was built by developers who were tired of uploading sensitive PDF invoices, Wi-Fi credentials, and resume histories to mysterious, unverified cloud servers just to perform basic modifications.
+            utool was built by developers who were tired of uploading sensitive PDF invoices, Wi-Fi credentials, and resume histories to mysterious, unverified cloud servers just to perform basic modifications.
           </p>
         </div>
 
@@ -57,10 +57,10 @@ export default function AboutPage() {
             Traditional utility sites like iLovePDF, Smallpdf, and Canva online have revolutionized document modification, but they make a critical design trade-off: they force you to send your files to their backend systems. In an era of strict data protection laws (GDPR, HIPAA, SOC2), uploading documents that contain employee records, tax invoices, or personal signatures is a major risk.
           </p>
           <p>
-            Toolzy is built on a simple premise: modern browser runtimes are powerful enough to execute compilers, image processors, and text analyzers locally. By writing specialized client-side scripts, we turn your browser into a local workstation. This ensures absolute compliance, total privacy, and offline processing capability.
+            utool is built on a simple premise: modern browser runtimes are powerful enough to execute compilers, image processors, and text analyzers locally. By writing specialized client-side scripts, we turn your browser into a local workstation. This ensures absolute compliance, total privacy, and offline processing capability.
           </p>
           <p>
-            Whether you are a developer formatting JSON structures, a marketing lead creating static Wi-Fi QR codes, or a job applicant editing a resume, Toolzy provides the secure sandbox environment you need to get things done without exposure.
+            Whether you are a developer formatting JSON structures, a marketing lead creating static Wi-Fi QR codes, or a job applicant editing a resume, utool provides the secure sandbox environment you need to get things done without exposure.
           </p>
         </div>
 

@@ -69,7 +69,7 @@ export default function PricingPage() {
         "24/7 dedicated Slack support",
       ],
       cta: "Contact Sales",
-      href: "mailto:sales@toolzy.com?subject=Enterprise%20Plan%20Inquiry",
+      href: "mailto:sales@utool.com?subject=Enterprise%20Plan%20Inquiry",
       highlighted: false,
     },
   ];

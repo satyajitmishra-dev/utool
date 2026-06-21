@@ -25,7 +25,7 @@ function getLocalUsage(identifier: string): LocalUsageData {
     return { count: 0, resetAt: startOfNextDay.toISOString() };
   }
 
-  const key = `toolzy_global_usage_${identifier}`;
+  const key = `utool_global_usage_${identifier}`;
   try {
     const stored = localStorage.getItem(key);
     if (stored) {
@@ -43,13 +43,13 @@ function getLocalUsage(identifier: string): LocalUsageData {
   const defaultData = { count: 0, resetAt: startOfNextDay.toISOString() };
   try {
     localStorage.setItem(key, JSON.stringify(defaultData));
-  } catch (e) {}
+  } catch (e) { }
   return defaultData;
 }
 
 function saveLocalUsage(identifier: string, data: LocalUsageData) {
   if (typeof window === "undefined") return;
-  const key = `toolzy_global_usage_${identifier}`;
+  const key = `utool_global_usage_${identifier}`;
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (e) {

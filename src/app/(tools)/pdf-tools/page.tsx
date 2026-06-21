@@ -44,7 +44,7 @@ export default function PDFToolsHubPage() {
           100% Client-Side Compiler
         </Badge>
         <h1 className="text-h1 text-foreground">
-          Toolzy PDF Workstation
+          utool PDF Workstation
         </h1>
         <p className="text-body-s text-muted-foreground leading-relaxed">
           Supercharge your PDF workflows with zero server latency. Your documents are compiled directly on your device, ensuring maximum confidentiality and speed.

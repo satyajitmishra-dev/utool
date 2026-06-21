@@ -105,7 +105,7 @@ export default function BillingPage() {
 
   const handleUpgrade = async (planId: string) => {
     if (planId !== "pro") {
-      toast.info("Please contact sales at sales@toolzy.com for Enterprise plan inquiry.");
+      toast.info("Please contact sales at sales@utool.com for Enterprise plan inquiry.");
       return;
     }
 
@@ -134,7 +134,7 @@ export default function BillingPage() {
       const options = {
         key: keyId,
         subscription_id: subId,
-        name: "Toolzy Pro",
+        name: "utool Pro",
         description: "Monthly Pro Subscription",
         handler: async function (checkoutResponse: any) {
           toast.loading("Verifying payment...", { id: toastId });
@@ -306,8 +306,8 @@ export default function BillingPage() {
             {isCancelledPending
               ? "Your subscription is cancelled but you maintain access to all premium features until your billing cycle ends. You can renew by upgrading again when your access expires."
               : isPro
-              ? "You have unlimited daily tool actions and unrestricted access to all 60+ tools. Thank you for supporting Toolzy!"
-              : "You are currently on the free tier. Upgrading lifts daily limits and unlocks premium utilities."}
+                ? "You have unlimited daily tool actions and unrestricted access to all 60+ tools. Thank you for supporting utool!"
+                : "You are currently on the free tier. Upgrading lifts daily limits and unlocks premium utilities."}
           </p>
           {isPro && !isCancelledPending && (
             <button
@@ -338,11 +338,10 @@ export default function BillingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Pro Card */}
           <div
-            className={`rounded-2xl border p-6 flex flex-col justify-between transition ${
-              isPro && !isCancelledPending
+            className={`rounded-2xl border p-6 flex flex-col justify-between transition ${isPro && !isCancelledPending
                 ? "border-emerald-500/20 bg-emerald-950/5"
                 : "border-indigo-500/30 bg-slate-900/20 hover:border-indigo-500/50"
-            }`}
+              }`}
           >
             <div>
               <div className="flex justify-between items-start">
@@ -379,11 +378,10 @@ export default function BillingPage() {
             <button
               onClick={() => handleUpgrade("pro")}
               disabled={loading !== null || (isPro && !isCancelledPending)}
-              className={`mt-6 w-full flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition ${
-                isPro && !isCancelledPending
+              className={`mt-6 w-full flex justify-center items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition ${isPro && !isCancelledPending
                   ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                   : "bg-gradient-to-r from-indigo-500 to-violet-600 shadow shadow-indigo-500/10 hover:from-indigo-600 hover:to-violet-700"
-              }`}
+                }`}
             >
               {loading === "pro" ? (
                 <>

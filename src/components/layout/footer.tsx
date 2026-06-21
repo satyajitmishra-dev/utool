@@ -45,7 +45,7 @@ export function Footer() {
             </h3>
             <p className="mt-3 text-body-s text-background/60 max-w-lg mx-auto">
               Join thousands of developers, designers, and creators who use
-              Toolzy every day.
+              utool every day.
             </p>
             <div className="mt-8">
               <Link href="/signup">

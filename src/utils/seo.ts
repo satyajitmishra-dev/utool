@@ -39,7 +39,7 @@ export function constructMetadata({
       title: fullTitle,
       description,
       images: [image],
-      creator: "@toolzy",
+      creator: "@utool",
     },
     icons: {
       icon: icons,
@@ -84,7 +84,7 @@ export function generateBlogMetadata(slug: string): Metadata {
   const post = blogPosts[slug];
   if (!post) {
     return constructMetadata({
-      title: "Toolzy Blog",
+      title: "utool Blog",
       description: "Read helpful guides about PDF workflows, resume building, and developer productivity.",
     });
   }
@@ -101,21 +101,21 @@ export function generateBlogMetadata(slug: string): Metadata {
 export function generateCategoryMetadata(category: string): Metadata {
   const categories: Record<string, { title: string; desc: string }> = {
     "pdf-tools": {
-      title: "Free PDF Utilities — Merge, Split, Compress PDFs | Toolzy",
+      title: "Free PDF Utilities — Merge, Split, Compress PDFs | utool",
       desc: "Merge PDF files, extract ranges, and compress document sizes online. All tools process files locally in your browser for absolute privacy.",
     },
     "qr-guides": {
-      title: "QR Code Guides & WiFi Generator Tutorials | Toolzy Blog",
+      title: "QR Code Guides & WiFi Generator Tutorials | utool Blog",
       desc: "Learn how to generate Wi-Fi auto-login codes, optimize print contrast, and design static QR codes for marketing.",
     },
     "resume-guides": {
-      title: "ATS Resume Writing Guides & Career Advice | Toolzy Blog",
+      title: "ATS Resume Writing Guides & Career Advice | utool Blog",
       desc: "Pass applicant tracking systems with expert resume formatting, single-column structures, and job description keyword targeting.",
     },
   };
 
   const data = categories[category] || {
-    title: "Toolzy Blog & Guides",
+    title: "utool Blog & Guides",
     desc: "Read the latest tips on developer workflows, link shortening, and marketing utilities.",
   };
 

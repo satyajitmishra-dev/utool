@@ -71,7 +71,7 @@ function LoginForm() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] shadow-md">
               <Wrench className="h-5 w-5 text-white" />
             </div>
-            <span>Toolzy</span>
+            <span>utool</span>
           </Link>
           <h2 className="text-center text-h2 text-foreground">Welcome back</h2>
           <p className="mt-2 text-center text-body-s text-muted-foreground">

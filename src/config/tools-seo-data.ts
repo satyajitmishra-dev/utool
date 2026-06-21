@@ -21,10 +21,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "merge-pdf",
     name: "Merge PDF",
     cluster: "PDF Tools",
-    title: "Merge PDF Online Free in Seconds — Without Losing Quality | Toolzy",
+    title: "Merge PDF Online Free in Seconds — Without Losing Quality | utool",
     h1: "Merge PDF Documents Online Free",
     description: "Combine multiple PDF files into a single document in seconds. 100% free, secure client-side merging. No sign-up required, no file size limits.",
-    intro: "Need to combine report sections, compile receipts, or merge client presentations? Toolzy's Merge PDF utility offers a seamless, secure, and lightning-fast way to compile multiple files in any sequence. Unlike other online converters that process your private documents on remote cloud servers, Toolzy's compression and compilation engine operates entirely in your local browser, meaning your files never leave your computer.",
+    intro: "Need to combine report sections, compile receipts, or merge client presentations? utool's Merge PDF utility offers a seamless, secure, and lightning-fast way to compile multiple files in any sequence. Unlike other online converters that process your private documents on remote cloud servers, utool's compression and compilation engine operates entirely in your local browser, meaning your files never leave your computer.",
     howItWorks: [
       "Select and upload the PDF documents you want to merge.",
       "Drag and drop the file cards to arrange them in your preferred sequence.",
@@ -37,15 +37,15 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
       { title: "Zero Size Limits", desc: "Since processing happens locally, you can combine massive files without facing standard cloud limits." }
     ],
     faqs: [
-      { q: "Is it safe to merge my PDFs on Toolzy?", a: "Yes, 100% safe. Toolzy uses WebAssembly and javascript libraries (pdf-lib) to merge your files directly in your web browser. Your private documents are never uploaded to any remote server, ensuring complete confidentiality." },
+      { q: "Is it safe to merge my PDFs on utool?", a: "Yes, 100% safe. utool uses WebAssembly and javascript libraries (pdf-lib) to merge your files directly in your web browser. Your private documents are never uploaded to any remote server, ensuring complete confidentiality." },
       { q: "Can I rearrange pages after uploading?", a: "Currently, our merger allows you to arrange documents in any sequence before combining them. To extract or split specific pages first, you can use our dynamic Split PDF tool." },
       { q: "Is there a limit on the number of files I can combine?", a: "No. Since the merging operations run on your local device, there are no software limits on the number of PDFs you can merge at one time." }
     ],
     longFormContent: [
       {
-        sectionTitle: "Why Toolzy is the Best Free PDF Merger Online",
+        sectionTitle: "Why utool is the Best Free PDF Merger Online",
         paragraphs: [
-          "When comparing Toolzy to traditional services like iLovePDF, Smallpdf, or Adobe Acrobat online, the key differentiator is safety and velocity. Most online tools require you to upload your files to their cloud servers. This exposes your financial statements, contracts, or personal records to security risks and GDPR/HIPAA compliance violations. Toolzy eliminates this vector by performing all operations locally inside your web browser.",
+          "When comparing utool to traditional services like iLovePDF, Smallpdf, or Adobe Acrobat online, the key differentiator is safety and velocity. Most online tools require you to upload your files to their cloud servers. This exposes your financial statements, contracts, or personal records to security risks and GDPR/HIPAA compliance violations. utool eliminates this vector by performing all operations locally inside your web browser.",
           "Our system runs on highly optimized JavaScript processing engines that stitch PDF pages, streams, and cross-reference tables in milliseconds. You don't have to wait for uploads to complete or queues to clear. It is ideal for students compiling assignments, developers merging documentation, and business teams bundling transaction receipts."
         ]
       },
@@ -53,7 +53,7 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
         sectionTitle: "Best Practices for Merging PDFs Seamlessly",
         paragraphs: [
           "To get the best results when combining documents, make sure all source files are not password-protected. If a file is encrypted, decrypt it first before adding it to the queue. Additionally, organizing your files with clear naming conventions beforehand helps you arrange them quickly on our visual drag-and-drop workspace.",
-          "Toolzy automatically scales pages to fit their original canvas proportions, meaning you can mix portrait and landscape documents without breaking the layout structure. The output file retains all links, table of contents (outlines), and form fields intact."
+          "utool automatically scales pages to fit their original canvas proportions, meaning you can mix portrait and landscape documents without breaking the layout structure. The output file retains all links, table of contents (outlines), and form fields intact."
         ]
       }
     ],
@@ -63,10 +63,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "split-pdf",
     name: "Split PDF",
     cluster: "PDF Tools",
-    title: "Split PDF Online — Extract Specific PDF Pages Free | Toolzy",
+    title: "Split PDF Online — Extract Specific PDF Pages Free | utool",
     h1: "Split PDF Documents Online Free",
     description: "Extract specific pages or custom ranges from any PDF document. Free, secure, client-side page splitting with visual preview. No registration required.",
-    intro: "Need to extract a single chapter from a textbook, pull out specific invoice pages, or split a giant contract? Toolzy's Split PDF utility allows you to extract custom page sequences or split your files into separate documents. Like all our core utilities, page extraction is processed completely locally in your browser, keeping your documents confidential.",
+    intro: "Need to extract a single chapter from a textbook, pull out specific invoice pages, or split a giant contract? utool's Split PDF utility allows you to extract custom page sequences or split your files into separate documents. Like all our core utilities, page extraction is processed completely locally in your browser, keeping your documents confidential.",
     howItWorks: [
       "Select and load the PDF document you wish to split.",
       "Enter the page numbers or custom ranges you want to extract (e.g., 1-3, 5).",
@@ -85,10 +85,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     ],
     longFormContent: [
       {
-        sectionTitle: "Compare Toolzy PDF Splitter with Competitors",
+        sectionTitle: "Compare utool PDF Splitter with Competitors",
         paragraphs: [
-          "Most online splitters restrict free accounts to extracting only 1 or 2 pages at a time or enforce a file size cap of 50MB. Toolzy has no such restrictions. Since the processing runs on your CPU within the browser, you can load a 500-page book and extract specific ranges instantly without paying a dime.",
-          "Our interface is optimized for rapid production workflows. It bypasses upload bottlenecks entirely. Whether you're working on a slow public Wi-Fi or handling confidential corporate documentation, Toolzy provides the ultimate secure workspace."
+          "Most online splitters restrict free accounts to extracting only 1 or 2 pages at a time or enforce a file size cap of 50MB. utool has no such restrictions. Since the processing runs on your CPU within the browser, you can load a 500-page book and extract specific ranges instantly without paying a dime.",
+          "Our interface is optimized for rapid production workflows. It bypasses upload bottlenecks entirely. Whether you're working on a slow public Wi-Fi or handling confidential corporate documentation, utool provides the ultimate secure workspace."
         ]
       }
     ],
@@ -98,10 +98,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "compress-pdf",
     name: "Compress PDF",
     cluster: "PDF Tools",
-    title: "Compress PDF Online — Reduce PDF File Size Free | Toolzy",
+    title: "Compress PDF Online — Reduce PDF File Size Free | utool",
     h1: "Compress PDF Documents Online Free",
     description: "Compress and reduce your PDF file size online without losing quality. 100% free client-side compression. Perfect for email attachments and uploads.",
-    intro: "Struggling with a PDF that is too large to email, upload to a job application portal, or attach to a form? Toolzy's Compress PDF tool optimizes and reduces your file sizes without sacrificing readability or image clarity. It optimizes resource streams and compresses high-definition images locally in your browser, keeping your details safe.",
+    intro: "Struggling with a PDF that is too large to email, upload to a job application portal, or attach to a form? utool's Compress PDF tool optimizes and reduces your file sizes without sacrificing readability or image clarity. It optimizes resource streams and compresses high-definition images locally in your browser, keeping your details safe.",
     howItWorks: [
       "Select and upload the PDF file you want to shrink.",
       "Our utility automatically optimizes font files and image streams.",
@@ -122,7 +122,7 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
       {
         sectionTitle: "Secure Client-Side Document Compression",
         paragraphs: [
-          "For organizations handling compliance-sensitive documents, compressing files on remote web servers is a major risk. Toolzy offers a complete paradigm shift: a web-based utility that acts like a local desktop app. Financial records, government application forms, and medical histories can now be optimized safely without violating data privacy standard acts.",
+          "For organizations handling compliance-sensitive documents, compressing files on remote web servers is a major risk. utool offers a complete paradigm shift: a web-based utility that acts like a local desktop app. Financial records, government application forms, and medical histories can now be optimized safely without violating data privacy standard acts.",
           "Our system strips unnecessary metadata, optimizes duplicate font references, and downscales bloated images to a web-friendly 150 DPI resolution. The result is a lightweight document that loads instantly and fits easily within email attachments."
         ]
       }
@@ -133,10 +133,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "qr-generator",
     name: "QR Code Generator",
     cluster: "Marketing Tools",
-    title: "Free QR Code Generator — Create Custom QR Codes Online | Toolzy",
+    title: "Free QR Code Generator — Create Custom QR Codes Online | utool",
     h1: "Create Custom QR Codes Online Free",
     description: "Generate custom QR codes for URLs, text, email, or Wi-Fi networks. Free, customizable colors and sizes, instant download in high-resolution.",
-    intro: "Looking to create custom QR codes for a restaurant menu, business card, event flyer, or Wi-Fi login? Toolzy's QR Code Generator provides a clean, fast, and completely free way to generate high-resolution QR codes. Customize foreground and background colors, adjust canvas padding, and choose error correction levels to suit your marketing needs.",
+    intro: "Looking to create custom QR codes for a restaurant menu, business card, event flyer, or Wi-Fi login? utool's QR Code Generator provides a clean, fast, and completely free way to generate high-resolution QR codes. Customize foreground and background colors, adjust canvas padding, and choose error correction levels to suit your marketing needs.",
     howItWorks: [
       "Select your data type: URL, plain text, email template, or Wi-Fi network.",
       "Input your data (e.g., destination URL or Wi-Fi credentials).",
@@ -158,7 +158,7 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
         sectionTitle: "Designing High-Performing Brand QR Codes",
         paragraphs: [
           "When utilizing QR codes in physical print marketing, color contrast is critical. Ensure your foreground color is significantly darker than your background color (e.g., dark blue on a white card) to guarantee fast scanning on all phone models. Avoid reversing the contrast, as some older barcode scanners struggle to read light-on-dark codes.",
-          "Toolzy allows you to preview and fine-tune padding and error correction dynamically. Static QR codes generated here are 100% free of ads, tracking redirect loops, or subscription locks, providing a direct link between the user and your destination content."
+          "utool allows you to preview and fine-tune padding and error correction dynamically. Static QR codes generated here are 100% free of ads, tracking redirect loops, or subscription locks, providing a direct link between the user and your destination content."
         ]
       }
     ],
@@ -168,10 +168,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "url-shortener",
     name: "URL Shortener",
     cluster: "Productivity Tools",
-    title: "Free URL Shortener — Create Clean Short Links Online | Toolzy",
+    title: "Free URL Shortener — Create Clean Short Links Online | utool",
     h1: "Shorten Long URLs Online Free",
     description: "Compile long destination URLs into clean, shortened redirection strings. Free, secure, and tracks click counts in real-time.",
-    intro: "Long, messy links look unprofessional and eat up character limits on social media and SMS campaigns. Toolzy's URL Shortener creates compact, readable links instantly. Perfect for Twitter, Instagram bios, and promotional emails. Track redirect success and monitor aggregate analytics in real-time.",
+    intro: "Long, messy links look unprofessional and eat up character limits on social media and SMS campaigns. utool's URL Shortener creates compact, readable links instantly. Perfect for Twitter, Instagram bios, and promotional emails. Track redirect success and monitor aggregate analytics in real-time.",
     howItWorks: [
       "Paste your long destination URL into the input field.",
       "Click the 'Shorten Link' button to generate a clean alias.",
@@ -184,9 +184,9 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
       { title: "Clean Appearance", desc: "Convert bulky query parameters and tracking hashes into short, sleek links." }
     ],
     faqs: [
-      { q: "Are these short links permanent?", a: "Yes. Short links created on Toolzy remain active indefinitely, as long as they are not used for spam or malicious purposes." },
-      { q: "Can I track how many people clicked my link?", a: "Yes. Registered users can view their shortening transaction history and click counters directly in the Toolzy History Dashboard." },
-      { q: "Do you inject ads during redirection?", a: "No. Toolzy does not show ads or intermediate redirect landing pages. Your users are forwarded straight to the destination page instantly." }
+      { q: "Are these short links permanent?", a: "Yes. Short links created on utool remain active indefinitely, as long as they are not used for spam or malicious purposes." },
+      { q: "Can I track how many people clicked my link?", a: "Yes. Registered users can view their shortening transaction history and click counters directly in the utool History Dashboard." },
+      { q: "Do you inject ads during redirection?", a: "No. utool does not show ads or intermediate redirect landing pages. Your users are forwarded straight to the destination page instantly." }
     ],
     longFormContent: [
       {
@@ -203,10 +203,10 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     slug: "resume-builder",
     name: "Resume Builder",
     cluster: "Career Tools",
-    title: "Free ATS Resume Builder — Create Professional Resumes | Toolzy",
+    title: "Free ATS Resume Builder — Create Professional Resumes | utool",
     h1: "Free ATS-Friendly Resume Builder",
     description: "Create professional, ATS-friendly resumes in minutes. Free customizable sections, clean templates, and instant download in PDF format.",
-    intro: "Searching for a job is tough, and your resume is your first impression. Toolzy's ATS Resume Builder helps you compile a professional, clean, and layout-perfect resume that stands out to hiring managers and passes Applicant Tracking Systems (ATS) with ease. Enter your experience, skills, and education, and download a polished PDF instantly.",
+    intro: "Searching for a job is tough, and your resume is your first impression. utool's ATS Resume Builder helps you compile a professional, clean, and layout-perfect resume that stands out to hiring managers and passes Applicant Tracking Systems (ATS) with ease. Enter your experience, skills, and education, and download a polished PDF instantly.",
     howItWorks: [
       "Fill in your contact info, professional summary, and job history.",
       "Add your educational background, core skills, and custom sections.",
@@ -220,7 +220,7 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
     ],
     faqs: [
       { q: "What makes a resume ATS-friendly?", a: "ATS software reads resumes from top to bottom, left to right. Single-column layouts, standard headers, and readable font styles ensure the system extracts your job history, contact info, and skills correctly without glitches." },
-      { q: "Is my personal data safe here?", a: "Yes. Toolzy compiles your resume on your device. We do not store your personal resume inputs or contact details in a database unless you explicitly save them." },
+      { q: "Is my personal data safe here?", a: "Yes. utool compiles your resume on your device. We do not store your personal resume inputs or contact details in a database unless you explicitly save them." },
       { q: "Can I download my resume in other formats?", a: "Our builder exports high-quality vector PDFs directly. PDF is the gold standard for job applications because it locks in your typography and design across all devices." }
     ],
     longFormContent: [
@@ -228,7 +228,7 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
         sectionTitle: "Writing a Resume That Wins Interviews",
         paragraphs: [
           "To stand out to recruiters, tailor your professional summary and work history to match the keywords in the job description. Focus on action verbs and quantify your achievements (e.g., 'increased sales by 20%' instead of 'responsible for sales'). A clean, standard resume that highlights concrete achievements is far more effective than colorful, multi-column templates that confuse scanning software.",
-          "Toolzy's resume creator guarantees your document follows industry-standard formatting guidelines. It handles line spacing, margin alignment, and section dividers automatically, giving you a polished layout in minutes."
+          "utool's resume creator guarantees your document follows industry-standard formatting guidelines. It handles line spacing, margin alignment, and section dividers automatically, giving you a polished layout in minutes."
         ]
       }
     ],

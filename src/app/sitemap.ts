@@ -4,11 +4,11 @@ import { blogPosts } from "@/config/blog-data";
 import { siteConfig } from "@/config/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Ensure we use the production base URL in the crawlers' sitemap, falling back to canonical toolzy.com
+  // Ensure we use the production base URL in the crawlers' sitemap, falling back to canonical utool.com
   const baseUrl =
     siteConfig.url && !siteConfig.url.includes("localhost")
       ? siteConfig.url
-      : "https://toolzy.com";
+      : "https://utool.com";
 
   // 1. Core and E-E-A-T pages
   const staticRoutes = [

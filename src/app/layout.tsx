@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Toolzy — Every Tool You Need, One Beautiful Workspace",
+  title: "utool — Every Tool You Need, One Beautiful Workspace",
   description:
     "60+ premium developer, design, and productivity tools in a single subscription. No ads. No bloat. Just tools that work.",
 };

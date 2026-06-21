@@ -31,7 +31,7 @@ export default function ToolExecutionClient() {
     "json-formatter": {
       name: "JSON Formatter & Beautifier",
       desc: "Format, validate, and parse JSON strings with deep syntax validation.",
-      inputPlaceholder: 'Paste raw JSON here...\ne.g. {"name":"toolzy","active":true}',
+      inputPlaceholder: 'Paste raw JSON here...\ne.g. {"name":"utool","active":true}',
       credits: 1,
     },
     "env-validator": {

@@ -83,7 +83,7 @@ export function CompressTool() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `toolzy-compressed-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
+    a.download = `utool-compressed-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -195,11 +195,10 @@ export function CompressTool() {
                         key={levelItem.id}
                         type="button"
                         onClick={() => setLevel(levelItem.id as CompressionLevel)}
-                        className={`text-left p-4 rounded-2xl border transition-all ${
-                          level === levelItem.id
+                        className={`text-left p-4 rounded-2xl border transition-all ${level === levelItem.id
                             ? "border-indigo-500 bg-indigo-50/10 text-indigo-900 shadow-sm"
                             : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-700"
-                        }`}
+                          }`}
                       >
                         <span className="block text-xs font-bold">{levelItem.label}</span>
                         <span className="block text-4xs text-slate-500 mt-1 font-semibold leading-relaxed">
@@ -276,7 +275,7 @@ export function CompressTool() {
             </div>
 
             <p className="mt-4 text-xs text-slate-500 max-w-xs leading-relaxed">
-              {wasReduced 
+              {wasReduced
                 ? "Your compressed document is ready for download."
                 : "No further size reduction could be achieved. Unused structural components were cleaned up successfully."
               }

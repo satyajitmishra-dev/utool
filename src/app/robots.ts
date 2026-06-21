@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
   const baseUrl =
     siteConfig.url && !siteConfig.url.includes("localhost")
       ? siteConfig.url
-      : "https://toolzy.com";
+      : "https://utool.com";
 
   return {
     rules: {

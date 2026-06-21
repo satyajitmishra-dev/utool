@@ -125,7 +125,7 @@ export default function ResumeBuilderPage({ hideHeader = false }: { hideHeader?:
       toast.dismiss(toastId);
       toast.success("Your PDF is ready.");
       await recordUsage("resume-builder", "success");
-      
+
       // Trigger Print flow
       window.print();
     } catch (err) {
@@ -136,8 +136,8 @@ export default function ResumeBuilderPage({ hideHeader = false }: { hideHeader?:
   };
 
   const isFormEmpty = () => {
-    return !name.trim() && !email.trim() && !phone.trim() && !website.trim() && !summary.trim() && !skills.trim() && 
-           experiences.every(e => !e.company.trim()) && educations.every(e => !e.school.trim());
+    return !name.trim() && !email.trim() && !phone.trim() && !website.trim() && !summary.trim() && !skills.trim() &&
+      experiences.every(e => !e.company.trim()) && educations.every(e => !e.school.trim());
   };
 
   return (
@@ -152,7 +152,7 @@ export default function ResumeBuilderPage({ hideHeader = false }: { hideHeader?:
                   <FileText className="h-[18px] w-[18px] text-white" />
                 </div>
                 <span>
-                  Toolzy{" "}
+                  utool{" "}
                   <Badge variant="primary" className="ml-1 align-middle text-[9px]">
                     Workspace
                   </Badge>
@@ -260,11 +260,10 @@ export default function ResumeBuilderPage({ hideHeader = false }: { hideHeader?:
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold border transition ${
-                        activeTab === tab.id
+                      className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold border transition ${activeTab === tab.id
                           ? "bg-primary border-primary text-white shadow-sm"
                           : "bg-muted/40 border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <TabIcon className="h-3.5 w-3.5" />
                       {tab.label}
@@ -644,7 +643,7 @@ export default function ResumeBuilderPage({ hideHeader = false }: { hideHeader?:
               {/* Print Footer */}
               {!isFormEmpty() && (
                 <div className="border-t border-slate-100 pt-3 text-center text-[8px] font-semibold text-slate-455 uppercase tracking-widest hidden print:block">
-                  Compiled via Toolzy Workstation
+                  Compiled via utool Workstation
                 </div>
               )}
             </div>

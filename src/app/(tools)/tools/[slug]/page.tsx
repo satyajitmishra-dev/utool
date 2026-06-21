@@ -59,19 +59,19 @@ export default async function ProgrammaticToolPage({ params }: Props) {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://toolzy.com",
+        "item": "https://utool.com",
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Tools",
-        "item": "https://toolzy.com/tools",
+        "item": "https://utool.com/tools",
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": tool.name,
-        "item": `https://toolzy.com/tools/${tool.slug}`,
+        "item": `https://utool.com/tools/${tool.slug}`,
       },
     ],
   };
@@ -79,8 +79,8 @@ export default async function ProgrammaticToolPage({ params }: Props) {
   const appSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": `${tool.name} | Toolzy`,
-    "url": `https://toolzy.com/tools/${tool.slug}`,
+    "name": `${tool.name} | utool`,
+    "url": `https://utool.com/tools/${tool.slug}`,
     "description": tool.description,
     "applicationCategory": "Utility",
     "operatingSystem": "All",

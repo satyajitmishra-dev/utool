@@ -41,7 +41,7 @@ export default function SignupPage() {
     try {
       await signUp(email, password);
       toast.dismiss(toastId);
-      toast.success("Welcome to Toolzy!");
+      toast.success("Welcome to utool!");
       setTimeout(() => { router.push("/dashboard"); }, 500);
     } catch (err) {
       setLoading(false);
@@ -55,7 +55,7 @@ export default function SignupPage() {
     try {
       await loginWithGoogle();
       toast.dismiss(toastId);
-      toast.success("Welcome to Toolzy!");
+      toast.success("Welcome to utool!");
     } catch (err) {
       toast.dismiss(toastId);
       toast.error(mapFirebaseError(err));
@@ -73,7 +73,7 @@ export default function SignupPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] shadow-md">
               <Wrench className="h-5 w-5 text-white" />
             </div>
-            <span>Toolzy</span>
+            <span>utool</span>
           </Link>
           <h2 className="text-center text-h2 text-foreground">Create your account</h2>
           <p className="mt-2 text-center text-body-s text-muted-foreground">

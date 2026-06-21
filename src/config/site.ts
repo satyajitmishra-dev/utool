@@ -1,11 +1,11 @@
 export const siteConfig = {
-  name: "Toolzy",
+  name: "utool",
   description: "The ultimate multi-tool workspace for creators, developers, and power users.",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  ogImage: "https://toolzy.com/og.jpg",
+  ogImage: "https://utool.com/og.jpg",
   links: {
-    twitter: "https://twitter.com/toolzy",
-    github: "https://github.com/toolzy",
+    twitter: "https://twitter.com/utool",
+    github: "https://github.com/utool",
   },
   mainNav: [
     { title: "Features", href: "/#features" },

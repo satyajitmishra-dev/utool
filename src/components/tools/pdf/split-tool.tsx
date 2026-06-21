@@ -110,7 +110,7 @@ export function SplitTool() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `toolzy-split-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
+    a.download = `utool-split-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
