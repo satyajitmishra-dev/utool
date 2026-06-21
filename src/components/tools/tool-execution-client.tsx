@@ -17,9 +17,9 @@ import {
   Terminal,
 } from "lucide-react";
 
-export default function ToolExecutionPage() {
+export default function ToolExecutionClient() {
   const params = useParams();
-  const toolId = params.toolId as string;
+  const slug = params.slug as string;
 
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -48,7 +48,7 @@ export default function ToolExecutionPage() {
     },
   };
 
-  const currentTool = toolsMeta[toolId] || {
+  const currentTool = toolsMeta[slug] || {
     name: "Interactive Tool Runner",
     desc: "A premium utility tool workspace.",
     inputPlaceholder: "Enter utility inputs here...",
@@ -63,17 +63,17 @@ export default function ToolExecutionPage() {
     // Simulate server side utility execution
     setTimeout(() => {
       try {
-        if (toolId === "json-formatter") {
+        if (slug === "json-formatter") {
           const parsed = JSON.parse(input);
           setOutput(JSON.stringify(parsed, null, 2));
-        } else if (toolId === "env-validator") {
+        } else if (slug === "env-validator") {
           const lines = input.split("\n").filter((l) => l.trim() && !l.startsWith("#"));
           const validated = lines.map((l) => {
             const [k, v] = l.split("=");
             return `[VALID] ${k}: ${v ? "Present" : "Missing Value"}`;
           });
           setOutput(validated.join("\n"));
-        } else if (toolId === "gradient-maker") {
+        } else if (slug === "gradient-maker") {
           const colors = input.split(",").map((c) => c.trim());
           setOutput(`background-image: linear-gradient(to right, ${colors.map((c) => `hsl(${c}, 70%, 50%)`).join(", ")});`);
         } else {

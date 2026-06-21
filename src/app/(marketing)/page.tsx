@@ -135,7 +135,7 @@ function ToolGridSection() {
         <ToolCard
           title="QR Code Generator"
           description="Generate customized high-quality QR codes for URLs, plain text, email templates, and Wi-Fi credentials."
-          href="/qr-generator"
+          href="/tools/qr-generator"
           tag="qr-static"
           status="live"
           index={1}
@@ -143,7 +143,7 @@ function ToolGridSection() {
         <ToolCard
           title="Short Link Creator"
           description="Create, track, and manage clean short links with detailed browser click statistics."
-          href="/url-shortener"
+          href="/tools/url-shortener"
           tag="url-shortener"
           status="live"
           index={2}
@@ -151,7 +151,7 @@ function ToolGridSection() {
         <ToolCard
           title="Resume Builder"
           description="Design and print beautiful, professional resumes with clean PDF templates."
-          href="/resume-builder"
+          href="/tools/resume-builder"
           tag="resume-builder"
           status="beta"
           index={3}

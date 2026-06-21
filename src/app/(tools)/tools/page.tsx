@@ -21,7 +21,7 @@ const tools = [
     tag: "merge",
     status: "live" as const,
     isPremium: false,
-    href: "/pdf-tools/merge",
+    href: "/tools/merge-pdf",
   },
   {
     id: "pdf-split",
@@ -31,7 +31,7 @@ const tools = [
     tag: "split",
     status: "live" as const,
     isPremium: false,
-    href: "/pdf-tools/split",
+    href: "/tools/split-pdf",
   },
   {
     id: "pdf-compress",
@@ -41,7 +41,7 @@ const tools = [
     tag: "compress",
     status: "live" as const,
     isPremium: false,
-    href: "/pdf-tools/compress",
+    href: "/tools/compress-pdf",
   },
   {
     id: "qr-generator",
@@ -51,7 +51,7 @@ const tools = [
     tag: "qr",
     status: "live" as const,
     isPremium: false,
-    href: "/qr-generator",
+    href: "/tools/qr-generator",
   },
   {
     id: "url-shortener",
@@ -61,7 +61,7 @@ const tools = [
     tag: "url-shortener",
     status: "live" as const,
     isPremium: false,
-    href: "/url-shortener",
+    href: "/tools/url-shortener",
   },
   {
     id: "resume-builder",
@@ -71,7 +71,7 @@ const tools = [
     tag: "resume-builder",
     status: "beta" as const,
     isPremium: false,
-    href: "/resume-builder",
+    href: "/tools/resume-builder",
   },
   {
     id: "json-formatter",

@@ -18,14 +18,13 @@ export function Footer() {
     ],
     Company: [
       { label: "About", href: "/about" },
-      { label: "Blog", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Press", href: "#" },
+      { label: "Blog", href: "/blog" },
+      { label: "Contact", href: "/contact" },
+      { label: "Security", href: "/security" },
     ],
     Legal: [
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
-      { label: "Cookies", href: "/cookies" },
     ],
     Connect: [
       { label: "Twitter", href: siteConfig.links.twitter },
