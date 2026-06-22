@@ -50,12 +50,12 @@ const initializeFirebaseAdmin = () => {
 
   if (serviceAccountKey) {
     try {
-      const cleanJsonStr = serviceAccountKey.trim().replace(/^"|"$/g, "");
+      const cleanJsonStr = serviceAccountKey.trim().replace(/^["']|["']$/g, "");
       const parsedKey = JSON.parse(cleanJsonStr);
       if (parsedKey.private_key) {
         parsedKey.private_key = parsedKey.private_key
           .replace(/\\n/g, "\n")
-          .replace(/^"|"$/g, "");
+          .replace(/^["']|["']$/g, "");
       }
       console.log("Initializing Firebase Admin with Service Account Key. Project ID:", parsedKey.project_id);
       return initializeApp({
