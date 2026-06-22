@@ -47,9 +47,14 @@ export async function proxy(request: NextRequest) {
 
   // 1. Route Protection for Authenticated Views
   if (isProtectedRoute && !isSessionValid) {
+    const currentPath = request.nextUrl.pathname + request.nextUrl.search;
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    loginUrl.searchParams.set("redirect", currentPath);
+    const response = NextResponse.redirect(loginUrl);
+    if (sessionCookie) {
+      response.cookies.delete("__session");
+    }
+    return response;
   }
 
   // 2. Prevent logged in users from hitting auth routes

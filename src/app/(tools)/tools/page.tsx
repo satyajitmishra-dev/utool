@@ -91,7 +91,7 @@ const tools = [
     tag: "image-convert",
     status: "live" as const,
     isPremium: false,
-    href: "/image-tools",
+    href: "/image-tools/webp-converter",
   },
   {
     id: "image-resize",
