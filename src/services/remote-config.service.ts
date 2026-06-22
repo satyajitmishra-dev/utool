@@ -4,14 +4,23 @@ import { useState, useEffect } from "react";
 
 // Default configs (INR base values)
 const DEFAULTS = {
-  toolzy_pro_price: 299,
+  toolzy_monthly_price: 49,
+  toolzy_monthly_original_price: 599,
+  toolzy_monthly_discount: 90,
+  toolzy_lifetime_price: 299,
+  toolzy_lifetime_original_price: 1999,
+  toolzy_lifetime_discount: 85,
+  toolzy_lifetime_recommended: true,
+  toolzy_offer_label: "Launch Offer",
+  // Backward compatibility defaults
+  toolzy_pro_price: 49,
   toolzy_pro_original_price: 599,
   toolzy_pro_discount_enabled: true,
-  toolzy_pro_discount_percentage: 50,
-  toolzy_enterprise_price: 1499,
-  toolzy_enterprise_original_price: 2999,
+  toolzy_pro_discount_percentage: 90,
+  toolzy_enterprise_price: 299,
+  toolzy_enterprise_original_price: 1999,
   toolzy_enterprise_discount_enabled: true,
-  toolzy_enterprise_discount_percentage: 50,
+  toolzy_enterprise_discount_percentage: 85,
   toolzy_discount_end_date: "2026-07-01T23:59:59Z",
 };
 
@@ -40,6 +49,15 @@ export function initializeRemoteConfig(): Promise<boolean> {
 export function getPricingConfig() {
   if (typeof window === "undefined") {
     return {
+      monthlyPrice: DEFAULTS.toolzy_monthly_price,
+      monthlyOriginalPrice: DEFAULTS.toolzy_monthly_original_price,
+      monthlyDiscount: DEFAULTS.toolzy_monthly_discount,
+      lifetimePrice: DEFAULTS.toolzy_lifetime_price,
+      lifetimeOriginalPrice: DEFAULTS.toolzy_lifetime_original_price,
+      lifetimeDiscount: DEFAULTS.toolzy_lifetime_discount,
+      lifetimeRecommended: DEFAULTS.toolzy_lifetime_recommended,
+      offerLabel: DEFAULTS.toolzy_offer_label,
+      // Compatibility fields
       proPrice: DEFAULTS.toolzy_pro_price,
       proOriginalPrice: DEFAULTS.toolzy_pro_original_price,
       proDiscountEnabled: DEFAULTS.toolzy_pro_discount_enabled,
@@ -53,18 +71,45 @@ export function getPricingConfig() {
   
   try {
     const rc = getRemoteConfig(app);
+    const monthlyPrice = Number(getValue(rc, "toolzy_monthly_price").asString() || DEFAULTS.toolzy_monthly_price);
+    const monthlyOriginalPrice = Number(getValue(rc, "toolzy_monthly_original_price").asString() || DEFAULTS.toolzy_monthly_original_price);
+    const monthlyDiscount = Number(getValue(rc, "toolzy_monthly_discount").asString() || DEFAULTS.toolzy_monthly_discount);
+    const lifetimePrice = Number(getValue(rc, "toolzy_lifetime_price").asString() || DEFAULTS.toolzy_lifetime_price);
+    const lifetimeOriginalPrice = Number(getValue(rc, "toolzy_lifetime_original_price").asString() || DEFAULTS.toolzy_lifetime_original_price);
+    const lifetimeDiscount = Number(getValue(rc, "toolzy_lifetime_discount").asString() || DEFAULTS.toolzy_lifetime_discount);
+    const lifetimeRecommended = getValue(rc, "toolzy_lifetime_recommended").asBoolean() ?? DEFAULTS.toolzy_lifetime_recommended;
+    const offerLabel = getValue(rc, "toolzy_offer_label").asString() || DEFAULTS.toolzy_offer_label;
+
     return {
-      proPrice: Number(getValue(rc, "toolzy_pro_price").asString() || DEFAULTS.toolzy_pro_price),
-      proOriginalPrice: Number(getValue(rc, "toolzy_pro_original_price").asString() || DEFAULTS.toolzy_pro_original_price),
-      proDiscountEnabled: getValue(rc, "toolzy_pro_discount_enabled").asBoolean() ?? DEFAULTS.toolzy_pro_discount_enabled,
-      proDiscountPercentage: Number(getValue(rc, "toolzy_pro_discount_percentage").asString() || DEFAULTS.toolzy_pro_discount_percentage),
-      enterprisePrice: Number(getValue(rc, "toolzy_enterprise_price").asString() || DEFAULTS.toolzy_enterprise_price),
-      enterpriseOriginalPrice: Number(getValue(rc, "toolzy_enterprise_original_price").asString() || DEFAULTS.toolzy_enterprise_original_price),
-      enterpriseDiscountEnabled: getValue(rc, "toolzy_enterprise_discount_enabled").asBoolean() ?? DEFAULTS.toolzy_enterprise_discount_enabled,
-      enterpriseDiscountPercentage: Number(getValue(rc, "toolzy_enterprise_discount_percentage").asString() || DEFAULTS.toolzy_enterprise_discount_percentage),
+      monthlyPrice,
+      monthlyOriginalPrice,
+      monthlyDiscount,
+      lifetimePrice,
+      lifetimeOriginalPrice,
+      lifetimeDiscount,
+      lifetimeRecommended,
+      offerLabel,
+      // Compatibility fields
+      proPrice: monthlyPrice,
+      proOriginalPrice: monthlyOriginalPrice,
+      proDiscountEnabled: true,
+      proDiscountPercentage: monthlyDiscount,
+      enterprisePrice: lifetimePrice,
+      enterpriseOriginalPrice: lifetimeOriginalPrice,
+      enterpriseDiscountEnabled: true,
+      enterpriseDiscountPercentage: lifetimeDiscount,
     };
   } catch (error) {
     return {
+      monthlyPrice: DEFAULTS.toolzy_monthly_price,
+      monthlyOriginalPrice: DEFAULTS.toolzy_monthly_original_price,
+      monthlyDiscount: DEFAULTS.toolzy_monthly_discount,
+      lifetimePrice: DEFAULTS.toolzy_lifetime_price,
+      lifetimeOriginalPrice: DEFAULTS.toolzy_lifetime_original_price,
+      lifetimeDiscount: DEFAULTS.toolzy_lifetime_discount,
+      lifetimeRecommended: DEFAULTS.toolzy_lifetime_recommended,
+      offerLabel: DEFAULTS.toolzy_offer_label,
+      // Compatibility fields
       proPrice: DEFAULTS.toolzy_pro_price,
       proOriginalPrice: DEFAULTS.toolzy_pro_original_price,
       proDiscountEnabled: DEFAULTS.toolzy_pro_discount_enabled,
@@ -120,12 +165,37 @@ function formatTimeRemaining(endTimeStr: string): { text: string; isExpired: boo
 
 export function useRemoteConfig() {
   const [loading, setLoading] = useState(true);
-  const [pricing, setPricing] = useState(getPricingConfig());
-  const [discount, setDiscount] = useState(getDiscountConfig());
+  const [pricing, setPricing] = useState({
+    monthlyPrice: DEFAULTS.toolzy_monthly_price,
+    monthlyOriginalPrice: DEFAULTS.toolzy_monthly_original_price,
+    monthlyDiscount: DEFAULTS.toolzy_monthly_discount,
+    lifetimePrice: DEFAULTS.toolzy_lifetime_price,
+    lifetimeOriginalPrice: DEFAULTS.toolzy_lifetime_original_price,
+    lifetimeDiscount: DEFAULTS.toolzy_lifetime_discount,
+    lifetimeRecommended: DEFAULTS.toolzy_lifetime_recommended,
+    offerLabel: DEFAULTS.toolzy_offer_label,
+    // Compatibility fields
+    proPrice: DEFAULTS.toolzy_pro_price,
+    proOriginalPrice: DEFAULTS.toolzy_pro_original_price,
+    proDiscountEnabled: DEFAULTS.toolzy_pro_discount_enabled,
+    proDiscountPercentage: DEFAULTS.toolzy_pro_discount_percentage,
+    enterprisePrice: DEFAULTS.toolzy_enterprise_price,
+    enterpriseOriginalPrice: DEFAULTS.toolzy_enterprise_original_price,
+    enterpriseDiscountEnabled: DEFAULTS.toolzy_enterprise_discount_enabled,
+    enterpriseDiscountPercentage: DEFAULTS.toolzy_enterprise_discount_percentage,
+  });
+  const [discount, setDiscount] = useState({
+    endDate: DEFAULTS.toolzy_discount_end_date,
+    isExpired: false,
+  });
   const [timeRemaining, setTimeRemaining] = useState("");
 
   useEffect(() => {
     let active = true;
+    
+    // Update state to client-side remote config state immediately after hydration completes
+    setPricing(getPricingConfig());
+    setDiscount(getDiscountConfig());
     
     const setup = async () => {
       await initializeRemoteConfig();
@@ -160,8 +230,8 @@ export function useRemoteConfig() {
     return () => clearInterval(interval);
   }, [loading, discount.endDate]);
 
-  const proDiscountActive = pricing.proDiscountEnabled && !discount.isExpired;
-  const enterpriseDiscountActive = pricing.enterpriseDiscountEnabled && !discount.isExpired;
+  const proDiscountActive = !discount.isExpired;
+  const enterpriseDiscountActive = !discount.isExpired;
 
   return {
     loading,
@@ -171,17 +241,30 @@ export function useRemoteConfig() {
     proDiscountActive,
     enterpriseDiscountActive,
     pricingConfig: {
+      monthly: {
+        price: pricing.monthlyPrice,
+        originalPrice: pricing.monthlyOriginalPrice,
+        discount: pricing.monthlyDiscount,
+      },
+      lifetime: {
+        price: pricing.lifetimePrice,
+        originalPrice: pricing.lifetimeOriginalPrice,
+        discount: pricing.lifetimeDiscount,
+        recommended: pricing.lifetimeRecommended,
+      },
+      offerLabel: pricing.offerLabel,
+      // Compatibility fields
       pro: {
-        price: proDiscountActive ? pricing.proPrice : pricing.proOriginalPrice,
-        originalPrice: pricing.proOriginalPrice,
-        discountEnabled: proDiscountActive,
-        discountPercentage: pricing.proDiscountPercentage,
+        price: pricing.monthlyPrice,
+        originalPrice: pricing.monthlyOriginalPrice,
+        discountEnabled: true,
+        discountPercentage: pricing.monthlyDiscount,
       },
       enterprise: {
-        price: enterpriseDiscountActive ? pricing.enterprisePrice : pricing.enterpriseOriginalPrice,
-        originalPrice: pricing.enterpriseOriginalPrice,
-        discountEnabled: enterpriseDiscountActive,
-        discountPercentage: pricing.enterpriseDiscountPercentage,
+        price: pricing.lifetimePrice,
+        originalPrice: pricing.lifetimeOriginalPrice,
+        discountEnabled: true,
+        discountPercentage: pricing.lifetimeDiscount,
       },
     },
   };

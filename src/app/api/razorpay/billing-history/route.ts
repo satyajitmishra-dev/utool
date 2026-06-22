@@ -19,16 +19,21 @@ export async function GET() {
       return {
         id: data.id,
         uid: data.uid,
-        subscriptionId: data.subscriptionId,
-        paymentId: data.paymentId,
+        subscriptionId: data.subscriptionId || null,
+        paymentId: data.paymentId || null,
         amount: data.amount,
-        currency: data.currency,
+        currency: data.currency || "INR",
         status: data.status,
-        planName: data.planName,
-        invoiceMonth: data.invoiceMonth,
+        planName: data.planName || (data.planType === "lifetime" ? "Pro Lifetime" : "Pro Monthly"),
+        invoiceMonth: data.invoiceMonth || "—",
         date: data.date,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         rawCreatedAt: data.createdAt,
+        paymentType: data.paymentType || "subscription",
+        planType: data.planType || "monthly",
+        invoiceType: data.invoiceType || "monthly",
+        paymentMethod: data.paymentMethod || "Unknown",
+        receiptUrl: data.receiptUrl || null,
       };
     });
 

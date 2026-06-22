@@ -64,6 +64,8 @@ export async function POST(request: NextRequest) {
             subscriptionTier: "pro",
             subscriptionStatus: "active",
             subscriptionId: subscriptionId,
+            planType: "monthly",
+            paymentReference: subscriptionId,
             updatedAt: now,
           },
           { merge: true }
@@ -78,6 +80,8 @@ export async function POST(request: NextRequest) {
             subscriptionTier: "pro",
             subscriptionStatus: "active",
             subscriptionId: subscriptionId,
+            planType: "monthly",
+            paymentReference: subscriptionId,
             updatedAt: now,
           },
           { merge: true }
@@ -89,13 +93,16 @@ export async function POST(request: NextRequest) {
           const paymentEntity = payload.payment.entity;
           const paymentId = paymentEntity.id;
           const invoiceId = `INV-${paymentId}`;
-          const amountInRupees = paymentEntity.amount ? paymentEntity.amount / 100 : 299;
+          const amountInRupees = paymentEntity.amount ? paymentEntity.amount / 100 : 49;
           const invoiceMonth = now.toLocaleString("en-US", { month: "long", year: "numeric" });
           const friendlyDate = now.toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",
             year: "numeric",
           });
+          const receiptUrl = paymentEntity.invoice_id 
+            ? `https://dashboard.razorpay.com/invoices/${paymentEntity.invoice_id}` 
+            : null;
 
           await adminDb
             .collection("billing_history")
@@ -108,10 +115,15 @@ export async function POST(request: NextRequest) {
               amount: amountInRupees,
               currency: paymentEntity.currency || "INR",
               status: "Paid",
-              planName: "Pro Utility",
+              planName: "Pro Monthly",
               invoiceMonth: invoiceMonth,
               date: friendlyDate,
               createdAt: now,
+              paymentType: "subscription",
+              planType: "monthly",
+              invoiceType: "monthly",
+              paymentMethod: paymentEntity.method || "Unknown",
+              receiptUrl: receiptUrl,
             });
         }
         break;

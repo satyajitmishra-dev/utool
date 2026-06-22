@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyRazorpaySubscriptionSignature, razorpay } from "@/lib/razorpay";
+import { verifyRazorpayPaymentSignature, razorpay } from "@/lib/razorpay";
 import { getAuthUser } from "@/lib/auth-server";
 import { adminDb } from "@/lib/firebase-admin";
 import { redis } from "@/lib/redis";
@@ -11,14 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { subscriptionId, paymentId, signature } = await request.json();
+    const { orderId, paymentId, signature } = await request.json();
 
-    if (!subscriptionId || !paymentId || !signature) {
+    if (!orderId || !paymentId || !signature) {
       return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
     }
 
     // Verify signature securely
-    const isValid = verifyRazorpaySubscriptionSignature(subscriptionId, paymentId, signature);
+    const isValid = verifyRazorpayPaymentSignature(orderId, paymentId, signature);
     if (!isValid) {
       return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
     }
@@ -38,15 +38,15 @@ export async function POST(request: NextRequest) {
 
     const now = new Date();
 
-    // Webhook is the final source of truth, but we update Firestore instantly to sync UI
+    // Update Firestore user profile - Lifetime plan type, orderId as paymentReference
     const userRef = adminDb.collection("users").doc(user.uid);
     await userRef.set(
       {
         subscriptionTier: "pro",
         subscriptionStatus: "active",
-        subscriptionId: subscriptionId,
-        planType: "monthly",
-        paymentReference: subscriptionId,
+        planType: "lifetime",
+        paymentReference: orderId,
+        subscriptionId: null, // Clear any previous subscriptionId to avoid conflict
         updatedAt: now,
       },
       { merge: true }
@@ -54,21 +54,21 @@ export async function POST(request: NextRequest) {
 
     // Sync Redis cache instantly
     try {
-      await redis.set(`user:tier:${user.uid}`, "pro", { ex: 60 * 60 * 24 * 5 }); // 5 days expiration
+      await redis.set(`user:tier:${user.uid}`, "pro", { ex: 60 * 60 * 24 * 30 }); // 30 days expiration or longer
     } catch (redisError) {
       console.warn("Failed to set Redis cache tier:", redisError);
     }
 
-    const verifiedPrice = Number(process.env.RAZORPAY_MONTHLY_PRICE) || 49;
+    const verifiedPrice = Number(process.env.RAZORPAY_LIFETIME_PRICE) || 299;
 
     // Record invoice in billing history
     const invoiceId = `INV-${paymentId}`;
-    const invoiceMonth = now.toLocaleString("en-US", { month: "long", year: "numeric" }); // E.g. "June 2026"
+    const invoiceMonth = now.toLocaleString("en-US", { month: "long", year: "numeric" });
     const friendlyDate = now.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
-    }); // E.g. "June 21, 2026"
+    });
 
     await adminDb
       .collection("billing_history")
@@ -76,26 +76,26 @@ export async function POST(request: NextRequest) {
       .set({
         id: invoiceId,
         uid: user.uid,
-        subscriptionId: subscriptionId,
+        subscriptionId: orderId, // or null, but acts as unique checkout id
         paymentId: paymentId,
         amount: verifiedPrice,
         currency: "INR",
         status: "Paid",
-        planName: "Pro Monthly",
+        planName: "Pro Lifetime",
         invoiceMonth: invoiceMonth,
         date: friendlyDate,
         createdAt: now,
-        paymentType: "subscription",
-        planType: "monthly",
-        invoiceType: "monthly",
+        paymentType: "one-time",
+        planType: "lifetime",
+        invoiceType: "one-time",
         paymentMethod: paymentMethod,
         receiptUrl: receiptUrl || null,
       });
 
     return NextResponse.json({ status: "success" });
   } catch (error: unknown) {
-    console.error("Failed to verify subscription:", error);
-    const message = error instanceof Error ? error.message : "Failed to verify subscription";
+    console.error("Failed to verify order:", error);
+    const message = error instanceof Error ? error.message : "Failed to verify order";
     return NextResponse.json(
       { error: message },
       { status: 500 }
