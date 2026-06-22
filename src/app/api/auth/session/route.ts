@@ -71,8 +71,17 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ status: "success" });
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("Session creation endpoint error", error);
+    
+    // Check if it's a Firebase Auth error related to the token
+    if (error?.code?.startsWith('auth/') || error?.message?.includes('INVALID_ID_TOKEN')) {
+      return NextResponse.json(
+        { error: "Invalid or expired authentication token. Please sign in again. Ensure your client and server Firebase project credentials match." },
+        { status: 401 }
+      );
+    }
+    
     const message = error instanceof Error ? error.message : "Failed to create session";
     return NextResponse.json({ error: message }, { status: 500 });
   }
