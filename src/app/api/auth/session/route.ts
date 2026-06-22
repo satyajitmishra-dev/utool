@@ -92,3 +92,5 @@ export async function DELETE() {
     return NextResponse.json({ error: "Failed to destroy session" }, { status: 500 });
   }
 }
+export const dynamic = "force-dynamic";
+
