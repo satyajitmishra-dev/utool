@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        console.error("Failed to sync session cookie with server:", errorData.error || res.statusText);
+        console.error("Failed to sync session cookie with server:", errorData.error || res.statusText, "Details:", errorData.details, "Code:", errorData.code);
       }
     } catch (error) {
       console.error("Auth state synchronization error", error);

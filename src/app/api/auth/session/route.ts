@@ -74,16 +74,19 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Session creation endpoint error", error);
     
+    const errorCode = error?.code || 'UNKNOWN_ERROR';
+    const errorMessage = error instanceof Error ? error.message : "Failed to create session";
+    
     // Check if it's a Firebase Auth error related to the token
-    if (error?.code?.startsWith('auth/') || error?.message?.includes('INVALID_ID_TOKEN')) {
+    if (errorCode.startsWith('auth/') || errorMessage.includes('INVALID_ID_TOKEN')) {
       return NextResponse.json(
-        { error: "Invalid or expired authentication token. Please sign in again. Ensure your client and server Firebase project credentials match." },
+        { error: "Invalid or expired authentication token. Please sign in again.", code: errorCode, details: errorMessage },
         { status: 401 }
       );
     }
     
-    const message = error instanceof Error ? error.message : "Failed to create session";
-    return NextResponse.json({ error: message }, { status: 500 });
+    // Return detailed error for debugging Vercel deployment
+    return NextResponse.json({ error: errorMessage, code: errorCode, details: String(error) }, { status: 500 });
   }
 }
 
