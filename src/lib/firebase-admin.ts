@@ -96,9 +96,9 @@ const initializeFirebaseAdmin = () => {
   return initializeApp();
 };
 
-let adminApp: any;
-let adminAuth: any;
-let adminDb: any;
+let adminApp: ReturnType<typeof initializeApp> = undefined as any;
+let adminAuth: ReturnType<typeof getAuth> = undefined as any;
+let adminDb: ReturnType<typeof getFirestore> = undefined as any;
 
 try {
   adminApp = initializeFirebaseAdmin();
@@ -108,5 +108,5 @@ try {
   console.error("Firebase Admin Initialization Error:", error);
 }
 
-// We export them as any to avoid TS errors in the consuming files if they are undefined
+// We export them properly typed to avoid TS errors in the consuming files
 export { adminApp, adminAuth, adminDb };
