@@ -90,10 +90,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginWithGoogle = async () => {
-    setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
       const credential = await signInWithPopup(auth, provider);
+      setLoading(true);
       await syncSessionCookie(credential.user);
       router.push("/dashboard");
     } catch (error) {
