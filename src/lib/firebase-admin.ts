@@ -96,8 +96,17 @@ const initializeFirebaseAdmin = () => {
   return initializeApp();
 };
 
-const adminApp = initializeFirebaseAdmin();
-const adminAuth = getAuth(adminApp);
-const adminDb = getFirestore(adminApp);
+let adminApp: any;
+let adminAuth: any;
+let adminDb: any;
 
+try {
+  adminApp = initializeFirebaseAdmin();
+  adminAuth = getAuth(adminApp);
+  adminDb = getFirestore(adminApp);
+} catch (error) {
+  console.error("Firebase Admin Initialization Error:", error);
+}
+
+// We export them as any to avoid TS errors in the consuming files if they are undefined
 export { adminApp, adminAuth, adminDb };

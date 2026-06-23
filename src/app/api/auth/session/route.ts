@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
  * DELETE /api/auth/session
  * Destroys session cookie on logout.
  */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     cookieStore.delete("__session");
