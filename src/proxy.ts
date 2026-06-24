@@ -24,7 +24,7 @@ function decodeSessionCookie(cookieValue: string) {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Retrieve Firebase session cookie (default named '__session' for Firebase Hosting routing)
