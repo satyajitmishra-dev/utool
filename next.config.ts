@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  serverExternalPackages: ["firebase-admin", "jose", "jwks-rsa"],
+  /* config options here */
   async redirects() {
     return [
       {
