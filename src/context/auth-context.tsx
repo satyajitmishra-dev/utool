@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import {
   User as FirebaseUser,
   UserCredential,
@@ -11,28 +11,31 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  updateProfile,
 } from "firebase/auth";
-import { auth } from "@/config/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/config/firebase";
 import { useRouter } from "next/navigation";
 
-interface AuthContextType {
+export interface AuthContextType {
   user: FirebaseUser | null;
   loading: boolean;
+  authInitializing: boolean;
   login: (email: string, password: string) => Promise<UserCredential>;
-  signUp: (email: string, password: string) => Promise<UserCredential>;
+  signUp: (email: string, password: string, name?: string) => Promise<UserCredential>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [authInitializing, setAuthInitializing] = useState(true);
   const router = useRouter();
 
-  // Helper function to sync session cookie synchronously
   const syncSessionCookie = async (firebaseUser: FirebaseUser) => {
     try {
       const idToken = await firebaseUser.getIdToken(true);
@@ -42,8 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ idToken }),
       });
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        console.error("Failed to sync session cookie with server:", errorData.error || res.statusText, "Details:", errorData.details, "Code:", errorData.code);
+        console.error("Failed to sync session cookie");
       }
     } catch (error) {
       console.error("Auth state synchronization error", error);
@@ -58,13 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await syncSessionCookie(firebaseUser);
         } else {
           setUser(null);
-          // Clear session cookie
-          await fetch("/api/auth/session", { method: "DELETE" });
         }
       } catch (error) {
         console.error("Auth state logic error", error);
       } finally {
-        setLoading(false);
+        setAuthInitializing(false);
       }
     });
 
@@ -82,33 +82,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, name?: string) => {
     setLoading(true);
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    await syncSessionCookie(credential.user);
-    return credential;
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      if (name) {
+        await updateProfile(credential.user, { displayName: name });
+      }
+
+      const now = new Date();
+      await setDoc(doc(db, "users", credential.user.uid), {
+        uid: credential.user.uid,
+        name: name || null,
+        email: credential.user.email,
+        photoURL: null,
+        emailVerified: false,
+        subscriptionTier: "free",
+        subscriptionStatus: "none",
+        planType: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      await syncSessionCookie(credential.user);
+      return credential;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      const credential = await signInWithPopup(auth, provider);
       setLoading(true);
+      const credential = await signInWithPopup(auth, provider);
       await syncSessionCookie(credential.user);
       router.push("/dashboard");
     } catch (error) {
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
     setLoading(true);
     try {
+      // 1. Clear session cookie via API
+      await fetch("/api/auth/logout", { method: "POST" });
+      
+      // 2. Clear Firebase auth
       await firebaseSignOut(auth);
-      await fetch("/api/auth/session", { method: "DELETE" });
+      
+      // 3. Clear local state
       setUser(null);
-      router.push("/login");
+      
+      // 4. Redirect home
+      router.push("/");
     } catch (error) {
       console.error("Logout error", error);
     } finally {
@@ -125,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        authInitializing,
         login,
         signUp,
         loginWithGoogle,
@@ -137,10 +169,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-}
+export { useAuth } from "@/hooks/use-auth";

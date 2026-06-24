@@ -1,5 +1,22 @@
 import { cookies } from "next/headers";
-import { adminAuth } from "./firebase-admin";
+import { adminAuth } from "@/lib/firebase-admin";
+
+export async function verifySessionServer() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("__session")?.value;
+
+  if (!sessionCookie) {
+    return null;
+  }
+
+  try {
+    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    return decodedToken;
+  } catch (error) {
+    console.error("[Auth Server] Session verification failed:", error);
+    return null;
+  }
+}
 
 export interface AuthenticatedUser {
   uid: string;
@@ -8,22 +25,8 @@ export interface AuthenticatedUser {
   [key: string]: unknown;
 }
 
-/**
- * Retrieves and verifies the authenticated user from the session cookie.
- * Returns decoded claims if verified, otherwise null.
- */
 export async function getAuthUser(): Promise<AuthenticatedUser | null> {
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("__session")?.value;
-    if (!sessionCookie) {
-      return null;
-    }
-    
-    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
-    return decodedClaims as AuthenticatedUser;
-  } catch (error) {
-    console.warn("Authentication check failed on server:", error);
-    return null;
-  }
+  const decoded = await verifySessionServer();
+  if (!decoded) return null;
+  return decoded as AuthenticatedUser;
 }
