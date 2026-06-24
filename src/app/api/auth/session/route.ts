@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
       console.warn("[Session] Redis error caching tier, proceeding:", redisError);
     }
 
-    // Set cookie using await cookies()
-    const cookieStore = await cookies();
-    cookieStore.set("__session", sessionCookie, {
+    // Set cookie using NextResponse
+    const response = NextResponse.json({ status: "success" });
+    response.cookies.set("__session", sessionCookie, {
       maxAge: expiresIn / 1000,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       path: "/",
     });
 
-    return NextResponse.json({ status: "success" });
+    return response;
   } catch (error: any) {
     console.error("[Session] Unexpected endpoint error:", error);
     return NextResponse.json({ error: "Internal Server Error", details: String(error) }, { status: 500 });

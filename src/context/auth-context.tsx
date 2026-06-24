@@ -45,7 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ idToken }),
       });
       if (!res.ok) {
-        console.error("Failed to sync session cookie");
+        const errorText = await res.text();
+        console.error("Failed to sync session cookie:", errorText);
       }
     } catch (error) {
       console.error("Auth state synchronization error", error);
