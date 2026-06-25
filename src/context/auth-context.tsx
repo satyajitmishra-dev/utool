@@ -36,17 +36,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authInitializing, setAuthInitializing] = useState(true);
   const router = useRouter();
 
-  const syncSessionCookie = async (firebaseUser: FirebaseUser) => {
+  const syncSessionCookie = async (firebaseUser: FirebaseUser | null) => {
     try {
-      const idToken = await firebaseUser.getIdToken(true);
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Failed to sync session cookie:", errorText);
+      if (firebaseUser) {
+        const idToken = await firebaseUser.getIdToken(true);
+        const res = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+        });
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Failed to sync session cookie:", errorText);
+        }
+      } else {
+        await fetch("/api/auth/logout", { method: "POST" });
       }
     } catch (error) {
       console.error("Auth state synchronization error", error);
@@ -58,9 +62,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         if (firebaseUser) {
           setUser(firebaseUser);
-          await syncSessionCookie(firebaseUser);
+          // Only sync if it's the initial load to prevent flicker/repeated syncs
+          if (authInitializing) {
+            await syncSessionCookie(firebaseUser);
+          }
         } else {
           setUser(null);
+          if (authInitializing) {
+            await syncSessionCookie(null);
+          }
         }
       } catch (error) {
         console.error("Auth state logic error", error);
@@ -70,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [authInitializing]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);

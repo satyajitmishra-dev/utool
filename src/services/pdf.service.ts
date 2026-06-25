@@ -135,3 +135,104 @@ export async function compressPDF(
   
   return compressedBytes;
 }
+
+/**
+ * Removes password protection from a PDF document.
+ * @param file PDF File to unlock
+ * @param password The password to unlock the document
+ * @param onProgress Optional progress callback
+ */
+export async function removePasswordFromPDF(
+  file: File,
+  password?: string,
+  onProgress?: (progress: number) => void
+): Promise<Uint8Array> {
+  const { createQpdfRunner } = await import("qpdf-run");
+  
+  if (onProgress) onProgress(10);
+  
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const workerUrl = `${baseUrl}/qpdf/worker.js`;
+  const qpdfJsUrl = `${baseUrl}/qpdf/qpdf.js`;
+  const wasmUrl = `${baseUrl}/qpdf/qpdf.wasm`;
+
+  if (onProgress) onProgress(30);
+  
+  const qpdf = await createQpdfRunner({ workerUrl, qpdfJsUrl, wasmUrl });
+  
+  try {
+    if (onProgress) onProgress(50);
+    const pdfBytes = new Uint8Array(await file.arrayBuffer());
+
+    if (onProgress) onProgress(70);
+    const outputBytes = await qpdf.runOne({
+      input: pdfBytes,
+      inputName: "input.pdf",
+      outputName: "output.pdf",
+      args: ["--decrypt", "--password=" + (password || ""), "input.pdf", "output.pdf"]
+    });
+
+    if (onProgress) onProgress(100);
+    return outputBytes;
+  } catch (error: any) {
+    if (error.message && (error.message.includes("password") || error.message.toLowerCase().includes("invalid"))) {
+      throw new Error("Invalid password or this PDF cannot be unlocked.");
+    }
+    throw new Error("Failed to decrypt the document. " + (error.message || ""));
+  } finally {
+    await qpdf.destroy();
+  }
+}
+
+/**
+ * Adds password protection to a PDF document using qpdf WASM.
+ * @param file PDF File to encrypt
+ * @param password The password to apply
+ * @param onProgress Optional progress callback
+ */
+export async function addPasswordToPDF(
+  file: File,
+  password?: string,
+  onProgress?: (progress: number) => void
+): Promise<Uint8Array> {
+  if (!password) {
+    throw new Error("Password is required for encryption.");
+  }
+
+  const { createQpdfRunner } = await import("qpdf-run");
+  
+  if (onProgress) onProgress(10);
+  
+  // We use explicitly hosted assets in the public folder to avoid Next.js Webpack 
+  // module resolution errors with WASM and Web Workers. We construct absolute URLs
+  // so that qpdf-run doesn't incorrectly resolve them against a file:// import.meta.url.
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const workerUrl = `${baseUrl}/qpdf/worker.js`;
+  const qpdfJsUrl = `${baseUrl}/qpdf/qpdf.js`;
+  const wasmUrl = `${baseUrl}/qpdf/qpdf.wasm`;
+
+  if (onProgress) onProgress(30);
+  
+  const qpdf = await createQpdfRunner({ workerUrl, qpdfJsUrl, wasmUrl });
+  
+  try {
+    if (onProgress) onProgress(50);
+    const pdfBytes = new Uint8Array(await file.arrayBuffer());
+
+    if (onProgress) onProgress(70);
+    const outputBytes = await qpdf.runOne({
+      input: pdfBytes,
+      inputName: "input.pdf",
+      outputName: "output.pdf",
+      // We use 256-bit encryption (AES) and apply both user and owner passwords identically
+      args: ["--encrypt", password, password, "256", "--", "input.pdf", "output.pdf"]
+    });
+
+    if (onProgress) onProgress(100);
+    return outputBytes;
+  } catch (error: any) {
+    throw new Error("Failed to encrypt the document. " + (error.message || ""));
+  } finally {
+    await qpdf.destroy();
+  }
+}

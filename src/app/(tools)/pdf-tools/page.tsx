@@ -20,18 +20,32 @@ export default function PDFToolsHubPage() {
       status: "live" as const,
     },
     {
-      title: "Split PDF",
-      description: "Extract specific page sequences from a single document. Add custom range blocks and download a clean split output.",
-      href: "/tools/split-pdf",
-      tag: "pdf-split",
-      status: "coming-soon" as const,
-    },
-    {
       title: "Compress PDF",
       description: "Shrink PDF file sizes client-side. Strips incremental edit histories, cleans structures, and encodes compact object streams.",
-      href: "/tools/compress-pdf",
+      href: "/pdf-tools/compress",
       tag: "pdf-compress",
-      status: "coming-soon" as const,
+      status: "live" as const,
+    },
+    {
+      title: "Split PDF",
+      description: "Extract specific page sequences from a single document. Add custom range blocks and download a clean split output.",
+      href: "/pdf-tools/split",
+      tag: "pdf-split",
+      status: "live" as const,
+    },
+    {
+      title: "Add Password",
+      description: "Protect your PDF files with military-grade AES-256 password encryption to prevent unauthorized access.",
+      href: "/pdf-tools/add-password",
+      tag: "pdf-add-password",
+      status: "live" as const,
+    },
+    {
+      title: "Remove Password",
+      description: "Unlock protected PDF files. Enter the current password to decrypt and save a clean, accessible copy.",
+      href: "/pdf-tools/remove-password",
+      tag: "pdf-remove-password",
+      status: "live" as const,
     },
   ];
 

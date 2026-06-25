@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { safeRedirect } from "@/utils/safe-redirect";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -30,10 +31,7 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  let redirectUrl = searchParams.get("redirect") || "/dashboard";
-  if (!redirectUrl.startsWith("/")) {
-    redirectUrl = "/dashboard";
-  }
+  const redirectUrl = safeRedirect(searchParams.get("redirect"));
 
   const {
     register,

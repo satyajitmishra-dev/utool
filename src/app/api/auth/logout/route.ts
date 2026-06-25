@@ -1,19 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-/**
- * POST /api/auth/logout
- * Destroys session cookie on logout.
- */
-export async function POST(request: NextRequest) {
-  try {
-    const cookieStore = await cookies();
-    cookieStore.delete("__session");
-    return NextResponse.json({ status: "success" });
-  } catch (error: unknown) {
-    console.error("Session destruction endpoint error", error);
-    return NextResponse.json({ error: "Failed to destroy session" }, { status: 500 });
-  }
+export async function POST() {
+  const response = NextResponse.json({ status: "success" });
+  response.cookies.set("__session", "", {
+    maxAge: 0,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return response;
 }
-
-export const dynamic = "force-dynamic";

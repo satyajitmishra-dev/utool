@@ -115,29 +115,8 @@ export function CompressTool() {
 
   return (
     <div className="relative">
-      {/* Coming Soon Glassmorphism Overlay */}
-      <div className="absolute inset-0 z-10 backdrop-blur-[6px] bg-slate-50/10 rounded-3xl flex flex-col items-center justify-center p-8 text-center min-h-[380px] pointer-events-none">
-        <div className="glass-card max-w-sm p-8 rounded-3xl border border-slate-200/80 bg-white/90 shadow-lg flex flex-col items-center gap-4 animate-scale-in pointer-events-auto">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-650 shadow-sm">
-            <Minimize2 className="h-5.5 w-5.5 animate-pulse" />
-          </div>
-          <div>
-            <h3 className="text-md font-extrabold text-slate-800 tracking-tight">Compress PDF is Coming Soon</h3>
-            <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-              We are calibrating the client-side parser to compress files, discard revisions, and strip metadata with zero server latency.
-            </p>
-          </div>
-          <Link
-            href="/pdf-tools"
-            className="mt-2 inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 text-xs font-bold text-white shadow shadow-indigo-100/50 hover:shadow-indigo-200/60 transition-all duration-200 hover:-translate-y-0.5"
-          >
-            Explore Active Tools
-          </Link>
-        </div>
-      </div>
-
-      {/* Underlying Tool UI (Blurred and Inert) */}
-      <div className="opacity-40 pointer-events-none select-none filter blur-[1.5px] space-y-6">
+      {/* Main Tool UI */}
+      <div className="space-y-6">
         {/* 1. Daily Quota Warning Alert */}
         {limitStatus.isLimited && !limitLoading && (
           <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-4 flex gap-3 text-sm text-rose-800">
@@ -168,8 +147,8 @@ export function CompressTool() {
                 <PDFPreview files={files} onRemove={handleReset} />
 
                 {/* Compression Configuration Card */}
-                <div className="glass-card rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                  <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-3">
+                <div className="glass-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-3">
                     Select Compression Level
                   </h4>
 
@@ -196,12 +175,12 @@ export function CompressTool() {
                         type="button"
                         onClick={() => setLevel(levelItem.id as CompressionLevel)}
                         className={`text-left p-4 rounded-2xl border transition-all ${level === levelItem.id
-                            ? "border-indigo-500 bg-indigo-50/10 text-indigo-900 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 text-slate-700"
+                            ? "border-indigo-500 bg-indigo-50/10 text-primary-foreground shadow-sm"
+                            : "border-border hover:border-primary hover:bg-muted text-foreground"
                           }`}
                       >
                         <span className="block text-xs font-bold">{levelItem.label}</span>
-                        <span className="block text-4xs text-slate-500 mt-1 font-semibold leading-relaxed">
+                        <span className="block text-4xs text-muted-foreground mt-1 font-semibold leading-relaxed">
                           {levelItem.desc}
                         </span>
                       </button>
@@ -210,10 +189,10 @@ export function CompressTool() {
                 </div>
 
                 {/* Action Trigger Block */}
-                <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
+                <div className="flex justify-end gap-3 border-t border-border pt-5">
                   <button
                     onClick={handleReset}
-                    className="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600 transition"
+                    className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition"
                   >
                     Clear File
                   </button>
@@ -251,30 +230,30 @@ export function CompressTool() {
               )}
             </div>
 
-            <h3 className="text-lg font-bold text-slate-800">
+            <h3 className="text-lg font-bold text-foreground">
               {wasReduced ? "Compression Successful!" : "Optimization Completed!"}
             </h3>
 
             {/* Size Comparison Card */}
-            <div className="mt-6 glass-card px-6 py-4 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-center gap-6 max-w-sm">
+            <div className="mt-6 glass-card px-6 py-4 rounded-2xl border border-border shadow-sm flex items-center justify-center gap-6 max-w-sm">
               <div className="text-left">
-                <span className="block text-4xs text-slate-400 font-bold uppercase tracking-wider">Before</span>
-                <span className="text-xs font-bold text-slate-500 font-mono">{formatSize(originalSize)}</span>
+                <span className="block text-4xs text-muted-foreground font-bold uppercase tracking-wider">Before</span>
+                <span className="text-xs font-bold text-muted-foreground font-mono">{formatSize(originalSize)}</span>
               </div>
-              <ArrowRight className="h-4 w-4 text-slate-400" />
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
               <div className="text-left">
                 <span className="block text-4xs text-indigo-400 font-bold uppercase tracking-wider">After</span>
                 <span className="text-xs font-bold text-indigo-600 font-mono">{formatSize(compressedSize)}</span>
               </div>
               {wasReduced && (
-                <div className="border-l border-slate-100 pl-4 py-1 flex flex-col items-center">
+                <div className="border-l border-border pl-4 py-1 flex flex-col items-center">
                   <span className="text-[10px] font-extrabold text-emerald-600">-{savingsPercent}%</span>
-                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Saved</span>
+                  <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Saved</span>
                 </div>
               )}
             </div>
 
-            <p className="mt-4 text-xs text-slate-500 max-w-xs leading-relaxed">
+            <p className="mt-4 text-xs text-muted-foreground max-w-xs leading-relaxed">
               {wasReduced
                 ? "Your compressed document is ready for download."
                 : "No further size reduction could be achieved. Unused structural components were cleaned up successfully."
@@ -284,7 +263,7 @@ export function CompressTool() {
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
               <button
                 onClick={handleReset}
-                className="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600 transition flex items-center gap-1.5"
+                className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
               >
                 <RotateCcw className="h-4 w-4" />
                 Compress Another File
@@ -305,7 +284,7 @@ export function CompressTool() {
           <div className="flex justify-center mt-4">
             <button
               onClick={handleReset}
-              className="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600 transition flex items-center gap-1.5"
+              className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
             >
               <RotateCcw className="h-4 w-4" />
               Reset Workspace

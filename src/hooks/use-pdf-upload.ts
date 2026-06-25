@@ -5,11 +5,15 @@ import { toast } from "sonner";
 interface UsePDFUploadProps {
   tier?: "free" | "pro" | "enterprise";
   allowMultiple?: boolean;
+  requiresEncryption?: boolean;
+  rejectEncrypted?: boolean;
 }
 
 export function usePDFUpload({
   tier = "free",
   allowMultiple = true,
+  requiresEncryption = false,
+  rejectEncrypted = false,
 }: UsePDFUploadProps = {}) {
   const [files, setFiles] = useState<PDFFile[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +55,20 @@ export function usePDFUpload({
           // Parse page count dynamically
           const { PDFDocument } = await import("pdf-lib");
           const arrayBuffer = await file.arrayBuffer();
-          const pdfDoc = await PDFDocument.load(arrayBuffer);
+          // ignoreEncryption allows us to load the document metadata without throwing an error
+          const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
           const pageCount = pdfDoc.getPageCount();
+          const isEncrypted = pdfDoc.isEncrypted;
+
+          // Check encryption requirements
+          if (requiresEncryption && !isEncrypted) {
+            toast.error(`"${file.name}" is not password protected.`);
+            continue;
+          }
+          if (rejectEncrypted && isEncrypted) {
+            toast.error(`"${file.name}" is already encrypted.`);
+            continue;
+          }
 
           // Generate preview URL if browser supports it
           let previewUrl: string | undefined;
@@ -67,6 +83,7 @@ export function usePDFUpload({
             pageCount,
             file,
             previewUrl,
+            isEncrypted,
           });
         } catch (err) {
           console.error(`Failed to parse PDF metadata for ${file.name}:`, err);

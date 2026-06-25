@@ -5,6 +5,7 @@ export interface PDFFile {
   pageCount: number;
   file: File;
   previewUrl?: string;
+  isEncrypted?: boolean;
 }
 
 export type CompressionLevel = "low" | "medium" | "high";

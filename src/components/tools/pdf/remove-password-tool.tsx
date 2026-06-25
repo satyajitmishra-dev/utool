@@ -1,32 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { usePDFUpload } from "@/hooks/use-pdf-upload";
 import { useToolLimit } from "@/hooks/use-tool-limit";
-import { splitPDF } from "@/services/pdf.service";
+import { removePasswordFromPDF } from "@/services/pdf.service";
 import { UploadZone } from "./upload-zone";
 import { PDFPreview } from "./pdf-preview";
 import { ProgressBar } from "./progress-bar";
-import { AlertCircle, CheckCircle2, FileText, Download, RotateCcw, Lock, Plus, Trash2, Scissors } from "lucide-react";
+import { CheckCircle2, FileText, Download, RotateCcw, Lock, Unlock } from "lucide-react";
 import { motion } from "framer-motion";
-import { PageRange } from "@/types/pdf";
 import { toast } from "sonner";
 
-export function SplitTool() {
+export function RemovePasswordTool() {
   const { limitStatus, loading: limitLoading, checkLimit, recordUsage } = useToolLimit();
   const {
     files,
     error: uploadError,
-    setError,
     isDragActive,
     isParsing,
     addFiles,
     clearFiles,
     dragHandlers,
-  } = usePDFUpload({ tier: limitStatus.tier, allowMultiple: false });
+  } = usePDFUpload({ tier: limitStatus.tier, allowMultiple: false, requiresEncryption: true });
 
-  const [ranges, setRanges] = useState<PageRange[]>([{ start: 1, end: 1 }]);
+  const [password, setPassword] = useState("");
   const [processingState, setProcessingState] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [processingProgress, setProcessingProgress] = useState(0);
   const [downloadBytes, setDownloadBytes] = useState<Uint8Array | null>(null);
@@ -34,34 +31,12 @@ export function SplitTool() {
 
   const file = files[0];
 
-  const handleAddRange = () => {
-    if (!file) return;
-    setRanges((prev) => [...prev, { start: 1, end: file.pageCount }]);
-  };
-
-  const handleRemoveRange = (idx: number) => {
-    setRanges((prev) => prev.filter((_, i) => i !== idx));
-  };
-
-  const handleRangeChange = (idx: number, field: "start" | "end", val: number) => {
-    if (!file) return;
-    // Bound check
-    const boundedVal = Math.min(file.pageCount, Math.max(1, isNaN(val) ? 1 : val));
-    setRanges((prev) =>
-      prev.map((r, i) => (i === idx ? { ...r, [field]: boundedVal } : r))
-    );
-  };
-
-  const handleSplit = async () => {
+  const handleUnlock = async () => {
     if (!file) return;
 
-    // Validate ranges
-    for (let i = 0; i < ranges.length; i++) {
-      const r = ranges[i];
-      if (r.start > r.end) {
-        toast.error(`Validation Error (Range ${i + 1}): Start page cannot be greater than end page.`);
-        return;
-      }
+    if (!password) {
+      toast.error("Please enter a password to unlock.");
+      return;
     }
 
     setGeneralError(null);
@@ -74,32 +49,32 @@ export function SplitTool() {
     }
 
     setProcessingState("processing");
-    const toastId = toast.info("Preparing your split file...");
+    const toastId = toast.info("Removing password...");
 
     try {
-      const splitPdfBytes = await splitPDF(
+      const unlockedPdfBytes = await removePasswordFromPDF(
         file.file,
-        ranges,
+        password,
         (progress) => setProcessingProgress(progress)
       );
 
-      setDownloadBytes(splitPdfBytes);
+      setDownloadBytes(unlockedPdfBytes);
       setProcessingState("success");
 
       toast.dismiss(toastId);
-      toast.success("Your PDF is ready.");
+      toast.success("PDF unlocked successfully.");
 
-      await recordUsage("pdf-split", "success");
+      await recordUsage("pdf-remove-password", "success");
     } catch (err) {
-      console.error("PDF Split failure:", err);
-      const errMsg = err instanceof Error ? err.message : "An error occurred while splitting the file.";
+      console.error("PDF Unlock failure:", err);
+      const errMsg = err instanceof Error ? err.message : "An error occurred during unlocking.";
       setGeneralError(errMsg);
       setProcessingState("error");
 
       toast.dismiss(toastId);
       toast.error(errMsg);
 
-      await recordUsage("pdf-split", "failed", errMsg);
+      await recordUsage("pdf-remove-password", "failed", errMsg);
     }
   };
 
@@ -110,7 +85,7 @@ export function SplitTool() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `utool-split-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
+    a.download = `utool-unlocked-${file.name.replace(".pdf", "")}-${Date.now()}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -119,7 +94,7 @@ export function SplitTool() {
 
   const handleReset = () => {
     clearFiles();
-    setRanges([{ start: 1, end: 1 }]);
+    setPassword("");
     setProcessingState("idle");
     setProcessingProgress(0);
     setDownloadBytes(null);
@@ -132,7 +107,7 @@ export function SplitTool() {
     <div className="relative">
       {/* Main Tool UI */}
       <div className="space-y-6">
-        {/* 1. Daily Quota Warning Alert */}
+        {/* Daily Quota Warning Alert */}
         {limitStatus.isLimited && !limitLoading && (
           <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-4 flex gap-3 text-sm text-rose-800">
             <Lock className="h-5 w-5 text-rose-500 flex-shrink-0" />
@@ -145,7 +120,7 @@ export function SplitTool() {
           </div>
         )}
 
-        {/* 2. Main Workstation Panel */}
+        {/* Main Workstation Panel */}
         {processingState === "idle" && (
           <div className="space-y-6">
             {!file ? (
@@ -161,74 +136,26 @@ export function SplitTool() {
               <div className="space-y-6">
                 <PDFPreview files={files} onRemove={handleReset} />
 
-                {/* Page Range Customizer panel */}
+                {/* Password Configuration Card */}
                 <div className="glass-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
-                  <div className="flex justify-between items-center border-b border-border pb-3">
-                    <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">
-                      Select Page Ranges to Extract
-                    </h4>
-                    <span className="text-xs text-muted-foreground font-semibold">
-                      Document has {file.pageCount} {file.pageCount === 1 ? "page" : "pages"}
-                    </span>
-                  </div>
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider border-b border-border pb-3">
+                    Unlock PDF
+                  </h4>
 
                   <div className="space-y-3">
-                    {ranges.map((range, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <div className="flex-1 grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-4xs font-bold text-muted-foreground uppercase tracking-wider">
-                              Start Page
-                            </label>
-                            <input
-                              type="number"
-                              min={1}
-                              max={file.pageCount}
-                              value={range.start}
-                              onChange={(e) =>
-                                handleRangeChange(idx, "start", parseInt(e.target.value))
-                              }
-                              className="block w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold focus:border-indigo-500 focus:outline-none transition"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-4xs font-bold text-muted-foreground uppercase tracking-wider">
-                              End Page
-                            </label>
-                            <input
-                              type="number"
-                              min={1}
-                              max={file.pageCount}
-                              value={range.end}
-                              onChange={(e) =>
-                                handleRangeChange(idx, "end", parseInt(e.target.value))
-                              }
-                              className="block w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold focus:border-indigo-500 focus:outline-none transition"
-                            />
-                          </div>
-                        </div>
-
-                        {ranges.length > 1 && (
-                          <button
-                            onClick={() => handleRemoveRange(idx)}
-                            className="mt-5 p-2 rounded-xl text-muted-foreground hover:text-rose-600 hover:bg-rose-50/50 transition-colors"
-                            title="Remove range block"
-                          >
-                            <Trash2 className="h-4.5 w-4.5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                    <div>
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Enter the document password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="block w-full max-w-sm rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold focus:border-indigo-500 focus:outline-none transition"
+                      />
+                    </div>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={handleAddRange}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-500 transition-colors mt-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Another Range
-                  </button>
                 </div>
 
                 {/* Action Trigger Block */}
@@ -240,12 +167,12 @@ export function SplitTool() {
                     Clear File
                   </button>
                   <button
-                    onClick={handleSplit}
-                    disabled={limitStatus.isLimited}
+                    onClick={handleUnlock}
+                    disabled={limitStatus.isLimited || !password}
                     className="rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 shadow shadow-indigo-200/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-2"
                   >
-                    <FileText className="h-4.5 w-4.5" />
-                    Extract & Split PDF
+                    <Unlock className="h-4.5 w-4.5" />
+                    Unlock PDF
                   </button>
                 </div>
               </div>
@@ -253,24 +180,28 @@ export function SplitTool() {
           </div>
         )}
 
-        {/* 3. Processing State */}
+        {/* Processing State */}
         {processingState === "processing" && (
-          <ProgressBar progress={processingProgress} statusMessage="Extracting selected pages..." />
+          <ProgressBar progress={processingProgress} statusMessage="Decrypting and removing protection..." />
         )}
 
-        {/* 4. Success State */}
-        {processingState === "success" && (
+        {/* Success State */}
+        {processingState === "success" && file && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             className="glass-card border border-emerald-100 bg-emerald-50/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[280px]"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-5">
-              <CheckCircle2 className="h-6 w-6" />
+              <Unlock className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-bold text-foreground">Split Action Completed!</h3>
-            <p className="mt-2 text-xs text-muted-foreground max-w-sm leading-relaxed">
-              Successfully extracted your selected page sequence from the source document.
+
+            <h3 className="text-lg font-bold text-foreground">
+              PDF Unlocked Successfully!
+            </h3>
+
+            <p className="mt-4 text-xs text-muted-foreground max-w-xs leading-relaxed">
+              The password protection has been removed. Your clean, unlocked document is ready for download.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
@@ -279,20 +210,20 @@ export function SplitTool() {
                 className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
               >
                 <RotateCcw className="h-4 w-4" />
-                Split Another File
+                Unlock Another File
               </button>
               <button
                 onClick={handleDownload}
                 className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 shadow shadow-emerald-100/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-1.5"
               >
                 <Download className="h-4 w-4" />
-                Download Split PDF
+                Download Unlocked PDF
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* 6. Processing Failed State (can reset) */}
+        {/* Processing Failed State */}
         {processingState === "error" && (
           <div className="flex justify-center mt-4">
             <button

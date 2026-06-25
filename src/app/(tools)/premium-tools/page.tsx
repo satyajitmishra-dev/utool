@@ -17,6 +17,7 @@ import {
   Eraser,
   Wand2,
 } from "lucide-react";
+import { useToolLimit } from "@/hooks/use-tool-limit";
 
 const premiumTools = [
   {
@@ -52,6 +53,9 @@ const premiumTools = [
 export default function PremiumToolsPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string>("");
+  const { limitStatus } = useToolLimit();
+
+  const isPro = limitStatus.tier === "pro" || limitStatus.tier === "enterprise";
 
   const handleToolClick = (name: string) => {
     setSelectedTool(name);
@@ -82,15 +86,17 @@ export default function PremiumToolsPage() {
           return (
             <div key={tool.id} className="relative">
               {/* Blur overlay */}
-              <div className="absolute inset-0 z-10 rounded-2xl bg-background/40 backdrop-blur-[2px] flex items-center justify-center">
-                <button
-                  onClick={() => handleToolClick(tool.name)}
-                  className="flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold shadow-lg hover:opacity-90 transition-opacity"
-                >
-                  <Lock className="h-4 w-4" />
-                  Unlock with Pro
-                </button>
-              </div>
+              {!isPro && (
+                <div className="absolute inset-0 z-10 rounded-2xl bg-background/40 backdrop-blur-[2px] flex items-center justify-center">
+                  <button
+                    onClick={() => handleToolClick(tool.name)}
+                    className="flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-semibold shadow-lg hover:opacity-90 transition-opacity"
+                  >
+                    <Lock className="h-4 w-4" />
+                    Unlock with Pro
+                  </button>
+                </div>
+              )}
 
               {/* Card (blurred behind) */}
               <GlassCard hover={false} className="p-6">
