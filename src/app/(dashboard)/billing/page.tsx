@@ -44,7 +44,7 @@ export default function BillingPage() {
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [planType, setPlanType] = useState<string | null>(null);
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
-  
+
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
 
@@ -396,7 +396,8 @@ export default function BillingPage() {
   return (
     <div className="space-y-10 pb-16 relative">
       {/* Dynamic inline styles for premium glowing effects and animations */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes border-pulse {
           0%, 100% {
             border-color: rgba(139, 92, 246, 0.4);
@@ -458,7 +459,7 @@ export default function BillingPage() {
                   : "You are on the free tier. Upgrading gives you unlimited operations, faster processing speeds, priority support, and premium conversion utilities."}
             </p>
           </div>
-          
+
           {/* Cancel button is ONLY shown for Active Monthly subscribers */}
           {isPro && planType === "monthly" && !isCancelledPending && (
             <div>
@@ -525,7 +526,7 @@ export default function BillingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto pt-4">
-          
+
           {/* Card 1 — Pro Monthly (Secondary Card) */}
           <div
             className={cn(
@@ -686,27 +687,27 @@ export default function BillingPage() {
               <ul className="space-y-3 text-xs text-muted-foreground border-t border-violet-500/20 pt-5">
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Unlimited tools & actions</span>
+                  <span className="text-foreground/95 font-semibold">Unlimited tools & actions</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Premium-only tools unlocked</span>
+                  <span className="text-foreground/95 font-semibold">Premium-only tools unlocked</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Faster processing & priority</span>
+                  <span className="text-foreground/95 font-semibold">Faster processing & priority</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Higher usage limits</span>
+                  <span className="text-foreground/95 font-semibold">Higher usage limits</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Future premium updates (FREE)</span>
+                  <span className="text-foreground/95 font-semibold">Future premium updates(FREE)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-violet-400 flex-shrink-0" />
-                  <span className="text-foreground/95 font-semibold">✓ Priority VIP support</span>
+                  <span className="text-foreground/95 font-semibold">Priority VIP support</span>
                 </li>
               </ul>
             </div>
@@ -748,7 +749,7 @@ export default function BillingPage() {
           <ShieldCheck className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-bold text-foreground">Billing Statements</h2>
         </div>
-        
+
         {invoices.length === 0 ? (
           <div className="rounded-3xl border border-border p-12 text-center bg-card/10 border-dashed">
             <p className="text-body-s text-muted-foreground">No invoices or billing statements found for this account.</p>

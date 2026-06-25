@@ -12,6 +12,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
@@ -102,6 +103,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await updateProfile(credential.user, { displayName: name });
       }
 
+      // Automatically send verification email
+      try {
+        await sendEmailVerification(credential.user);
+        console.log("[Auth] Automatic signup verification email sent.");
+      } catch (err) {
+        console.error("[Auth] Failed to send verification email on signup:", err);
+      }
+
       const now = new Date();
       await setDoc(doc(db, "users", credential.user.uid), {
         uid: credential.user.uid,
@@ -114,6 +123,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         planType: null,
         createdAt: now,
         updatedAt: now,
+        totalLifetimeUsage: 0,
+        toolUsageCounts: {},
+        lastUsedTool: "None",
+        lastActiveAt: now,
       });
 
       await syncSessionCookie(credential.user);

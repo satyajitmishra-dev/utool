@@ -14,6 +14,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     "",
     "/tools",
+    "/tools/pdf-tools",
+    "/tools/image-tools",
+    "/tools/developer-tools",
+    "/tools/resume-tools",
+    "/tools/text-tools",
     "/blog",
     "/about",
     "/privacy",

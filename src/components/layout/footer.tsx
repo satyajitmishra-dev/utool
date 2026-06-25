@@ -84,9 +84,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-14 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 text-body-s font-semibold text-foreground">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] shadow-sm">
-              <Wrench className="h-3.5 w-3.5 text-white" />
-            </div>
+            <img src="/logo.png" alt="Logo" className="h-7 w-7 object-contain rounded-lg" />
             {siteConfig.name}
           </div>
           <p className="text-caption text-muted-foreground">

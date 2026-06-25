@@ -62,9 +62,7 @@ export function Navbar({
             href="/"
             className="flex items-center gap-2.5 font-semibold text-[17px] tracking-tight text-foreground hover:opacity-90 transition-opacity"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[image:var(--gradient-primary)] shadow-sm">
-              <Wrench className="h-[18px] w-[18px] text-white" />
-            </div>
+            <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain rounded-[10px]" />
             {siteConfig.name}
           </Link>
 

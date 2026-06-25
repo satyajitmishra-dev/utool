@@ -10,6 +10,9 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    if (!user.email_verified) {
+      return NextResponse.json({ error: "Email verification required" }, { status: 403 });
+    }
 
     const body = await request.json().catch(() => ({}));
     const clientPrice = Number(body.price);

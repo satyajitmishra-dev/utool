@@ -102,7 +102,7 @@ export function useToolLimit() {
       
       try {
         if (status === "success") {
-          await incrementGlobalUsage(identifier);
+          await incrementGlobalUsage(identifier, toolId);
         }
         await refresh(); // Refresh local counts after logging
       } catch (error) {

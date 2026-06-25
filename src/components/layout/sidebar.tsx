@@ -47,9 +47,7 @@ export function Sidebar() {
             collapsed && "justify-center"
           )}
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] shadow-sm flex-shrink-0">
-            <Wrench className="h-4 w-4 text-white" />
-          </div>
+          <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain rounded-lg flex-shrink-0" />
           {!collapsed && <span>{siteConfig.name}</span>}
         </Link>
         <button

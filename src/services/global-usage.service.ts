@@ -6,7 +6,7 @@ import {
   updateDoc,
   serverTimestamp,
   increment,
-  Timestamp,
+  runTransaction,
 } from "firebase/firestore";
 import { ToolLimitStatus } from "@/types/pdf";
 
@@ -78,7 +78,6 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
   const isGuest = identifier.startsWith("anon_");
   let tier: "free" | "pro" | "enterprise" = "free";
 
-  // If it's a guest, use local storage immediately to avoid unnecessary Firestore writes and permission errors
   if (isGuest) {
     const localData = getLocalUsage(identifier);
     const now = new Date();
@@ -106,13 +105,23 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
   }
 
   try {
-    // 1. Fetch user subscription tier if registered
+    // Fetch user document from users/{uid}
     const userDocRef = doc(db, "users", identifier);
     const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      tier = userData.subscriptionTier || "free";
+    
+    if (!userDocSnap.exists()) {
+      return {
+        count: 0,
+        max: LIMIT_FREE_USER,
+        isLimited: false,
+        loading: false,
+        tier: "free",
+        resetAt: null,
+      };
     }
+
+    const userData = userDocSnap.data();
+    tier = userData.subscriptionTier || "free";
 
     // Pro and Enterprise users have unlimited access
     if (tier === "pro" || tier === "enterprise") {
@@ -125,42 +134,17 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
       };
     }
 
-    // 2. Fetch or create usage_logs/{identifier} aggregate log document
-    const logDocRef = doc(db, "usage_logs", identifier);
-    const logDocSnap = await getDoc(logDocRef);
-
-    const now = new Date();
-    const startOfNextDay = new Date();
-    startOfNextDay.setUTCHours(24, 0, 0, 0);
-
+    const dateStr = new Date().toISOString().split("T")[0];
+    const dailyUsageDate = userData.dailyUsageDate || "";
+    
     let count = 0;
-    let resetAt = startOfNextDay;
-
-    if (logDocSnap.exists()) {
-      const data = logDocSnap.data();
-      const dbResetAt = data.resetAt ? (data.resetAt as Timestamp).toDate() : null;
-
-      // If the reset date has passed, reset the count
-      if (dbResetAt && dbResetAt < now) {
-        await resetUsage(identifier);
-        count = 0;
-        resetAt = startOfNextDay;
-      } else {
-        count = data.count || 0;
-        resetAt = dbResetAt || startOfNextDay;
-      }
-    } else {
-      // Create empty record
-      await setDoc(logDocRef, {
-        identifier,
-        type: isGuest ? "guest" : "user",
-        count: 0,
-        lastUsedAt: serverTimestamp(),
-        resetAt: Timestamp.fromDate(startOfNextDay),
-      });
+    if (dailyUsageDate === dateStr) {
+      count = userData.dailyUsageCount || 0;
     }
 
-    const max = isGuest ? LIMIT_GUEST : LIMIT_FREE_USER;
+    const max = LIMIT_FREE_USER;
+    const startOfNextDay = new Date();
+    startOfNextDay.setUTCHours(24, 0, 0, 0);
 
     return {
       count,
@@ -168,10 +152,10 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
       isLimited: count >= max,
       loading: false,
       tier,
-      resetAt,
+      resetAt: startOfNextDay,
     };
   } catch (error) {
-    console.warn("Firestore usage log query offline/unconfigured, falling back to client-side localStorage limits.", error);
+    console.warn("Firestore user document query failed, falling back to localStorage limits.", error);
 
     // Local storage fallback
     const localData = getLocalUsage(identifier);
@@ -189,7 +173,7 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
       saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
     }
 
-    const max = isGuest ? LIMIT_GUEST : LIMIT_FREE_USER;
+    const max = LIMIT_FREE_USER;
 
     return {
       count,
@@ -203,9 +187,9 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
 }
 
 /**
- * Increments the global usage count.
+ * Increments the global usage count and updates user stats aggregates atomically on the users/{uid} document.
  */
-export async function incrementGlobalUsage(identifier: string): Promise<void> {
+export async function incrementGlobalUsage(identifier: string, toolId?: string): Promise<void> {
   if (identifier.startsWith("anon_")) {
     const localData = getLocalUsage(identifier);
     localData.count += 1;
@@ -214,13 +198,38 @@ export async function incrementGlobalUsage(identifier: string): Promise<void> {
   }
 
   try {
-    const logDocRef = doc(db, "usage_logs", identifier);
-    await updateDoc(logDocRef, {
-      count: increment(1),
-      lastUsedAt: serverTimestamp(),
+    const userRef = doc(db, "users", identifier);
+    const dateStr = new Date().toISOString().split("T")[0];
+
+    await runTransaction(db, async (transaction) => {
+      const userSnap = await transaction.get(userRef);
+
+      if (!userSnap.exists()) {
+        throw new Error(`User document ${identifier} does not exist`);
+      }
+
+      const userData = userSnap.data();
+      const dailyUsageDate = userData.dailyUsageDate || "";
+      const currentDailyCount = dailyUsageDate === dateStr ? (userData.dailyUsageCount || 0) : 0;
+
+      // Update aggregate fields on users/{uid}
+      const userUpdate: Record<string, any> = {
+        totalLifetimeUsage: increment(1),
+        dailyUsageDate: dateStr,
+        dailyUsageCount: currentDailyCount + 1,
+        lastActiveAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      if (toolId) {
+        userUpdate.lastUsedTool = toolId;
+        userUpdate[`toolUsageCounts.${toolId}`] = increment(1);
+      }
+
+      transaction.update(userRef, userUpdate);
     });
   } catch (error) {
-    console.warn("Failed to increment Firestore usage log, falling back to local limit increment.");
+    console.warn("Failed to atomically increment usage log, falling back to local limit increment.", error);
     const localData = getLocalUsage(identifier);
     localData.count += 1;
     saveLocalUsage(identifier, localData);
@@ -228,7 +237,7 @@ export async function incrementGlobalUsage(identifier: string): Promise<void> {
 }
 
 /**
- * Resets the daily usage count and updates resetAt timestamp.
+ * Resets the daily usage count on the users/{uid} document.
  */
 export async function resetUsage(identifier: string): Promise<void> {
   const startOfNextDay = new Date();
@@ -240,14 +249,13 @@ export async function resetUsage(identifier: string): Promise<void> {
   }
 
   try {
-    const logDocRef = doc(db, "usage_logs", identifier);
-
-    await updateDoc(logDocRef, {
-      count: 0,
-      resetAt: Timestamp.fromDate(startOfNextDay),
+    const userRef = doc(db, "users", identifier);
+    await updateDoc(userRef, {
+      dailyUsageCount: 0,
+      updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.warn("Failed to reset Firestore usage log, falling back to local reset.");
+    console.warn("Failed to reset Firestore usage log, falling back to local reset.", error);
     saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
   }
 }
