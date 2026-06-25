@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const clientPrice = Number(body.price);
 
     // Secure backend price validation
-    const verifiedPrice = Number(process.env.RAZORPAY_MONTHLY_PRICE) || 49;
+    const verifiedPrice = Number(process.env.RAZORPAY_MONTHLY_PRICE) || 29;
 
     let planId = process.env.RAZORPAY_MONTHLY_PLAN_ID || process.env.RAZORPAY_PRO_PLAN_ID;
 

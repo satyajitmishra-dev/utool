@@ -15,7 +15,7 @@ const imageTools = [
     tag: "image-convert",
     status: "live" as const,
     isPremium: false,
-    href: "/image-tools/webp-converter",
+    href: "/tools/webp-converter",
   },
   {
     id: "image-resize",

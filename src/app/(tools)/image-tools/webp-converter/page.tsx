@@ -40,7 +40,7 @@ interface ConversionItem {
   error?: string;
 }
 
-export default function WebPConverterPage() {
+export default function WebPConverterPage({ hideHeader = false }: { hideHeader?: boolean }) {
   const { user, logout } = useAuth();
   const { limitStatus, loading: limitLoading, checkLimit, recordUsage, refresh } = useToolLimit();
 
@@ -245,112 +245,118 @@ export default function WebPConverterPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20 selection:text-foreground">
+    <div className={hideHeader ? "w-full" : "min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20 selection:text-foreground"}>
       {/* Header */}
-      <header className="sticky top-0 z-40 glass border-b border-border">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2.5 font-semibold text-[17px] tracking-tight text-foreground hover:opacity-90 transition-opacity"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[image:var(--gradient-primary)] shadow-sm">
-                <FileImage className="h-[18px] w-[18px] text-white" />
-              </div>
-              <span>
-                utool{" "}
-                <Badge variant="primary" className="ml-1 align-middle text-[9px]">
-                  Workspace
-                </Badge>
-              </span>
-            </Link>
-            <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-border">
-              <span className="text-caption font-bold text-foreground">WebP Converter</span>
-              <Badge variant="success">Live</Badge>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {!limitLoading ? (
-              limitStatus.tier === "pro" ? (
-                <Badge variant="pro" className="hidden sm:inline-flex">
-                  <Sparkles className="h-3 w-3" />
-                  Pro: Unlimited
-                </Badge>
-              ) : (
-                <div className="hidden sm:flex items-center gap-2">
-                  <Badge variant="default">
-                    Actions: {limitStatus.count} / {limitStatus.max}
-                  </Badge>
-                  <button
-                    onClick={refresh}
-                    className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  </button>
+      {!hideHeader && (
+        <header className="sticky top-0 z-40 glass border-b border-border">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2.5 font-semibold text-[17px] tracking-tight text-foreground hover:opacity-90 transition-opacity"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[image:var(--gradient-primary)] shadow-sm">
+                  <FileImage className="h-[18px] w-[18px] text-white" />
                 </div>
-              )
-            ) : (
-              <div className="hidden sm:block h-6 w-24 skeleton rounded-full" />
-            )}
+                <span>
+                  utool{" "}
+                  <Badge variant="primary" className="ml-1 align-middle text-[9px]">
+                    Workspace
+                  </Badge>
+                </span>
+              </Link>
+              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-border">
+                <span className="text-caption font-bold text-foreground">WebP Converter</span>
+                <Badge variant="success">Live</Badge>
+              </div>
+            </div>
 
-            <ThemeToggle />
-
-            <div className="flex items-center gap-2 pl-3 border-l border-border">
-              {user ? (
-                <>
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-muted border border-border text-muted-foreground"
-                    title={user.email || ""}
-                  >
-                    <User className="h-4.5 w-4.5" />
+            <div className="flex items-center gap-3">
+              {!limitLoading ? (
+                limitStatus.tier === "pro" ? (
+                  <Badge variant="pro" className="hidden sm:inline-flex">
+                    <Sparkles className="h-3 w-3" />
+                    Pro: Unlimited
+                  </Badge>
+                ) : (
+                  <div className="hidden sm:flex items-center gap-2">
+                    <Badge variant="default">
+                      Actions: {limitStatus.count} / {limitStatus.max}
+                    </Badge>
+                    <button
+                      onClick={refresh}
+                      className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                  <button
-                    onClick={logout}
-                    className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </button>
-                </>
+                )
               ) : (
-                <Link
-                  href="/login?redirect=/image-tools/webp-converter"
-                  className="inline-flex items-center justify-center rounded-xl bg-card border border-border px-3.5 py-1.5 text-caption font-bold text-foreground hover:bg-muted transition-all"
-                >
-                  Log In
-                </Link>
+                <div className="hidden sm:block h-6 w-24 skeleton rounded-full" />
               )}
+
+              <ThemeToggle />
+
+              <div className="flex items-center gap-2 pl-3 border-l border-border">
+                {user ? (
+                  <>
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted border border-border text-muted-foreground"
+                      title={user.email || ""}
+                    >
+                      <User className="h-4.5 w-4.5" />
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login?redirect=/image-tools/webp-converter"
+                    className="inline-flex items-center justify-center rounded-xl bg-card border border-border px-3.5 py-1.5 text-caption font-bold text-foreground hover:bg-muted transition-all"
+                  >
+                    Log In
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-10 flex flex-col justify-center">
-        <div className="mb-8">
-          <Link
-            href="/tools"
-            className="inline-flex items-center gap-2 text-caption font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Catalog
-          </Link>
-        </div>
+      <main className={hideHeader ? "w-full" : "flex-1 max-w-4xl w-full mx-auto px-6 py-10 flex flex-col justify-center"}>
+        {!hideHeader && (
+          <div className="mb-8">
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-2 text-caption font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Catalog
+            </Link>
+          </div>
+        )}
 
         <div className="space-y-10">
           {/* Headline */}
-          <div className="text-center max-w-xl mx-auto space-y-3">
-            <Badge variant="primary" className="mx-auto">
-              <Sparkles className="h-3.5 w-3.5 mr-1" />
-              100% Client-Side Engine
-            </Badge>
-            <h1 className="text-display-md font-extrabold tracking-tight text-foreground">
-              Image WebP Converter
-            </h1>
-            <p className="text-body-sm text-muted-foreground leading-relaxed">
-              Convert PNG, JPEG, and WebP images to highly compressed WebP files directly in your browser. Complete privacy with zero server uploads.
-            </p>
-          </div>
+          {!hideHeader && (
+            <div className="text-center max-w-xl mx-auto space-y-3">
+              <Badge variant="primary" className="mx-auto">
+                <Sparkles className="h-3.5 w-3.5 mr-1" />
+                100% Client-Side Engine
+              </Badge>
+              <h1 className="text-display-md font-extrabold tracking-tight text-foreground">
+                Image WebP Converter
+              </h1>
+              <p className="text-body-sm text-muted-foreground leading-relaxed">
+                Convert PNG, JPEG, and WebP images to highly compressed WebP files directly in your browser. Complete privacy with zero server uploads.
+              </p>
+            </div>
+          )}
 
           {/* Daily Quota Alert */}
           {limitStatus.isLimited && !limitLoading && (

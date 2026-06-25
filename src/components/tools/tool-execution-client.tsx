@@ -17,7 +17,7 @@ import {
   Terminal,
 } from "lucide-react";
 
-export default function ToolExecutionClient() {
+export default function ToolExecutionClient({ hideHeader = false }: { hideHeader?: boolean }) {
   const params = useParams();
   const slug = params.slug as string;
 
@@ -40,7 +40,7 @@ export default function ToolExecutionClient() {
       inputPlaceholder: "PORT=3000\nDATABASE_URL=mongodb://localhost\nUPSTASH_TOKEN=",
       credits: 1,
     },
-    "gradient-maker": {
+    "css-gradient-generator": {
       name: "CSS Gradient Generator",
       desc: "Compile custom radial/linear CSS HSL gradient codes.",
       inputPlaceholder: "Enter primary hues separated by commas...\ne.g. 210, 260, 320",
@@ -73,7 +73,7 @@ export default function ToolExecutionClient() {
             return `[VALID] ${k}: ${v ? "Present" : "Missing Value"}`;
           });
           setOutput(validated.join("\n"));
-        } else if (slug === "gradient-maker") {
+        } else if (slug === "css-gradient-generator") {
           const colors = input.split(",").map((c) => c.trim());
           setOutput(`background-image: linear-gradient(to right, ${colors.map((c) => `hsl(${c}, 70%, 50%)`).join(", ")});`);
         } else {
@@ -102,29 +102,31 @@ export default function ToolExecutionClient() {
   return (
     <div className="space-y-6">
       {/* Navigation and Title */}
-      <div className="flex flex-col gap-4 border-b border-border pb-6">
-        <div>
-          <Link
-            href="/tools"
-            className="inline-flex items-center gap-1.5 text-caption font-bold text-muted-foreground hover:text-foreground transition mb-3 uppercase tracking-wider"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Catalog
-          </Link>
-          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-            <div>
-              <h1 className="text-display-sm font-bold tracking-tight text-foreground flex items-center gap-2.5">
-                {currentTool.name}
-              </h1>
-              <p className="text-body-sm text-muted-foreground mt-1">{currentTool.desc}</p>
+      {!hideHeader && (
+        <div className="flex flex-col gap-4 border-b border-border pb-6">
+          <div>
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-1.5 text-caption font-bold text-muted-foreground hover:text-foreground transition mb-3 uppercase tracking-wider"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Catalog
+            </Link>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+              <div>
+                <h1 className="text-display-sm font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  {currentTool.name}
+                </h1>
+                <p className="text-body-sm text-muted-foreground mt-1">{currentTool.desc}</p>
+              </div>
+              <Badge variant="primary" className="self-start">
+                <Sparkles className="h-3.5 w-3.5 mr-1" />
+                <span>Cost: {currentTool.credits} {currentTool.credits === 1 ? "credit" : "credits"}</span>
+              </Badge>
             </div>
-            <Badge variant="primary" className="self-start">
-              <Sparkles className="h-3.5 w-3.5 mr-1" />
-              <span>Cost: {currentTool.credits} {currentTool.credits === 1 ? "credit" : "credits"}</span>
-            </Badge>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Editor & Execution Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 // Default configs (INR base values)
 const DEFAULTS = {
-  toolzy_monthly_price: 49,
+  toolzy_monthly_price: 29,
   toolzy_monthly_original_price: 599,
   toolzy_monthly_discount: 90,
   toolzy_lifetime_price: 299,
@@ -13,7 +13,7 @@ const DEFAULTS = {
   toolzy_lifetime_recommended: true,
   toolzy_offer_label: "Launch Offer",
   // Backward compatibility defaults
-  toolzy_pro_price: 49,
+  toolzy_pro_price: 29,
   toolzy_pro_original_price: 599,
   toolzy_pro_discount_enabled: true,
   toolzy_pro_discount_percentage: 90,
@@ -29,7 +29,7 @@ let initPromise: Promise<boolean> | null = null;
 export function initializeRemoteConfig(): Promise<boolean> {
   if (typeof window === "undefined") return Promise.resolve(false);
   if (initPromise) return initPromise;
-  
+
   initPromise = (async () => {
     try {
       const rc = getRemoteConfig(app);
@@ -42,7 +42,7 @@ export function initializeRemoteConfig(): Promise<boolean> {
       return false;
     }
   })();
-  
+
   return initPromise;
 }
 
@@ -68,7 +68,7 @@ export function getPricingConfig() {
       enterpriseDiscountPercentage: DEFAULTS.toolzy_enterprise_discount_percentage,
     };
   }
-  
+
   try {
     const rc = getRemoteConfig(app);
     const monthlyPrice = Number(getValue(rc, "toolzy_monthly_price").asString() || DEFAULTS.toolzy_monthly_price);
@@ -129,7 +129,7 @@ export function getDiscountConfig() {
       isExpired: false,
     };
   }
-  
+
   try {
     const rc = getRemoteConfig(app);
     const endDate = getValue(rc, "toolzy_discount_end_date").asString() || DEFAULTS.toolzy_discount_end_date;
@@ -192,11 +192,11 @@ export function useRemoteConfig() {
 
   useEffect(() => {
     let active = true;
-    
+
     // Update state to client-side remote config state immediately after hydration completes
     setPricing(getPricingConfig());
     setDiscount(getDiscountConfig());
-    
+
     const setup = async () => {
       await initializeRemoteConfig();
       if (!active) return;

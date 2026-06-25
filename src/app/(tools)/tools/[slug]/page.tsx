@@ -25,7 +25,7 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-const devTools = ["json-formatter", "env-validator", "gradient-maker"];
+const devTools = ["env-validator"];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProgrammaticToolPage({ params }: Props) {
   const { slug } = await params;
 
-  // 1. Check if it's one of the developer/utility tools
+  // 1. Check if it's a developer/utility tool with no SEO landing page
   if (devTools.includes(slug)) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-10">
