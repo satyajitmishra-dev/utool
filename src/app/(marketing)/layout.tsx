@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { FloatingDock } from "@/components/ui/floating-dock";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 export default function MarketingLayout({
   children,
@@ -10,10 +10,10 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex-1 pt-16">{children}</main>
-      <Footer />
+    <div className="flex min-h-screen flex-col relative">
+      <FloatingDock />
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
     </div>
   );
 }

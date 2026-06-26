@@ -16,10 +16,20 @@ import {
   Zap,
   Home,
   ChevronRight,
+  MessageSquare,
+  LifeBuoy,
+  Heart,
 } from "lucide-react";
 
 import { ToolWorkspaceClient } from "@/components/tools/tool-workspace-client";
 import ToolExecutionClient from "@/components/tools/tool-execution-client";
+
+// Import new support & feedback components
+import { ReviewList } from "@/components/support/review-list";
+import { ReviewForm } from "@/components/support/review-form";
+import { ToolFeedback } from "@/components/support/tool-feedback";
+import { SupportForm } from "@/components/support/support-form";
+import { FeatureRequestSystem } from "@/components/support/feature-request";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -122,7 +132,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
       />
 
       <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground">
-        <main className="max-w-6xl w-full mx-auto px-6 py-10 space-y-12">
+        <main className="max-w-6xl w-full mx-auto px-6 py-10 space-y-16">
           {/* Breadcrumb Navigation */}
           <nav className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <Link href="/" className="hover:text-foreground flex items-center gap-1 transition-colors">
@@ -179,7 +189,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Interactive Workspace Area */}
+          {/* 1. Interactive Workspace Area (Tool UI) */}
           <section className="border border-border rounded-3xl bg-card/40 p-6 md:p-10 shadow-sm relative overflow-hidden backdrop-blur-sm">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-[image:var(--gradient-primary)]" />
             <div className="w-full flex flex-col items-stretch">
@@ -187,32 +197,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </div>
           </section>
 
-          {/* How It Works (Steps) */}
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
-              How to Use {tool.name} Online
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {tool.howItWorks.map((step, idx) => (
-                <div
-                  key={idx}
-                  className="border border-border rounded-2xl p-5 bg-card relative shadow-xs"
-                >
-                  <span className="absolute top-4 right-4 text-display-xs font-black text-muted-foreground/15">
-                    {idx + 1}
-                  </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/5 text-primary font-bold text-sm mb-4">
-                    {idx + 1}
-                  </div>
-                  <p className="text-xs text-foreground font-semibold leading-relaxed">
-                    {step}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Key Benefits Grid */}
+          {/* 2. Key Features & Benefits */}
           <section className="space-y-6">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
               Key Features & Benefits
@@ -239,6 +224,31 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </div>
           </section>
 
+          {/* 3. How It Works (Steps) */}
+          <section className="space-y-6">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
+              How to Use {tool.name} Online
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {tool.howItWorks.map((step, idx) => (
+                <div
+                  key={idx}
+                  className="border border-border rounded-2xl p-5 bg-card relative shadow-xs"
+                >
+                  <span className="absolute top-4 right-4 text-display-xs font-black text-muted-foreground/15">
+                    {idx + 1}
+                  </span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/5 text-primary font-bold text-sm mb-4">
+                    {idx + 1}
+                  </div>
+                  <p className="text-xs text-foreground font-semibold leading-relaxed">
+                    {step}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* NLP Long-form Copy Content (1000-1500 Words target) */}
           {tool.longFormContent && tool.longFormContent.length > 0 && (
             <section className="border-t border-border pt-10 space-y-8">
@@ -260,7 +270,32 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </section>
           )}
 
-          {/* FAQ Accordion Section */}
+          {/* 4. Reviews & Review Form */}
+          <section className="border-t border-border pt-10 space-y-8">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
+                User Reviews & Ratings
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+              <div className="lg:col-span-3">
+                {/* @ts-ignore - Server Component */}
+                <ReviewList toolSlug={slug} toolName={tool.name} />
+              </div>
+              <div className="lg:col-span-2">
+                <ReviewForm toolSlug={slug} />
+              </div>
+            </div>
+          </section>
+
+          {/* 5. Tool Success Poll */}
+          <section className="border-t border-border pt-10">
+            <ToolFeedback toolSlug={slug} />
+          </section>
+
+          {/* 6. FAQ Accordion Section */}
           <section className="border-t border-border pt-10 space-y-6 max-w-4xl">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
               Frequently Asked Questions
@@ -268,7 +303,29 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             <FaqAccordion faqs={tool.faqs} />
           </section>
 
-          {/* Related Tools & Internal Linking Engine */}
+          {/* 7. Support Ticket Submission Form */}
+          <section className="border-t border-border pt-10 space-y-6 max-w-4xl">
+            <div className="flex items-center gap-2">
+              <LifeBuoy className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
+                Submit Support Query
+              </h2>
+            </div>
+            <SupportForm defaultToolSlug={slug} />
+          </section>
+
+          {/* 8. Feature Request System */}
+          <section className="border-t border-border pt-10 space-y-6">
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-primary animate-pulse" />
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
+                Request a Custom Tool or Feature
+              </h2>
+            </div>
+            <FeatureRequestSystem />
+          </section>
+
+          {/* 9. Related Tools & Internal Linking Engine */}
           <section className="border-t border-border pt-10 space-y-6">
             <h2 className="text-base font-bold tracking-tight text-foreground uppercase tracking-widest">
               Related Utilities

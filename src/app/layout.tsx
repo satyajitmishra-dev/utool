@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import { FloatingSupport } from "@/components/support/floating-support";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -49,6 +50,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <FloatingSupport />
             <Toaster
               position="top-center"
               richColors

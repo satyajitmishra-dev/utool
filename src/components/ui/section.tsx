@@ -8,16 +8,19 @@ import { cn } from "@/utils/cn";
 export function Container({
   children,
   className,
+  wide = false,
 }: {
   children: React.ReactNode;
   className?: string;
+  wide?: boolean;
 }) {
   return (
-    <div className={cn("mx-auto w-full max-w-6xl px-6", className)}>
+    <div className={cn(wide ? "mx-auto w-full max-w-[1400px] px-6 lg:px-[120px]" : "mx-auto w-full max-w-6xl px-6", className)}>
       {children}
     </div>
   );
 }
+
 
 /* ─── Section ─── */
 interface SectionProps {

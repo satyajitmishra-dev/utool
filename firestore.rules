@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Checks if the logged-in user is an administrator
+    function isAdmin() {
+      return request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionTier == 'admin');
+    }
+
+    // Helper: Checks if user owns the document
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ==========================================
+    // 1. REVIEWS RULES
+    // ==========================================
+    // Publicly readable. Anyone can write reviews. Only admin can update or delete.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+      allow update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 2. SUPPORT TICKETS RULES
+    // ==========================================
+    // Anyone can create tickets. Users can read/update their own tickets. Admin has full control.
+    match /support_tickets/{ticketId} {
+      allow create: if true; // Allow guest and authenticated creations
+      allow read: if isAdmin() || (resource.data.uid != null && isOwner(resource.data.uid));
+      allow update: if isAdmin() || (resource.data.uid != null && isOwner(resource.data.uid));
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 3. TOOL FEEDBACK RULES
+    // ==========================================
+    // Anyone can submit tool helpfulness. Only admin can read or inspect.
+    match /tool_feedback/{feedbackId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 4. FEATURE REQUESTS RULES
+    // ==========================================
+    // Publicly readable so everyone can see ideas. Anyone can create.
+    // Authenticated users can upvote by incrementing votes and appending their UID.
+    match /feature_requests/{requestId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if request.auth != null && 
+                    request.resource.data.votes == resource.data.votes + 1 &&
+                    request.resource.data.votedUids.hasAll(resource.data.votedUids);
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 5. USER PROFILES RULES
+    // ==========================================
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+  }
+}
