@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
+import { ProProvider } from "@/context/pro-context";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+
 import { Toaster } from "sonner";
 import Script from "next/script";
 import { FloatingSupport } from "@/components/support/floating-support";
@@ -53,17 +55,19 @@ export default function RootLayout({
         )}
         <ThemeProvider>
           <AuthProvider>
-            {children}
-            <FloatingSupport />
-            <Toaster
-              position="top-center"
-              richColors
-              closeButton
-              expand
-              toastOptions={{
-                className: "!bg-card !text-card-foreground !border-border",
-              }}
-            />
+            <ProProvider>
+              {children}
+              <FloatingSupport />
+              <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                expand
+                toastOptions={{
+                  className: "!bg-card !text-card-foreground !border-border",
+                }}
+              />
+            </ProProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

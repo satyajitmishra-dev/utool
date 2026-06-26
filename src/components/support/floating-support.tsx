@@ -12,6 +12,18 @@ export function FloatingSupport() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [activeToolSlug, setActiveToolSlug] = useState("");
+  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDragConstraints({
+        left: -window.innerWidth + 320,
+        right: 20,
+        top: -window.innerHeight + 180,
+        bottom: 20,
+      });
+    }
+  }, []);
 
   React.useEffect(() => {
     const handleToolSuccess = (e: Event) => {
@@ -33,8 +45,11 @@ export function FloatingSupport() {
       {/* AI Support Widget — Premium glass card */}
       <div className="fixed bottom-8 right-8 z-50 select-none">
         <motion.div
+          drag
+          dragMomentum={false}
+          dragConstraints={dragConstraints}
           layout
-          className="relative rounded-2xl border border-white/[0.08] bg-card/70 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.3),0_0_30px_rgba(139,92,246,0.12)] overflow-hidden"
+          className="relative rounded-2xl border border-white/[0.08] bg-card/70 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.3),0_0_30px_rgba(139,92,246,0.12)] overflow-hidden cursor-grab active:cursor-grabbing"
           onMouseEnter={() => setIsExpanded(true)}
           onMouseLeave={() => setIsExpanded(false)}
         >
@@ -93,7 +108,7 @@ export function FloatingSupport() {
                   {/* Documentation button */}
                   <a
                     href="/support"
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] text-muted-foreground text-[12px] font-semibold py-2.5 transition-all hover:bg-white/[0.06] hover:text-foreground"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] text-muted-foreground text-[12px] font-semibold py-2.5 transition-all hover:bg-white/[0.06] hover:text-foreground cursor-pointer"
                   >
                     <BookOpen className="h-3.5 w-3.5" />
                     Documentation

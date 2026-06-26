@@ -31,7 +31,7 @@ import {
   Plus
 } from "lucide-react";
 
-const categories = ["All", "PDF", "Images", "Developer", "Design", "Converters", "Media"];
+const categories = ["All", "PDF", "Images", "Developer", "Design", "Converters", "Media", "PRO"];
 
 const categoryIcons: Record<string, string> = {
   All: "🌐",
@@ -40,8 +40,10 @@ const categoryIcons: Record<string, string> = {
   Media: "🎬",
   Developer: "💻",
   Design: "🎨",
-  Converters: "🔄"
+  Converters: "🔄",
+  PRO: "👑"
 };
+
 
 const tools = [
   {
@@ -182,7 +184,27 @@ const tools = [
     tag: "image-resize",
     status: "pro" as const,
     isPremium: true,
-    href: "/premium-tools",
+    href: "/tools/image-resizer",
+  },
+  {
+    id: "background-remover",
+    name: "Background Remover",
+    description: "Remove image backgrounds with AI-powered edge detection in seconds.",
+    category: "Images",
+    tag: "background-remover",
+    status: "pro" as const,
+    isPremium: true,
+    href: "/tools/background-remover",
+  },
+  {
+    id: "subtitle-generator",
+    name: "Subtitle Generator",
+    description: "Write transcriptions and burn auto subtitle tracks using AI.",
+    category: "Media",
+    tag: "subtitle-generator",
+    status: "pro" as const,
+    isPremium: true,
+    href: "/tools/subtitle-generator",
   },
   {
     id: "pdf-extractor",
@@ -192,7 +214,7 @@ const tools = [
     tag: "extractor",
     status: "pro" as const,
     isPremium: true,
-    href: "/premium-tools",
+    href: "/tools/pdf-ocr",
   },
   {
     id: "css-gradient-generator",
@@ -266,6 +288,10 @@ function getToolIcon(id: string) {
       return RefreshCw;
     case "image-resize":
       return Sliders;
+    case "background-remover":
+      return ImageIcon;
+    case "subtitle-generator":
+      return Video;
     case "pdf-extractor":
       return FileCheck;
     case "css-gradient-generator":
@@ -374,7 +400,10 @@ export default function ToolsCatalogPage() {
     const matchesSearch =
       tool.name.toLowerCase().includes(search.toLowerCase()) ||
       tool.description.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === "All" || tool.category === activeCategory;
+    const matchesCategory =
+      activeCategory === "All" ||
+      (activeCategory === "PRO" && (tool.status === "pro" || tool.isPremium)) ||
+      tool.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 

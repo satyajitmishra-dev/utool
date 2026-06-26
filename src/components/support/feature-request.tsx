@@ -217,7 +217,7 @@ export function FeatureRequestSystem() {
             id="feature-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            disabled={!!user || isPending}
+            disabled={!!(user && user.displayName) || isPending}
             placeholder="Name"
             required
           />
@@ -227,7 +227,7 @@ export function FeatureRequestSystem() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={!!user || isPending}
+            disabled={!!(user && user.email) || isPending}
             placeholder="email@example.com"
             required
           />

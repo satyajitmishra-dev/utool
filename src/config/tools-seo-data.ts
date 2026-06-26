@@ -686,6 +686,145 @@ export const toolsSeoData: Record<string, ToolSeoContent> = {
       }
     ],
     relatedTools: ["webp-converter", "image-to-pdf"]
+  },
+  "image-resizer": {
+    slug: "image-resizer",
+    name: "Smart Image Resizer",
+    cluster: "Image Tools",
+    title: "Smart Image Resizer Online — Resize, Crop & Convert Images | utool",
+    h1: "Smart Image Resizer & Converter Online",
+    description: "Resize, crop, and convert your images online. High-quality transformations with custom aspect ratios, formats, and quality controls.",
+    intro: "Need to prepare images for social media, optimize web assets, or resize photos for applications? Utool's Smart Image Resizer provides a comprehensive suite for resizing, cropping, and converting image formats. Powered by secure Cloudinary APIs, it processes your requests instantly while keeping details sharp and aspect ratios intact.",
+    howItWorks: [
+      "Upload the image you want to resize into the upload zone.",
+      "Configure your desired width, height, crop mode, and format.",
+      "Click 'Process & Resize' to transform the image.",
+      "Preview the result side-by-side and click download."
+    ],
+    benefits: [
+      { title: "Smart Aspect Ratios", desc: "Crop, fit, scale, or use AI-driven thumbnails to preserve faces and primary focus elements automatically." },
+      { title: "Multi-Format Conversions", desc: "Convert images to WebP, PNG, JPEG, or GIF instantly during the resizing process." },
+      { title: "Optimized Quality", desc: "Adjust quality sliders to compress image file size by up to 80% with minimal loss in clarity." }
+    ],
+    faqs: [
+      { q: "What image formats are supported?", a: "You can upload JPEG, PNG, WebP, and GIF images. The tool can output to WebP, JPG, PNG, and GIF formats." },
+      { q: "What does the AI Thumbnail option do?", a: "The AI thumbnail option uses face-detection algorithms on the server to automatically detect the main subject of your image and crop around it, ensuring faces or key elements aren't cut off." },
+      { q: "Are my original images saved?", a: "Your files are uploaded to secure Cloudinary buckets for conversion and are subject to cache cleanup schedules. No personal logs or assets are permanently retained." }
+    ],
+    longFormContent: [
+      {
+        sectionTitle: "Why Image Compression and Resizing is Crucial for Web Performance",
+        paragraphs: [
+          "Large, unoptimized images are the primary cause of slow web page loading speeds. By utilizing formats like WebP, you can compress images significantly while maintaining high visual quality. The Smart Image Resizer lets you control the dimensions and quality directly before publishing.",
+          "Combining cropping, resizing, and format changes into a single workspace streamlines asset workflows, enabling you to output the exact dimensions and compression levels for your site in seconds."
+        ]
+      }
+    ],
+    relatedTools: ["webp-converter"]
+  },
+  "background-remover": {
+    slug: "background-remover",
+    name: "Background Remover",
+    cluster: "Image Tools",
+    title: "Free AI Background Remover Online — Extract Transparent PNGs | utool",
+    h1: "AI Background Remover Online",
+    description: "Remove background from images online automatically. AI isolates subjects, people, or products cleanly, returning high-quality transparent PNG outputs.",
+    intro: "Isolating product photos or subject images manually takes time and precise editing skill. Utool's AI Background Remover does it in seconds automatically. Powered by secure Clipdrop API, it extracts clear transparent PNG overlays while preserving fine details like hair edges and product shadows.",
+    howItWorks: [
+      "Upload the JPEG or PNG photo to extract subjects from.",
+      "Click 'Remove Background' to initiate AI isolation.",
+      "Review the output overlaid on a transparent checkerboard preview.",
+      "Download your transparent PNG file directly."
+    ],
+    benefits: [
+      { title: "Automatic Isolation", desc: "Advanced neural networks detect subjects, products, or characters instantly without manual brushing." },
+      { title: "Edge Preservation", desc: "Maintains edge transitions, fine details, and silhouettes accurately for professional composts." },
+      { title: "Transparent PNGs", desc: "Outputs lossless transparency formats perfectly suited for web overlays, e-commerce, or composites." }
+    ],
+    faqs: [
+      { q: "What types of images work best?", a: "Photos with clear distinction between the primary subject and the background yield the best visual cuts. AI detects people, products, animals, and objects." },
+      { q: "Is transparency preserved in the output?", a: "Yes. The tool saves the output file as a transparent PNG, letting you place it directly over any background." },
+      { q: "Are my images private?", a: "Yes. We process file transformations on secure sandboxed workers, and files are cleaned immediately upon session completion." }
+    ],
+    longFormContent: [
+      {
+        sectionTitle: "Using Transparent Images in Graphic Design and E-Commerce",
+        paragraphs: [
+          "In digital marketing and online sales, presenting products on clean, transparent backgrounds is standard practice. It increases user focus, enhances aesthetics, and allows graphics designers to construct promotional assets or banners easily.",
+          "Our automated AI remover replaces hours of pen-tool trace work with a single-click script, giving you a ready-to-use PNG element in seconds."
+        ]
+      }
+    ],
+    relatedTools: ["image-resizer", "webp-converter"]
+  },
+  "subtitle-generator": {
+    slug: "subtitle-generator",
+    name: "Subtitle Generator",
+    cluster: "Media Tools",
+    title: "Free AI Subtitle Generator — Auto Transcription & SRT Creator | utool",
+    h1: "AI Subtitle Generator Online",
+    description: "Transcribe audio/video files and generate timed subtitles automatically using Groq Whisper. Download SRT, TXT formats.",
+    intro: "Adding captions increases video watch time and accessibility. Utool's AI Subtitle Generator automatically transcribes audio or video file speech with high precision. Powered by Groq Whisper, it supports formats like MP3, MP4, WAV, and outputs timed SRT tracks.",
+    howItWorks: [
+      "Upload your video (MP4, MOV) or audio (MP3, WAV) file.",
+      "Click 'Generate Subtitles' to run transcription.",
+      "Review the timed transcription text segments in the preview.",
+      "Download timed SRT or plain TXT files."
+    ],
+    benefits: [
+      { title: "Whisper-Large AI Accuracy", desc: "Utilizes Groq's high-speed Whisper pipeline to transcribe complex accents and voices clearly." },
+      { title: "Timed SRT Subtitles", desc: "Outputs timed segments in SRT subtitle format, ready to load directly into video editors." },
+      { title: "Universal Formats", desc: "Supports MP3, MP4, WAV, MOV, M4A with high-performance local buffer streaming." }
+    ],
+    faqs: [
+      { q: "What files can I upload?", a: "The tool supports audio and video formats including MP3, WAV, M4A, MP4, MOV, and WebM." },
+      { q: "What subtitle output formats are supported?", a: "You can download SubRip subtitle tracks (.srt) or plain text transcripts (.txt)." }
+    ],
+    longFormContent: [
+      {
+        sectionTitle: "Increasing Accessibility and Reach with Subtitles",
+        paragraphs: [
+          "Captions are vital for video accessibility on social channels where clips autoplay on mute. Utilizing high-performance AI engines to write transcripts ensures accuracy and saves time compared to manual transcription workflows."
+        ]
+      }
+    ],
+    relatedTools: ["media-workspace"]
+  },
+  "pdf-ocr": {
+    slug: "pdf-ocr",
+    name: "PDF Text Extractor",
+    cluster: "PDF Tools",
+    title: "Free PDF OCR Text Extractor Online — Extract Text from Scans | utool",
+    h1: "PDF Text Extractor & OCR Online",
+    description: "Extract plain text elements from PDF documents and image scans online using OCR.Space. Safe, fast, with direct copying.",
+    intro: "Extracting editable text from scans, photocopies, or image assets shouldn't require manual typing. Utool's PDF Text Extractor uses advanced OCR algorithms to parse text blocks from PDF and image files, returning formatted plain text.",
+    howItWorks: [
+      "Upload your scanned PDF document or image file.",
+      "Click 'Extract Text' to run optical character recognition.",
+      "Review the parsed text formatting in the canvas editor.",
+      "Click to copy to clipboard or download as a TXT file."
+    ],
+    benefits: [
+      { title: "Scanned Document OCR", desc: "Reads text embedded in flat image layers and photocopies where text selection is blocked." },
+      { title: "Multi-Format Support", desc: "Supports PDFs, PNGs, and JPEG image uploads." },
+      { title: "Local Safety", desc: "Processed secure backend APIs validate buffers without caching or preserving your sensitive documents." }
+    ],
+    faqs: [
+      { q: "Can I parse handwritten notes?", a: "OCR accuracy is optimized for printed fonts and digital documents. Handwritten note parsing quality varies based on writing clarity." },
+      { q: "What is the maximum file page limit?", a: "Standard limits allow processing of files up to 10MB." }
+    ],
+    longFormContent: [
+      {
+        sectionTitle: "Optimizing Document Indexing with OCR Technology",
+        paragraphs: [
+          "Converting flat PDFs and images into indexed plain text allows search engines and text readers to parse contents easily. OCR (Optical Character Recognition) bridges the gap between printed pages and digital systems."
+        ]
+      }
+    ],
+    relatedTools: ["merge-pdf", "split-pdf"]
   }
 };
+
+
+
 

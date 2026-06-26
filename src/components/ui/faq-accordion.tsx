@@ -25,6 +25,7 @@ export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
             className="border border-border rounded-2xl bg-card overflow-hidden transition-all duration-200 shadow-sm"
           >
             <button
+              suppressHydrationWarning
               onClick={() => toggle(i)}
               className="flex justify-between items-center w-full px-6 py-4.5 text-left font-bold text-sm text-foreground hover:bg-muted/40 transition-colors"
             >

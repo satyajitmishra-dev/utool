@@ -68,9 +68,10 @@ const imageTools = [
     tag: "image-resize",
     status: "pro" as const,
     isPremium: true,
-    href: "/premium-tools",
+    href: "/tools/image-resizer",
     icon: Crop
   }
+
 ];
 
 const faqs = [

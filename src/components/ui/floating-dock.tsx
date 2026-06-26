@@ -89,6 +89,7 @@ export function FloatingDock() {
           <div className="flex md:hidden items-center gap-3">
             <ThemeToggle />
             <button
+              suppressHydrationWarning
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-card/40 text-foreground hover:bg-white/[0.06] active:scale-95 transition-all"
             >

@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   ArrowUpRight,
+  Lock,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -119,12 +120,20 @@ export default function DashboardPage() {
             </p>
           )}
         </div>
-        <Link href="/tools">
-          <Button variant="premium" className="rounded-xl shadow-md transition-transform hover:scale-[1.02]">
-            <Sparkles className="h-4 w-4" />
-            Launch Workspace
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/dashboard/pro">
+            <Button variant="outline" className="rounded-xl border-border shadow-xs transition-transform hover:scale-[1.02]">
+              <Lock className="h-4 w-4" />
+              Pro Space
+            </Button>
+          </Link>
+          <Link href="/tools">
+            <Button variant="premium" className="rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+              <Sparkles className="h-4 w-4" />
+              Launch Workspace
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Metrics Grid */}

@@ -19,8 +19,16 @@ export async function isAdmin(uid: string): Promise<boolean> {
 
   try {
     const userRecord = await adminAuth.getUser(uid);
-    if (userRecord.email && userRecord.email.toLowerCase() === "satyajitmishra1412@gmail.com") {
-      return true;
+    if (userRecord.email) {
+      const emailLower = userRecord.email.toLowerCase().trim();
+      const adminMailEnv = process.env.ADMIN_MAIL?.toLowerCase().trim();
+
+      if (adminMailEnv) {
+        const adminMailNoAt = adminMailEnv.replace("@", "");
+        if (emailLower === adminMailEnv || emailLower === adminMailNoAt) {
+          return true;
+        }
+      }
     }
   } catch (err) {
     console.error("[Auth Admin check] Auth error:", err);
@@ -315,7 +323,7 @@ export async function replyToTicketAction(ticketId: string, replyMessage: string
       });
     } else {
       // Notify admin
-      const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || "support@utool.in";
+      const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_MAIL || "support@utool.in";
       await sendTicketReplyEmail({
         toEmail: adminEmail,
         toName: "Utool Admin",

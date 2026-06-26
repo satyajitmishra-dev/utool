@@ -15,6 +15,11 @@ interface UploadZoneProps {
   onFileSelect: (files: File[]) => void;
   maxSizeLabel?: string;
   allowMultiple?: boolean;
+  accept?: string;
+  title?: string;
+  description?: string;
+  fileTypeLabel?: string;
+  icon?: React.ReactNode;
 }
 
 export function UploadZone({
@@ -24,6 +29,11 @@ export function UploadZone({
   onFileSelect,
   maxSizeLabel = "50MB",
   allowMultiple = true,
+  accept = ".pdf,application/pdf",
+  title = "Upload your first PDF to get started.",
+  description,
+  fileTypeLabel = "PDF Document Only",
+  icon,
 }: UploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,7 +63,7 @@ export function UploadZone({
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept=".pdf,application/pdf"
+        accept={accept}
         multiple={allowMultiple}
         className="hidden"
         disabled={isParsing}
@@ -73,31 +83,35 @@ export function UploadZone({
           {isParsing ? (
             <Loader2 className="h-7 w-7 animate-spin text-primary" />
           ) : (
-            <UploadCloud className="h-7 w-7 text-primary" />
+            icon || <UploadCloud className="h-7 w-7 text-primary" />
           )}
         </motion.div>
 
         {isParsing ? (
           <>
             <h3 className="text-base font-semibold text-foreground tracking-tight">
-              Analyzing Document Structure
+              Analyzing file structure
             </h3>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              Counting pages and verifying security parameters. This will only take a moment...
+              Verifying security parameters and parsing file header. This will only take a moment...
             </p>
           </>
         ) : (
           <>
             <h3 className="text-base font-semibold text-foreground tracking-tight">
-              Upload your first PDF to get started.
+              {title}
             </h3>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-              Or <span className="text-primary font-semibold hover:opacity-90">browse file directory</span> to select from your device.
+              {description || (
+                <>
+                  Or <span className="text-primary font-semibold hover:opacity-90">browse file directory</span> to select from your device.
+                </>
+              )}
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-3xs font-semibold text-muted-foreground tracking-wide uppercase">
               <span className="flex items-center gap-1">
                 <FileText className="h-3 w-3" />
-                PDF Document Only
+                {fileTypeLabel}
               </span>
               <span className="h-1 w-1 rounded-full bg-border hidden sm:inline" />
               <span>Max size: {maxSizeLabel}</span>

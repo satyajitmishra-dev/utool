@@ -152,7 +152,7 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
           id="ticket-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          disabled={!!user || isPending}
+          disabled={!!(user && user.displayName) || isPending}
           placeholder="Enter name"
           required
         />
@@ -162,7 +162,7 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled={!!user || isPending}
+          disabled={!!(user && user.email) || isPending}
           placeholder="your@email.com"
           required
         />
@@ -176,6 +176,7 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
             Related Workspace Tool
           </label>
           <select
+            suppressHydrationWarning
             value={toolSlug}
             onChange={(e) => setToolSlug(e.target.value)}
             disabled={!!defaultToolSlug || isPending}
@@ -196,6 +197,7 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
             Category
           </label>
           <select
+            suppressHydrationWarning
             value={issueType}
             onChange={(e) => setIssueType(e.target.value)}
             disabled={isPending}
@@ -215,6 +217,7 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
             Severity / Priority
           </label>
           <select
+            suppressHydrationWarning
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
             disabled={isPending}

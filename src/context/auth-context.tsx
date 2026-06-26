@@ -17,9 +17,15 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
 import { useRouter } from "next/navigation";
+import { Membership } from "@/types/pro";
+import { subscribeToUserProfile } from "@/lib/firebase/dashboard";
+
 
 export interface AuthContextType {
   user: FirebaseUser | null;
+  id?: string;
+  email?: string | null;
+  membership: Membership;
   loading: boolean;
   authInitializing: boolean;
   login: (email: string, password: string) => Promise<UserCredential>;
@@ -31,11 +37,42 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [membership, setMembership] = useState<Membership>({ plan: "free", active: false });
   const [loading, setLoading] = useState(false);
   const [authInitializing, setAuthInitializing] = useState(true);
   const router = useRouter();
+
+  // Listen to Firestore profile changes to sync membership details in real-time
+  useEffect(() => {
+    if (!user) {
+      setMembership({ plan: "free", active: false });
+      return;
+    }
+
+    const unsubscribe = subscribeToUserProfile(
+      user.uid,
+      (profileData) => {
+        if (profileData) {
+          setMembership({
+            plan: profileData.subscriptionTier === "pro" ? "pro" : "free",
+            active: profileData.subscriptionStatus === "active",
+            expiresAt: profileData.createdAt ? new Date(profileData.createdAt) : null,
+          });
+        } else {
+          setMembership({ plan: "free", active: false });
+        }
+      },
+      (err) => {
+        console.error("[Auth Context] Firestore sync error:", err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user]);
+
 
   const syncSessionCookie = async (firebaseUser: FirebaseUser | null) => {
     try {
@@ -179,6 +216,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        id: user?.uid,
+        email: user?.email,
+        membership,
         loading,
         authInitializing,
         login,

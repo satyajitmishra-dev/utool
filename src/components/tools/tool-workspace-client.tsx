@@ -45,6 +45,25 @@ const MediaWorkspaceClient = dynamic(
   () => import("@/components/tools/media/media-workspace-client").then((mod) => mod.MediaWorkspaceClient),
   { ssr: false }
 );
+const ImageResizerTool = dynamic(
+  () => import("@/components/pro/image-resizer-tool").then((mod) => mod.ImageResizerTool),
+  { ssr: false }
+);
+const BackgroundRemoverTool = dynamic(
+  () => import("@/components/pro/background-remover-tool").then((mod) => mod.BackgroundRemoverTool),
+  { ssr: false }
+);
+const SubtitleGeneratorTool = dynamic(
+  () => import("@/components/pro/subtitle-generator-tool").then((mod) => mod.SubtitleGeneratorTool),
+  { ssr: false }
+);
+const PdfOcrTool = dynamic(
+  () => import("@/components/pro/pdf-ocr-tool").then((mod) => mod.PdfOcrTool),
+  { ssr: false }
+);
+
+
+
 
 export function ToolWorkspaceClient({ slug }: { slug: string }) {
   switch (slug) {
@@ -78,6 +97,14 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <MetaTagGeneratorTool />;
     case "media-workspace":
       return <MediaWorkspaceClient />;
+    case "image-resizer":
+      return <ImageResizerTool />;
+    case "background-remover":
+      return <BackgroundRemoverTool />;
+    case "subtitle-generator":
+      return <SubtitleGeneratorTool />;
+    case "pdf-ocr":
+      return <PdfOcrTool />;
     default:
       return <div className="text-center py-10 text-muted-foreground text-xs font-semibold">Workspace not configured for this slug.</div>;
   }

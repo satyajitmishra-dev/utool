@@ -2,9 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["firebase-admin"],
-  /* config options here */
+  experimental: {
+    proxyClientMaxBodySize: "30mb",
+  },
   async redirects() {
     return [
+      {
+        source: "/support/admin",
+        destination: "/admin/support",
+        permanent: true,
+      },
       {
         source: "/qr-generator",
         destination: "/tools/qr-generator",
