@@ -98,6 +98,7 @@ export function AddPasswordTool() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: "protect-pdf" } }));
   };
 
   const handleReset = () => {

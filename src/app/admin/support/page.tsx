@@ -47,10 +47,40 @@ export default async function AdminSupportPage() {
           ...reply,
           createdAt: reply.createdAt || new Date().toISOString(),
         })),
+        timeline: (data.timeline || []).map((evt: any) => ({
+          ...evt,
+          createdAt: evt.createdAt || new Date().toISOString(),
+        })),
       };
     });
   } catch (error) {
     console.error("Error fetching support tickets for admin:", error);
+  }
+
+  // 3. Query all user reviews across the system
+  let reviews: any[] = [];
+  try {
+    const snapshot = await adminDb
+      .collection("reviews")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    reviews = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid || null,
+        name: data.name,
+        email: data.email,
+        rating: data.rating,
+        message: data.message,
+        toolSlug: data.toolSlug,
+        screenshotUrl: data.screenshotUrl || null,
+        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching reviews for admin:", error);
   }
 
   return (
@@ -72,7 +102,7 @@ export default async function AdminSupportPage() {
           <div className="flex items-center gap-2 mt-2">
             <ShieldAlert className="h-5 w-5 text-purple-400" />
             <h1 className="text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
-              Support Administration Panel
+              Support & Reviews Administration
             </h1>
           </div>
         </div>
@@ -86,6 +116,7 @@ export default async function AdminSupportPage() {
       {/* Main Admin Client Interface */}
       <SupportAdminClient
         initialTickets={tickets}
+        initialReviews={reviews}
         adminName={user.name || "Support Lead"}
         adminEmail={user.email || ""}
       />

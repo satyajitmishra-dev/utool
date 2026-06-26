@@ -199,6 +199,7 @@ export function ImageToPdfTool() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: "image-to-pdf" } }));
   };
 
   return (

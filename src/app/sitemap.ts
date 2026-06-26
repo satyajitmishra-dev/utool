@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tools/developer-tools",
     "/tools/resume-tools",
     "/tools/text-tools",
+    "/tools/media-tools",
     "/blog",
     "/about",
     "/privacy",

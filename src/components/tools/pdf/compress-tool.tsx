@@ -88,6 +88,7 @@ export function CompressTool() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: "compress-pdf" } }));
   };
 
   const handleReset = () => {

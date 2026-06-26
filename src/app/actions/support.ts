@@ -18,28 +18,12 @@ export async function isAdmin(uid: string): Promise<boolean> {
   if (!uid) return false;
 
   try {
-    // 1. Check user document in Firestore
-    const userDoc = await adminDb.collection("users").doc(uid).get();
-    if (userDoc.exists) {
-      const data = userDoc.data();
-      if (data?.role === "admin" || data?.subscriptionTier === "admin") {
-        return true;
-      }
-    }
-  } catch (err) {
-    console.error("[Auth Admin check] Firestore error:", err);
-  }
-
-  try {
-    // 2. Check admin emails in env configuration
     const userRecord = await adminAuth.getUser(uid);
-    const adminEmailsStr = process.env.ADMIN_EMAILS || "";
-    const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
-    if (userRecord.email && adminEmails.includes(userRecord.email.toLowerCase())) {
+    if (userRecord.email && userRecord.email.toLowerCase() === "satyajitmishra1412@gmail.com") {
       return true;
     }
   } catch (err) {
-    console.error("[Auth Admin check] Auth/Email check error:", err);
+    console.error("[Auth Admin check] Auth error:", err);
   }
 
   return false;
@@ -190,6 +174,16 @@ export async function submitTicketAction(prevState: any, formData: FormData) {
       status: "open",
       createdAt: FieldValue.serverTimestamp(),
       replies: [],
+      timeline: [
+        {
+          id: `created-${Date.now()}`,
+          type: "created",
+          actorName: validated.name,
+          actorRole: "user",
+          message: "created the ticket",
+          createdAt: new Date().toISOString(),
+        }
+      ],
     };
 
     await adminDb.collection("support_tickets").doc(ticketId).set(ticketData);
@@ -266,15 +260,43 @@ export async function replyToTicketAction(ticketId: string, replyMessage: string
       createdAt: new Date().toISOString(), // Use ISO string for serializable timeline array
     };
 
+    const newEvent = {
+      id: `reply-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      type: "reply",
+      actorName: user.name || user.email || (userIsAdmin ? "Support Agent" : "User"),
+      actorRole: userIsAdmin ? "admin" : "user",
+      message: replyMessage.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
     // Update Firestore array and flip status if user replies to resolved
     const updateData: Record<string, any> = {
       replies: FieldValue.arrayUnion(newReply),
+      timeline: FieldValue.arrayUnion(newEvent),
     };
 
     if (userIsAdmin && ticketData.status === "open") {
       updateData.status = "in_progress";
+      const progressEvent = {
+        id: `status-${Date.now()}-inprogress`,
+        type: "status_change",
+        actorName: user.name || "Support System",
+        actorRole: "admin",
+        message: "changed status to in progress",
+        createdAt: new Date().toISOString(),
+      };
+      updateData.timeline = FieldValue.arrayUnion(newEvent, progressEvent);
     } else if (!userIsAdmin && ticketData.status === "resolved") {
       updateData.status = "open"; // Reopen if user posts a reply
+      const reopenEvent = {
+        id: `status-${Date.now()}-open`,
+        type: "status_change",
+        actorName: user.name || user.email || "User",
+        actorRole: "user",
+        message: "reopened the ticket",
+        createdAt: new Date().toISOString(),
+      };
+      updateData.timeline = FieldValue.arrayUnion(newEvent, reopenEvent);
     }
 
     await ticketRef.update(updateData);
@@ -325,9 +347,19 @@ export async function updateTicketStatusAction(ticketId: string, status: "open" 
       return { success: false, error: "Unauthorized. Admin privileges required." };
     }
 
+    const newEvent = {
+      id: `status-${Date.now()}-${status}`,
+      type: "status_change",
+      actorName: user.name || "Support Lead",
+      actorRole: "admin",
+      message: `changed status to ${status.replace("_", " ")}`,
+      createdAt: new Date().toISOString(),
+    };
+
     await adminDb.collection("support_tickets").doc(ticketId).update({
       status,
       updatedAt: FieldValue.serverTimestamp(),
+      timeline: FieldValue.arrayUnion(newEvent),
     });
 
     revalidatePath("/dashboard/support");
@@ -469,5 +501,59 @@ export async function deleteTicketAction(ticketId: string) {
   } catch (error) {
     console.error("[Delete Ticket Error]:", error);
     return { success: false, error: "Failed to delete ticket." };
+  }
+}
+
+// ==========================================
+// 8. SYSTEM REVIEWS ACTIONS (ADMIN ONLY)
+// ==========================================
+
+export async function fetchSystemReviewsAction() {
+  try {
+    const user = await getAuthUser();
+    if (!user || !(await isAdmin(user.uid))) {
+      return { success: false, error: "Unauthorized. Admin privileges required." };
+    }
+
+    const snapshot = await adminDb
+      .collection("reviews")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const reviews = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid || null,
+        name: data.name,
+        email: data.email,
+        rating: data.rating,
+        message: data.message,
+        toolSlug: data.toolSlug,
+        screenshotUrl: data.screenshotUrl || null,
+        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+      };
+    });
+
+    return { success: true, reviews };
+  } catch (error) {
+    console.error("[Fetch System Reviews Error]:", error);
+    return { success: false, error: "Failed to load system reviews." };
+  }
+}
+
+export async function deleteReviewAction(reviewId: string) {
+  try {
+    const user = await getAuthUser();
+    if (!user || !(await isAdmin(user.uid))) {
+      return { success: false, error: "Unauthorized. Admin privileges required." };
+    }
+
+    await adminDb.collection("reviews").doc(reviewId).delete();
+
+    return { success: true, message: "Review deleted successfully." };
+  } catch (error) {
+    console.error("[Delete Review Error]:", error);
+    return { success: false, error: "Failed to delete review." };
   }
 }

@@ -3,7 +3,7 @@ export interface BlogPost {
   title: string;
   h1: string;
   description: string;
-  category: "PDF Guides" | "QR Guides" | "Resume Guides" | "Productivity Hacks";
+  category: "PDF Guides" | "QR Guides" | "Resume Guides" | "Productivity Hacks" | "Media Guides";
   readTime: string;
   date: string;
   author: string;
@@ -89,5 +89,43 @@ export const blogPosts: Record<string, BlogPost> = {
     ],
     ctaToolSlug: "url-shortener",
     ctaText: "Shorten a long URL now"
+  },
+  "how-to-extract-audio-from-video-locally": {
+    slug: "how-to-extract-audio-from-video-locally",
+    title: "How to Extract Audio from Video Online Free & Locally | utool Guides",
+    h1: "How to Extract Audio from Video Locally in Browser",
+    description: "Learn how to extract MP3, WAV, or AAC audio tracks from MP4/WebM video files directly on your computer without uploading them to remote servers.",
+    category: "Media Guides",
+    readTime: "4 min read",
+    date: "June 24, 2026",
+    author: "Elena Rostova, Media Architect",
+    summary: "Need to convert a webinar recording into a podcast, or rip music from a video? Learn how to extract clean audio streams in your browser session for maximum speed and security.",
+    paragraphs: [
+      "Extracting audio tracks from video files is a common necessity for content creators, students, and remote professionals. Whether you are turning a video presentation into an MP3 podcast, extracting background music, or saving audio clips from lectures, you need a workflow that is fast and secure. Most online converters upload your video file to a cloud server, which consumes massive upload bandwidth and exposes your private recordings to server leaks.",
+      "A superior alternative is extracting audio streams locally using browser decoders. Every modern web browser is equipped with powerful media parsing engines capable of demuxing MP4 or WebM containers. By utilizing JavaScript media decoders, you can peel away the video track and package the raw audio track into a standalone audio file in seconds, without sending a single byte over the network.",
+      "To extract audio using Utool, open the Media Workspace, navigate to the Utilities or Edit tab, and drag in your video file. The browser will parse the container header, isolate the audio stream, and prompt you to download it. You can select between formats like MP3 for high compatibility, or WAV for lossless audio quality.",
+      "Processing media files locally is also ideal for compliance. If you work with internal training clips, user interviews, or corporate presentations, cloud uploads can violate data privacy guidelines. Keeping the media parsing inside the local client sandbox guarantees 100% security."
+    ],
+    ctaToolSlug: "media-workspace",
+    ctaText: "Extract audio locally now"
+  },
+  "the-complete-guide-to-browser-video-compression": {
+    slug: "the-complete-guide-to-browser-video-compression",
+    title: "The Complete Guide to Browser-Native Video Compression | utool Guides",
+    h1: "How to Compress Video Files Locally in Your Web Browser",
+    description: "Learn how browser-native compression tools reduce MP4/WebM file sizes using WebAssembly (WASM) and local client hardware safely.",
+    category: "Media Guides",
+    readTime: "5 min read",
+    date: "June 26, 2026",
+    author: "Alex Mercer, Performance Engineer",
+    summary: "Heavy video files slow down communications and trigger email storage alerts. Discover how client-side WASM video compilers compress media without quality loss.",
+    paragraphs: [
+      "Videos are the richest form of communication, but they are also the heaviest. Uploading a raw 1080p clip to email, Slack, or Jira often fails due to strict attachment size caps. While compressing videos before sending is the obvious fix, uploading multi-gigabyte files to public clouds for compression is slow, frustrating, and risky.",
+      "Browser-native video compression solves this by compiling code locally. WebAssembly (WASM) allows developers to run native C/C++ libraries (like FFmpeg) directly inside the browser's sandbox. This means the heavy lifting is done by your computer's CPU and GPU threads, matching the execution speed of native desktop apps.",
+      "When compressing, you can adjust key parameters like bitrate, resolution, and framerate. Reducing the video bitrate by 30-50% often shrinks the file size in half while maintaining pixel-perfect clarity. WebM and H.264 formats are excellent choices for balancing high compression ratios with broad playback support.",
+      "Utool's Media Workspace provides a browser-native compressor. Just drag in your MP4/WebM file, choose a compression preset (e.g. 'Email Friendly' or 'Slack Compact'), and let the WASM pipeline compress it locally. It is fast, secure, and runs offline."
+    ],
+    ctaToolSlug: "media-workspace",
+    ctaText: "Compress video files now"
   }
 };

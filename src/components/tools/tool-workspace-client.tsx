@@ -41,6 +41,10 @@ const MetaTagGeneratorTool = dynamic(
   () => import("@/components/tools/meta-tag-generator-tool").then((mod) => mod.MetaTagGeneratorTool),
   { ssr: false }
 );
+const MediaWorkspaceClient = dynamic(
+  () => import("@/components/tools/media/media-workspace-client").then((mod) => mod.MediaWorkspaceClient),
+  { ssr: false }
+);
 
 export function ToolWorkspaceClient({ slug }: { slug: string }) {
   switch (slug) {
@@ -72,6 +76,8 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <ToolExecutionClient hideHeader={true} />;
     case "meta-tag-generator":
       return <MetaTagGeneratorTool />;
+    case "media-workspace":
+      return <MediaWorkspaceClient />;
     default:
       return <div className="text-center py-10 text-muted-foreground text-xs font-semibold">Workspace not configured for this slug.</div>;
   }

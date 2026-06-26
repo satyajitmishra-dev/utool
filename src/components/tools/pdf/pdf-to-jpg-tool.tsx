@@ -173,6 +173,7 @@ export function PdfToJpgTool() {
         document.body.removeChild(link);
       }, idx * 300);
     });
+    window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: "pdf-to-jpg" } }));
   };
 
   const downloadPage = (dataUrl: string, num: number) => {
@@ -182,6 +183,7 @@ export function PdfToJpgTool() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: "pdf-to-jpg" } }));
   };
 
   return (

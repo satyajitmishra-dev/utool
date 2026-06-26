@@ -56,7 +56,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Enterprise & Dev</h4>
-              <p className="text-xs text-primary font-bold mt-1.5">partners@utool.in</p>
+              <p className="text-xs text-primary font-bold mt-1.5">healgodse@gmail.com</p>
               <p className="text-4xs text-muted-foreground mt-1">For custom features or local deployment licenses.</p>
             </div>
           </GlassCard>

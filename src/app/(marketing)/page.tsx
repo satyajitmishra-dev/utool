@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
-import { WorkspaceCoreVisual } from "@/components/ui/workspace-core-visual";
+import { ModularHeroVisual } from "@/components/ui/modular-hero-visual";
 import { InteractiveWorkflow } from "@/components/ui/interactive-workflow";
 import { BentoCard } from "@/components/ui/bento-card";
 import { MagneticButton } from "@/components/ui/magnetic-button";
@@ -41,7 +41,8 @@ import {
   QrCode,
   FileText,
   Sliders,
-  Scale
+  Scale,
+  Cpu
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════
@@ -116,11 +117,63 @@ export default function LandingPage() {
 }
 
 /* ─── 2. HERO SECTION — Premium Two-Column Layout ─── */
+const HERO_CONFIGS = {
+  wasm: {
+    id: "wasm",
+    badge: "WASM Compiling Engines",
+    badgeIcon: Cpu,
+    title: "Powering Tools At The Speed Of",
+    gradientTitle: "Local Hardware.",
+    intro: "Convert and compress PDF archives, compile source formats, and design documents. 100% private execution running directly inside your client browser.",
+    bullets: ["• Run client-side scripts", "• Safe from data leaks", "• No sign-up required"],
+    primaryCta: "Open PDF Tools",
+    primaryLink: "/tools/pdf-tools",
+    secondaryCta: "Resume Architect",
+    secondaryLink: "/tools/resume-tools",
+    glowClass: "bg-purple-500/[0.07]"
+  },
+  media: {
+    id: "media",
+    badge: "Media Workspace Module",
+    badgeIcon: Sparkles,
+    title: "Everything You Need",
+    gradientTitle: "For Media.",
+    intro: "Download videos and audio where you have permission. Convert audio formats, compress large files, and extract clean soundtrack files in 1 click.",
+    bullets: ["• Download raw streams", "• Extract sound waves", "• Speed compression"],
+    primaryCta: "Open Media Workspace",
+    primaryLink: "/tools/media-workspace",
+    secondaryCta: "Explore Media Tools",
+    secondaryLink: "/tools/media-tools",
+    glowClass: "bg-indigo-500/[0.07]"
+  },
+  ai: {
+    id: "ai",
+    badge: "AI Workspace Module",
+    badgeIcon: Sparkles,
+    title: "Next-Gen Intelligent",
+    gradientTitle: "AI Workspaces.",
+    intro: "Generate voice transcripts using speech-to-text, upscale low-res cover images with super resolution neural nets, and remove background static.",
+    bullets: ["• AI Speech-to-text", "• Smart upscaling", "• Vocal enhancement"],
+    primaryCta: "Open AI Suite",
+    primaryLink: "/premium-tools",
+    secondaryCta: "AI Image Tools",
+    secondaryLink: "/tools/image-tools",
+    glowClass: "bg-rose-500/[0.07]"
+  }
+};
+
 function HeroSection() {
+  const [activeHero, setActiveHero] = useState<"wasm" | "media" | "ai">("wasm");
+  const activeConfig = HERO_CONFIGS[activeHero];
+  const BadgeIcon = activeConfig.badgeIcon;
+
   return (
     <div className="relative min-h-screen flex flex-col justify-center border-b border-white/[0.04] overflow-visible pt-20">
-      {/* Hero-specific glow behind WASM engine */}
-      <div className="absolute top-[15%] right-[15%] w-[700px] h-[700px] rounded-full bg-purple-500/[0.08] blur-[200px] pointer-events-none" />
+      {/* Hero-specific glow behind active config */}
+      <div className={cn(
+        "absolute top-[15%] right-[15%] w-[700px] h-[700px] rounded-full blur-[200px] pointer-events-none transition-all duration-1000",
+        activeConfig.glowClass
+      )} />
 
       {/* Floating particles in hero */}
       {[...Array(6)].map((_, i) => (
@@ -138,94 +191,113 @@ function HeroSection() {
         />
       ))}
 
-      <Container wide className="grid grid-cols-1 lg:grid-cols-[48fr_52fr] gap-8 lg:gap-4 items-center relative z-10 pt-16 pb-16 lg:pb-24">
-        {/* Left Side: Copy & CTA — 48% */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={stagger}
-          className="space-y-8 text-center lg:text-left order-2 lg:order-1"
-        >
-          <motion.div variants={fadeUp} custom={0}>
-            <span className="relative inline-flex items-center gap-1.5 rounded-full border border-indigo-500/25 bg-indigo-500/[0.08] px-4 py-1.5 text-xs font-semibold tracking-wider text-indigo-400 uppercase overflow-hidden group">
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-              <Sparkles className="h-3.5 w-3.5" />
-              Utool OS v2.0
-            </span>
-          </motion.div>
-
-          <motion.h1
-            variants={fadeUp}
-            custom={1}
-            className="text-[40px] sm:text-[52px] md:text-[60px] lg:text-[68px] xl:text-[80px] leading-[1.05] font-extrabold text-foreground tracking-[-0.04em]"
-          >
-            Everything you need.
-            <br />
-            <AnimatedHeroText />
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            custom={2}
-            className="text-[16px] sm:text-[18px] lg:text-[20px] xl:text-[22px] text-muted-foreground max-w-[620px] leading-relaxed mx-auto lg:mx-0"
-          >
-            A browser-native workspace that runs entirely in your client.
-            Convert, compress, format, and build at the speed of local hardware.
-            No server uploads, no queues, no friction.
-          </motion.p>
-
-          <motion.div
-            variants={fadeUp}
-            custom={3}
-            className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 pt-2"
-          >
-            {/* Primary CTA — Purple gradient */}
-            <Link href="/signup" className="w-full sm:w-auto">
-              <button className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 h-14 w-full sm:w-auto text-[15px] font-bold text-white transition-all hover:-translate-y-0.5 active:scale-95 shadow-[0_8px_32px_rgba(99,102,241,0.3)] hover:shadow-[0_12px_40px_rgba(99,102,241,0.45)] cursor-pointer">
-                <span className="relative z-10">Open Workspace</span>
-                <ArrowRight className="h-4 w-4 relative z-10 transition-transform group-hover:translate-x-0.5" />
-                {/* Hover glow overlay */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <Container wide className="grid grid-cols-1 lg:grid-cols-[46fr_54fr] gap-8 lg:gap-4 items-center relative z-10 pt-16 pb-16 lg:pb-24">
+        
+        {/* Left Side: Copy & CTA — 46% */}
+        <div className="flex flex-col space-y-6 order-2 lg:order-1 items-center lg:items-start">
+          
+          {/* Vercel/Linear Style Segment Controller */}
+          <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.03] p-1 mb-2 shadow-inner">
+            {[
+              { id: "wasm" as const, label: "WASM Engines" },
+              { id: "media" as const, label: "Media Hub" },
+              { id: "ai" as const, label: "AI Workspaces" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveHero(tab.id)}
+                className={cn(
+                  "rounded-full px-4.5 py-1.5 text-[10px] font-extrabold tracking-wider uppercase transition-all duration-300 cursor-pointer select-none",
+                  activeHero === tab.id
+                    ? "bg-indigo-600 text-white shadow-[0_4px_12px_rgba(99,102,241,0.25)] border-white/5"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tab.label}
               </button>
-            </Link>
-
-            {/* Secondary CTA — Glass button */}
-            <a href="#workflow" className="w-full sm:w-auto">
-              <button className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-md px-7 h-14 w-full sm:w-auto text-[15px] font-semibold text-muted-foreground transition-all hover:text-foreground hover:bg-white/[0.08] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)] active:scale-95 cursor-pointer">
-                Explore Tools
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
-            </a>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            custom={4}
-            className="flex items-center justify-center lg:justify-start gap-6 text-caption text-muted-foreground/80 pt-4"
-          >
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              <span>WASM compilation</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <LockKeyhole className="h-4 w-4 text-emerald-500" />
-              <span>Zero server logging</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Right Side: 3D Workspace Core Element — 52% */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-          className="flex items-center justify-center lg:justify-end relative order-1 lg:order-2"
-        >
-          {/* Responsive scaling: mobile 70%, tablet 85%, desktop 100% */}
-          <div className="transform-gpu scale-[0.65] sm:scale-[0.78] md:scale-[0.85] lg:scale-[0.92] xl:scale-100 origin-center lg:origin-right">
-            <WorkspaceCoreVisual />
+            ))}
           </div>
-        </motion.div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeHero}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start"
+            >
+              <div>
+                <span className="relative inline-flex items-center gap-1.5 rounded-full border border-indigo-500/25 bg-indigo-500/[0.08] px-4 py-1.5 text-xs font-semibold tracking-wider text-indigo-400 uppercase overflow-hidden group">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                  <BadgeIcon className="h-3.5 w-3.5 text-indigo-400 animate-pulse" />
+                  {activeConfig.badge}
+                </span>
+              </div>
+
+              <h1 className="text-[36px] sm:text-[48px] md:text-[56px] lg:text-[60px] xl:text-[76px] leading-[1.05] font-extrabold text-foreground tracking-[-0.04em]">
+                {activeConfig.title}
+                <br />
+                <span className={cn(
+                  "bg-gradient-to-r bg-clip-text text-transparent transition-all duration-500",
+                  activeHero === "wasm" && "from-purple-400 via-indigo-400 to-blue-400",
+                  activeHero === "media" && "from-indigo-400 via-purple-400 to-pink-400",
+                  activeHero === "ai" && "from-pink-400 via-rose-400 to-purple-400"
+                )}>
+                  {activeConfig.gradientTitle}
+                </span>
+              </h1>
+
+              <div className="space-y-4 max-w-[620px]">
+                <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-muted-foreground leading-relaxed">
+                  {activeConfig.intro}
+                </p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-x-4 gap-y-2 text-caption font-bold text-indigo-400/90 tracking-wider uppercase">
+                  {activeConfig.bullets.map((bullet, idx) => (
+                    <span key={idx}>{bullet}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-4 pt-2 w-full sm:w-auto">
+                {/* Primary CTA */}
+                <Link href={activeConfig.primaryLink} className="w-full sm:w-auto">
+                  <button className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 h-14 w-full sm:w-auto text-[15px] font-bold text-white transition-all hover:-translate-y-0.5 active:scale-95 shadow-[0_8px_32px_rgba(99,102,241,0.3)] hover:shadow-[0_12px_40px_rgba(99,102,241,0.45)] cursor-pointer">
+                    <span className="relative z-10">{activeConfig.primaryCta}</span>
+                    <ArrowRight className="h-4 w-4 relative z-10 transition-transform group-hover:translate-x-0.5" />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </button>
+                </Link>
+
+                {/* Secondary CTA */}
+                <Link href={activeConfig.secondaryLink} className="w-full sm:w-auto">
+                  <button className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-md px-7 h-14 w-full sm:w-auto text-[15px] font-semibold text-muted-foreground transition-all hover:text-foreground hover:bg-white/[0.08] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)] active:scale-95 cursor-pointer">
+                    {activeConfig.secondaryCta}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                </Link>
+              </div>
+
+              <div className="flex items-center justify-center lg:justify-start gap-6 text-caption text-muted-foreground/80 pt-2">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <span>WASM core execution</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <LockKeyhole className="h-4 w-4 text-emerald-500" />
+                  <span>100% Client-Side Privacy</span>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Right Side: Reusable Hero Visual Variants — 54% */}
+        <div className="flex items-center justify-center lg:justify-end relative order-1 lg:order-2 w-full overflow-visible">
+          <div className="transform-gpu scale-[0.65] sm:scale-[0.78] md:scale-[0.85] lg:scale-[0.92] xl:scale-100 origin-center lg:origin-right w-full">
+            <ModularHeroVisual variant={activeHero} />
+          </div>
+        </div>
       </Container>
     </div>
   );

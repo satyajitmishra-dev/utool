@@ -79,6 +79,7 @@ export default function ToolExecutionClient({ hideHeader = false }: { hideHeader
         } else {
           setOutput(`Success!\nUtility execution output for parameter: ${input}`);
         }
+        window.dispatchEvent(new CustomEvent("tool-success", { detail: { toolSlug: slug } }));
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         setOutput(`[ERROR] Execution failed:\n${errorMsg}`);

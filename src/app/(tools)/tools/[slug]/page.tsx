@@ -270,25 +270,6 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </section>
           )}
 
-          {/* 4. Reviews & Review Form */}
-          <section className="border-t border-border pt-10 space-y-8">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold tracking-tight text-foreground">
-                User Reviews & Ratings
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-              <div className="lg:col-span-3">
-                {/* @ts-ignore - Server Component */}
-                <ReviewList toolSlug={slug} toolName={tool.name} />
-              </div>
-              <div className="lg:col-span-2">
-                <ReviewForm toolSlug={slug} />
-              </div>
-            </div>
-          </section>
 
           {/* 5. Tool Success Poll */}
           <section className="border-t border-border pt-10">

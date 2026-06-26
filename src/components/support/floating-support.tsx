@@ -5,10 +5,28 @@ import { X, MessageCircle, BookOpen, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Modal } from "@/components/ui/modal";
 import { SupportForm } from "@/components/support/support-form";
+import { ReviewForm } from "@/components/support/review-form";
 
 export function FloatingSupport() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [activeToolSlug, setActiveToolSlug] = useState("");
+
+  React.useEffect(() => {
+    const handleToolSuccess = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const slug = customEvent.detail?.toolSlug || "";
+      if (slug) {
+        setTimeout(() => {
+          setActiveToolSlug(slug);
+          setIsReviewOpen(true);
+        }, 1500);
+      }
+    };
+    window.addEventListener("tool-success", handleToolSuccess);
+    return () => window.removeEventListener("tool-success", handleToolSuccess);
+  }, []);
 
   return (
     <>
@@ -97,6 +115,29 @@ export function FloatingSupport() {
           onSuccess={() => setIsFormOpen(false)} 
           className="border-none bg-transparent shadow-none p-0 sm:p-0 md:p-0 rounded-none overflow-visible"
         />
+      </Modal>
+
+      {/* Embedded Modal Dialog for Review Form */}
+      <Modal
+        open={isReviewOpen}
+        onClose={() => setIsReviewOpen(false)}
+        size="lg"
+      >
+        <div className="space-y-4">
+          <div className="flex justify-between items-center border-b border-border pb-3">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="h-4.5 w-4.5 text-purple-400 animate-pulse" />
+              <span>Share Your Feedback</span>
+            </h3>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Thank you for using Utool! We run all utilities locally in your browser for absolute privacy. Please tell us how we did.
+          </p>
+          <ReviewForm 
+            toolSlug={activeToolSlug} 
+            onSuccess={() => setIsReviewOpen(false)} 
+          />
+        </div>
       </Modal>
     </>
   );
