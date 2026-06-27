@@ -10,6 +10,7 @@ import { ProgressBar } from "./progress-bar";
 import { AlertCircle, CheckCircle2, FileText, Download, RotateCcw, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { ToolChaining } from "@/components/tools/ToolChaining";
 
 export function MergeTool() {
   const { limitStatus, loading: limitLoading, checkLimit, recordUsage } = useToolLimit();
@@ -166,36 +167,43 @@ export function MergeTool() {
 
       {/* 4. Success State */}
       {processingState === "success" && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="glass-card border border-emerald-100 bg-emerald-50/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[280px]"
-        >
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-5">
-            <CheckCircle2 className="h-6 w-6" />
-          </div>
-          <h3 className="text-lg font-bold text-slate-800">Merge Completed!</h3>
-          <p className="mt-2 text-xs text-slate-500 max-w-sm leading-relaxed">
-            Your files were successfully compiled into a single document entirely within your browser.
-          </p>
+        <>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-card border border-emerald-100 bg-emerald-50/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[280px]"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-5">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800">Merge Completed!</h3>
+            <p className="mt-2 text-xs text-slate-500 max-w-sm leading-relaxed">
+              Your files were successfully compiled into a single document entirely within your browser.
+            </p>
 
-          <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            <button
-              onClick={handleReset}
-              className="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600 transition flex items-center gap-1.5"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Merge More Files
-            </button>
-            <button
-              onClick={handleDownload}
-              className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 shadow shadow-emerald-100/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-1.5"
-            >
-              <Download className="h-4 w-4" />
-              Download Merged PDF
-            </button>
-          </div>
-        </motion.div>
+            <div className="mt-8 flex flex-wrap gap-3 justify-center">
+              <button
+                onClick={handleReset}
+                className="rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600 transition flex items-center gap-1.5"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Merge More Files
+              </button>
+              <button
+                onClick={handleDownload}
+                className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 shadow shadow-emerald-100/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-1.5"
+              >
+                <Download className="h-4 w-4" />
+                Download Merged PDF
+              </button>
+            </div>
+          </motion.div>
+          <ToolChaining
+            currentToolId="pdf-merge"
+            fileBytes={downloadBytes}
+            fileName={`utool-merged-${Date.now()}.pdf`}
+          />
+        </>
       )}
 
       {/* 6. Processing Failed State (can reset) */}

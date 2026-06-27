@@ -12,7 +12,7 @@ export const wordCounterVariants: RegistryTool[] = generateIntentVariants(
     category: 'Text',
     primaryTag: 'Text',
     iconTag: 'Type',
-    relatedTools: ['text-case-converter', 'character-counter', 'text-to-speech'],
+    relatedTools: ['case-converter', 'character-counter', 'text-to-speech'],
   },
   [
     { intent: 'online' },
@@ -27,8 +27,8 @@ export const wordCounterVariants: RegistryTool[] = generateIntentVariants(
 // ─── Text Case Converter ───────────────────────────────────────────────────
 export const textCaseConverterVariants: RegistryTool[] = generateIntentVariants(
   {
-    id: 'text-case-converter',
-    slug: 'text-case-converter',
+    id: 'case-converter',
+    slug: 'case-converter',
     name: 'Text Case Converter',
     actionPhrase: 'convert text case',
     description: 'Convert text between UPPER CASE, lower case, Title Case, and camelCase.',
@@ -50,15 +50,15 @@ export const textCaseConverterVariants: RegistryTool[] = generateIntentVariants(
 // ─── Lorem Ipsum Generator ─────────────────────────────────────────────────
 export const loremIpsumVariants: RegistryTool[] = generateIntentVariants(
   {
-    id: 'lorem-ipsum',
-    slug: 'lorem-ipsum',
+    id: 'lorem-ipsum-generator',
+    slug: 'lorem-ipsum-generator',
     name: 'Lorem Ipsum Generator',
     actionPhrase: 'generate Lorem Ipsum placeholder text',
     description: 'Generate Lorem Ipsum placeholder text for design mockups and prototypes.',
     category: 'Text',
     primaryTag: 'Text',
     iconTag: 'Type',
-    relatedTools: ['word-counter', 'text-case-converter'],
+    relatedTools: ['word-counter', 'case-converter'],
   },
   [
     { intent: 'online' },
@@ -80,7 +80,7 @@ export const textToBinaryVariants: RegistryTool[] = generateIntentVariants(
     primaryTag: 'Converter',
     iconTag: 'RefreshCw',
     isConverter: true,
-    relatedTools: ['base64-encoder-decoder', 'text-case-converter'],
+    relatedTools: ['base64-encoder-decoder', 'case-converter'],
   },
   [
     { intent: 'online' },
@@ -102,7 +102,7 @@ export const slugGeneratorVariants: RegistryTool[] = generateIntentVariants(
     category: 'Text',
     primaryTag: 'Text',
     iconTag: 'Globe',
-    relatedTools: ['text-case-converter', 'url-encoder', 'keyword-density'],
+    relatedTools: ['case-converter', 'url-encoder', 'keyword-density'],
   },
   [
     { intent: 'online' },

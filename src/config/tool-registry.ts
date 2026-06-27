@@ -2251,6 +2251,11 @@ const DYNAMIC_TOOL_BASES: Array<{
   { id: "cagr-calculator", slug: "cagr-calculator", name: "CAGR Growth Calculator", description: "Find compound annual growth rate values of assets.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
   { id: "break-even-calculator", slug: "break-even-calculator", name: "Break-Even Calculator", description: "Find units and sales revenue needed to cover fixed and variable costs.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
   { id: "amortization-schedule", slug: "amortization-schedule", name: "Amortization Calculator", description: "Generate monthly compound mortgage and principal schedules.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "image-compressor", slug: "image-compressor", name: "Image Compressor", description: "Reduce image file sizes without visible quality loss.", primaryTag: "Image", category: "Image", iconTag: "Maximize2" },
+  { id: "svg-to-png", slug: "svg-to-png", name: "SVG to PNG", description: "Convert SVG vector illustrations to PNG raster images.", primaryTag: "Converter", category: "Converters", iconTag: "RefreshCw" },
+  { id: "gif-to-mp4", slug: "gif-to-mp4", name: "GIF to MP4", description: "Convert animated GIF files to compressed MP4 video.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "heic-to-jpg", slug: "heic-to-jpg", name: "HEIC to JPG", description: "Convert iPhone HEIC photos to universal JPG format.", primaryTag: "Converter", category: "Converters", iconTag: "RefreshCw" },
+  { id: "gst-calculator", slug: "gst-calculator", name: "GST Calculator", description: "Calculate GST tax additions or extractions locally.", primaryTag: "Calculator", category: "Calculators", iconTag: "Gauge" }
 ];
 
 const DYNAMIC_TOOLS: RegistryTool[] = DYNAMIC_TOOL_BASES.map(generateDynamicTool);

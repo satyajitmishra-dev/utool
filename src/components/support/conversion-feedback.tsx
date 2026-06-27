@@ -106,9 +106,46 @@ export function ConversionFeedback({ toolSlug, conversionId, inputFileType, outp
               ))}
             </div>
 
+            {/* Quick suggestion chips */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {(rating <= 2 && rating > 0
+                ? [
+                    "Output quality was poor",
+                    "Conversion was too slow",
+                    "File was corrupted",
+                    "Formatting was lost",
+                    "Didn't support my file",
+                    "Result was blurry",
+                    "Process got stuck",
+                  ]
+                : [
+                    "Fast and accurate!",
+                    "Great quality output",
+                    "Super easy to use",
+                    "Love the privacy — no uploads!",
+                    "Works perfectly on mobile",
+                    "Best free tool I've found",
+                    "Clean UI, no ads",
+                  ]
+              ).map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => setReview((prev) => prev ? `${prev}. ${suggestion}` : suggestion)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                    review.includes(suggestion)
+                      ? "bg-primary/10 border-primary/40 text-primary font-semibold"
+                      : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
             <textarea
               className="w-full bg-muted/50 border border-border rounded-xl p-3 text-sm focus:ring-1 focus:ring-primary outline-none min-h-[80px] mb-4"
-              placeholder="Optional: What did you like about this tool?"
+              placeholder={rating <= 2 && rating > 0 ? "Tell us what went wrong so we can fix it..." : "Optional: What did you like about this tool?"}
               value={review}
               onChange={(e) => setReview(e.target.value)}
             />

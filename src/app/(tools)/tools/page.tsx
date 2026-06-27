@@ -43,11 +43,28 @@ import {
   Laptop
 } from "lucide-react";
 
-// Get unique categories from registry, plus "All" and "PRO"
-const categories = ["All", "PRO", ...Array.from(new Set(TOOL_REGISTRY.map(t => t.category)))];
+const FUNCTIONAL_SLUGS = new Set([
+  "merge-pdf", "split-pdf", "compress-pdf", "protect-pdf", "unlock-pdf",
+  "image-to-pdf", "jpg-to-pdf", "png-to-pdf", "webp-to-pdf", "heic-to-pdf",
+  "pdf-to-jpg", "pdf-to-png",
+  "qr-generator", "url-shortener", "resume-builder", "webp-converter",
+  "json-formatter", "css-gradient-generator", "env-validator", "word-counter",
+  "case-converter", "lorem-ipsum-generator", "text-to-binary", "slug-generator",
+  "password-generator", "hash-sha256-generator", "diff-checker", "uuid-generator",
+  "markdown-preview", "css-minifier", "percentage-calculator", "bmi-calculator",
+  "age-calculator", "loan-calculator", "gst-calculator", "base64-encoder-decoder",
+  "url-encoder", "regex-tester", "heic-to-jpg", "svg-to-png",
+  "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
+  "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer"
+]);
+
+// Get unique categories from registry, plus "All", "PRO", and "Upcoming"
+const categories = ["All", "PRO", "Upcoming", ...Array.from(new Set(TOOL_REGISTRY.map(t => t.category)))];
 
 const categoryIcons: Record<string, string> = {
   All: "🌐",
+  PRO: "👑",
+  Upcoming: "⏳",
   PDF: "📄",
   Image: "🖼️",
   Media: "🎬",
@@ -61,8 +78,7 @@ const categoryIcons: Record<string, string> = {
   SEO: "🔍",
   Security: "🛡️",
   Finance: "💵",
-  Utilities: "🛠️",
-  PRO: "👑"
+  Utilities: "🛠️"
 };
 
 // Helper to match icons to tools based on iconTag string in registry
@@ -140,8 +156,9 @@ function LocalToolCard({ tool, idx }: { tool: RegistryTool; idx: number }) {
 
   const IconComponent = getToolIcon(tool.iconTag);
   let status = "live";
-  if (tool.isPremium) status = "pro";
-  else if (tool.requiresAuth) status = "login required"; // Removed "coming-soon" globally
+  if (!FUNCTIONAL_SLUGS.has(tool.slug)) status = "upcoming";
+  else if (tool.isPremium) status = "pro";
+  else if (tool.requiresAuth) status = "login required";
 
   return (
     <motion.a
@@ -162,9 +179,10 @@ function LocalToolCard({ tool, idx }: { tool: RegistryTool; idx: number }) {
           "text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border",
           status === "live" && "bg-emerald-50 text-emerald-600 border-emerald-200",
           status === "pro" && "bg-purple-50 text-purple-600 border-purple-200",
-          status === "login required" && "bg-amber-50 text-amber-600 border-amber-200"
+          status === "login required" && "bg-amber-50 text-amber-600 border-amber-200",
+          status === "upcoming" && "bg-blue-50 text-blue-600 border-blue-200"
         )}>
-          {status === "login required" ? "Auth Required" : status}
+          {status === "login required" ? "Auth Required" : status === "upcoming" ? "Coming Soon" : status}
         </span>
       </div>
 
@@ -225,15 +243,27 @@ function ToolsGrid() {
   };
 
   const filteredTools = TOOL_REGISTRY.filter((tool) => {
+    // Hide intent variants from the main catalog list to avoid repetition
+    if (tool.intentVariant || tool.parentToolSlug) return false;
+
     const matchesSearch =
       tool.name.toLowerCase().includes(search.toLowerCase()) ||
       tool.description.toLowerCase().includes(search.toLowerCase());
+      
+    const isFunctional = FUNCTIONAL_SLUGS.has(tool.slug);
+
+    if (activeCategory === "Upcoming") {
+      return !isFunctional && matchesSearch;
+    }
+
+    // Hide upcoming tools from all other views
+    if (!isFunctional) return false;
+
     const matchesCategory =
       activeCategory === "All" ||
       (activeCategory === "PRO" && tool.isPremium) ||
       tool.category === activeCategory;
     
-    // Only show active tools (which is all of them now since Coming Soon is removed)
     return tool.isActive && matchesSearch && matchesCategory;
   });
 

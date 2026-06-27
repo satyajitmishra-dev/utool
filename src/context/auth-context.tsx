@@ -30,7 +30,7 @@ export interface AuthContextType {
   authInitializing: boolean;
   login: (email: string, password: string) => Promise<UserCredential>;
   signUp: (email: string, password: string, name?: string) => Promise<UserCredential>;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       const credential = await signInWithPopup(auth, provider);
       await syncSessionCookie(credential.user);
-      router.push("/dashboard");
+      return credential;
     } catch (error) {
       throw error;
     } finally {

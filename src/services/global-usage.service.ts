@@ -75,187 +75,93 @@ export async function checkGlobalUsage(identifier: string): Promise<ToolLimitSta
     };
   }
 
-  const isGuest = identifier.startsWith("anon_");
-  let tier: "free" | "pro" | "enterprise" = "free";
-
-  if (isGuest) {
-    const localData = getLocalUsage(identifier);
-    const now = new Date();
-    const localResetDate = new Date(localData.resetAt);
-
-    let count = localData.count;
-    let resetAt = localResetDate;
-
-    if (localResetDate < now) {
-      const startOfNextDay = new Date();
-      startOfNextDay.setUTCHours(24, 0, 0, 0);
-      count = 0;
-      resetAt = startOfNextDay;
-      saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
+  // Try API check first
+  try {
+    const res = await fetch("/api/usage/check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.resetAt) {
+        data.resetAt = new Date(data.resetAt);
+      }
+      return data;
     }
-
-    return {
-      count,
-      max: LIMIT_GUEST,
-      isLimited: count >= LIMIT_GUEST,
-      loading: false,
-      tier: "free",
-      resetAt,
-    };
+  } catch (error) {
+    console.warn("Usage API check failed, falling back to local storage limits", error);
   }
 
-  try {
-    // Fetch user document from users/{uid}
-    const userDocRef = doc(db, "users", identifier);
-    const userDocSnap = await getDoc(userDocRef);
-    
-    if (!userDocSnap.exists()) {
-      return {
-        count: 0,
-        max: LIMIT_FREE_USER,
-        isLimited: false,
-        loading: false,
-        tier: "free",
-        resetAt: null,
-      };
-    }
+  // Local storage fallback
+  const isGuest = identifier.startsWith("anon_");
+  const localData = getLocalUsage(identifier);
+  const now = new Date();
+  const localResetDate = new Date(localData.resetAt);
 
-    const userData = userDocSnap.data();
-    tier = userData.subscriptionTier || "free";
+  let count = localData.count;
+  let resetAt = localResetDate;
 
-    // Pro and Enterprise users have unlimited access
-    if (tier === "pro" || tier === "enterprise") {
-      return {
-        count: 0,
-        max: Infinity,
-        isLimited: false,
-        loading: false,
-        tier,
-      };
-    }
-
-    const dateStr = new Date().toISOString().split("T")[0];
-    const dailyUsageDate = userData.dailyUsageDate || "";
-    
-    let count = 0;
-    if (dailyUsageDate === dateStr) {
-      count = userData.dailyUsageCount || 0;
-    }
-
-    const max = LIMIT_FREE_USER;
+  if (localResetDate < now) {
     const startOfNextDay = new Date();
     startOfNextDay.setUTCHours(24, 0, 0, 0);
-
-    return {
-      count,
-      max,
-      isLimited: count >= max,
-      loading: false,
-      tier,
-      resetAt: startOfNextDay,
-    };
-  } catch (error) {
-    console.warn("Firestore user document query failed, falling back to localStorage limits.", error);
-
-    // Local storage fallback
-    const localData = getLocalUsage(identifier);
-    const now = new Date();
-    const localResetDate = new Date(localData.resetAt);
-
-    let count = localData.count;
-    let resetAt = localResetDate;
-
-    if (localResetDate < now) {
-      const startOfNextDay = new Date();
-      startOfNextDay.setUTCHours(24, 0, 0, 0);
-      count = 0;
-      resetAt = startOfNextDay;
-      saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
-    }
-
-    const max = LIMIT_FREE_USER;
-
-    return {
-      count,
-      max,
-      isLimited: count >= max,
-      loading: false,
-      tier: "free",
-      resetAt,
-    };
+    count = 0;
+    resetAt = startOfNextDay;
+    saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
   }
+
+  const max = isGuest ? LIMIT_GUEST : LIMIT_FREE_USER;
+
+  return {
+    count,
+    max,
+    isLimited: count >= max,
+    loading: false,
+    tier: "free",
+    resetAt,
+  };
 }
 
 /**
- * Increments the global usage count and updates user stats aggregates atomically on the users/{uid} document.
+ * Increments the global usage count and updates user stats aggregates.
  */
-export async function incrementGlobalUsage(identifier: string, toolId?: string): Promise<void> {
-  if (identifier.startsWith("anon_")) {
-    const localData = getLocalUsage(identifier);
-    localData.count += 1;
-    saveLocalUsage(identifier, localData);
-    return;
-  }
+export async function incrementGlobalUsage(
+  identifier: string,
+  toolId?: string,
+  status: "success" | "failed" = "success",
+  errorMessage?: string | null
+): Promise<void> {
+  if (!identifier) return;
 
+  // Try API increment first
   try {
-    const userRef = doc(db, "users", identifier);
-    const dateStr = new Date().toISOString().split("T")[0];
-
-    await runTransaction(db, async (transaction) => {
-      const userSnap = await transaction.get(userRef);
-
-      if (!userSnap.exists()) {
-        throw new Error(`User document ${identifier} does not exist`);
-      }
-
-      const userData = userSnap.data();
-      const dailyUsageDate = userData.dailyUsageDate || "";
-      const currentDailyCount = dailyUsageDate === dateStr ? (userData.dailyUsageCount || 0) : 0;
-
-      // Update aggregate fields on users/{uid}
-      const userUpdate: Record<string, any> = {
-        totalLifetimeUsage: increment(1),
-        dailyUsageDate: dateStr,
-        dailyUsageCount: currentDailyCount + 1,
-        lastActiveAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
-
-      if (toolId) {
-        userUpdate.lastUsedTool = toolId;
-        userUpdate[`toolUsageCounts.${toolId}`] = increment(1);
-      }
-
-      transaction.update(userRef, userUpdate);
+    const res = await fetch("/api/usage/increment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier, toolId, status, errorMessage }),
     });
+    if (res.ok) {
+      // Also update local storage count for offline parity
+      const localData = getLocalUsage(identifier);
+      localData.count += 1;
+      saveLocalUsage(identifier, localData);
+      return;
+    }
   } catch (error) {
-    console.warn("Failed to atomically increment usage log, falling back to local limit increment.", error);
-    const localData = getLocalUsage(identifier);
-    localData.count += 1;
-    saveLocalUsage(identifier, localData);
+    console.warn("Usage API increment failed, updating local storage only", error);
   }
+
+  // Local storage fallback
+  const localData = getLocalUsage(identifier);
+  localData.count += 1;
+  saveLocalUsage(identifier, localData);
 }
 
 /**
- * Resets the daily usage count on the users/{uid} document.
+ * Resets the daily usage count.
  */
 export async function resetUsage(identifier: string): Promise<void> {
   const startOfNextDay = new Date();
   startOfNextDay.setUTCHours(24, 0, 0, 0);
-
-  if (identifier.startsWith("anon_")) {
-    saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
-    return;
-  }
-
-  try {
-    const userRef = doc(db, "users", identifier);
-    await updateDoc(userRef, {
-      dailyUsageCount: 0,
-      updatedAt: serverTimestamp(),
-    });
-  } catch (error) {
-    console.warn("Failed to reset Firestore usage log, falling back to local reset.", error);
-    saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
-  }
+  saveLocalUsage(identifier, { count: 0, resetAt: startOfNextDay.toISOString() });
 }

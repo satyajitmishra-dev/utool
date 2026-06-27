@@ -101,9 +101,7 @@ export function useToolLimit() {
       if (!identifier) return;
       
       try {
-        if (status === "success") {
-          await incrementGlobalUsage(identifier, toolId);
-        }
+        await incrementGlobalUsage(identifier, toolId, status, errorMessage);
         await refresh(); // Refresh local counts after logging
       } catch (error) {
         console.error("Failed to record usage event hook:", error);

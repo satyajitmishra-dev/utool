@@ -79,8 +79,12 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <RemovePasswordTool />;
     case "image-to-pdf":
     case "jpg-to-pdf":
+    case "png-to-pdf":
+    case "webp-to-pdf":
+    case "heic-to-pdf":
       return <ImageToPdfTool />;
     case "pdf-to-jpg":
+    case "pdf-to-png":
       return <PdfToJpgTool />;
     case "qr-generator":
       return <QRGeneratorPage hideHeader={true} />;
@@ -92,10 +96,36 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <WebPConverterPage hideHeader={true} />;
     case "json-formatter":
     case "css-gradient-generator":
+    case "env-validator":
+    case "word-counter":
+    case "case-converter":
+    case "lorem-ipsum-generator":
+    case "text-to-binary":
+    case "slug-generator":
+    case "password-generator":
+    case "hash-sha256-generator":
+    case "diff-checker":
+    case "uuid-generator":
+    case "markdown-preview":
+    case "css-minifier":
+    case "percentage-calculator":
+    case "bmi-calculator":
+    case "age-calculator":
+    case "loan-calculator":
+    case "gst-calculator":
+    case "base64-encoder-decoder":
+    case "url-encoder":
+    case "regex-tester":
+    case "heic-to-jpg":
+    case "svg-to-png":
       return <ToolExecutionClient hideHeader={true} />;
     case "meta-tag-generator":
       return <MetaTagGeneratorTool />;
     case "media-workspace":
+    case "audio-converter":
+    case "video-trimmer":
+    case "gif-to-mp4":
+    case "image-compressor":
       return <MediaWorkspaceClient />;
     case "image-resizer":
       return <ImageResizerTool />;

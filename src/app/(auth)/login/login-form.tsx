@@ -15,8 +15,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { safeRedirect } from "@/utils/safe-redirect";
+import { getAnonymousId } from "@/utils/anonymous-id";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -43,8 +44,22 @@ function LoginFormContent() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
+      const credential = await login(data.email, data.password);
       toast.success("Welcome back to Utool.");
+      
+      const guestId = getAnonymousId();
+      if (guestId && credential?.user?.uid) {
+        try {
+          await fetch("/api/auth/merge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guestId, userId: credential.user.uid }),
+          });
+        } catch (mergeErr) {
+          console.error("Failed to merge guest account history:", mergeErr);
+        }
+      }
+
       router.push(redirectUrl);
     } catch (err) {
       toast.error(mapFirebaseError(err));
@@ -54,8 +69,23 @@ function LoginFormContent() {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      await loginWithGoogle();
+      const credential = await loginWithGoogle();
       toast.success("Welcome back to Utool.");
+
+      const guestId = getAnonymousId();
+      if (guestId && credential?.user?.uid) {
+        try {
+          await fetch("/api/auth/merge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guestId, userId: credential.user.uid }),
+          });
+        } catch (mergeErr) {
+          console.error("Failed to merge guest account history:", mergeErr);
+        }
+      }
+
+      router.push(redirectUrl);
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {

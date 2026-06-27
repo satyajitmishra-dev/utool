@@ -70,8 +70,8 @@ export const ageCalculatorVariants: RegistryTool[] = generateIntentVariants(
 // ─── EMI Calculator ────────────────────────────────────────────────────────
 export const emiCalculatorVariants: RegistryTool[] = generateIntentVariants(
   {
-    id: 'emi-calculator',
-    slug: 'emi-calculator',
+    id: 'loan-calculator',
+    slug: 'loan-calculator',
     name: 'EMI Calculator',
     actionPhrase: 'calculate EMI',
     description: 'Calculate monthly EMI payments for home, car, and personal loans.',
@@ -100,7 +100,7 @@ export const gstCalculatorVariants: RegistryTool[] = generateIntentVariants(
     category: 'Calculators',
     primaryTag: 'Calculators',
     iconTag: 'Scale',
-    relatedTools: ['percentage-calculator', 'emi-calculator', 'roi-calculator'],
+    relatedTools: ['percentage-calculator', 'loan-calculator', 'roi-calculator'],
   },
   [
     { intent: 'online' },

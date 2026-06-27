@@ -19,6 +19,10 @@ import {
   ArrowRight,
   ShieldAlert,
 } from "lucide-react";
+import fs from "fs/promises";
+import path from "path";
+import { marked } from "marked";
+import { ToolEmbed } from "@/components/tools/ToolEmbed";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -35,6 +39,16 @@ export default async function BlogPostReaderPage({ params }: Props) {
 
   if (!post) {
     notFound();
+  }
+
+  let markdownContent = "";
+  let hasMarkdown = false;
+  try {
+    const mdPath = path.join(process.cwd(), "src/content/blog", `${slug}.md`);
+    markdownContent = await fs.readFile(mdPath, "utf-8");
+    hasMarkdown = true;
+  } catch (e) {
+    // Fallback to database paragraphs array
   }
 
   const toolData = post.ctaToolSlug ? getToolBySlug(post.ctaToolSlug) : null;
@@ -103,7 +117,7 @@ export default async function BlogPostReaderPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground">
+      <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground pt-24 md:pt-28">
         <main className="max-w-4xl w-full mx-auto px-6 py-10 space-y-8">
           {/* Navigation controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -173,10 +187,30 @@ export default async function BlogPostReaderPage({ params }: Props) {
           </div>
 
           {/* Article Body Content */}
-          <article className="space-y-6 text-sm text-muted-foreground leading-relaxed text-justify">
-            {post.paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
+          <article className="space-y-6 text-sm text-neutral-300 leading-relaxed text-justify">
+            {hasMarkdown ? (
+              (() => {
+                const parts = markdownContent.split(/\[tool-embed:\s*([a-zA-Z0-9-]+)\s*\]/g);
+                return parts.map((part, idx) => {
+                  if (idx % 2 === 0) {
+                    const parsedHtml = marked.parse(part) as string;
+                    return (
+                      <div
+                        key={idx}
+                        className="prose prose-neutral dark:prose-invert max-w-none text-neutral-300 space-y-4"
+                        dangerouslySetInnerHTML={{ __html: parsedHtml }}
+                      />
+                    );
+                  } else {
+                    return <ToolEmbed key={idx} slug={part} />;
+                  }
+                });
+              })()
+            ) : (
+              post.paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))
+            )}
           </article>
 
           {/* Action CTA Widget (Internal Link Engine: Blog -> Tool) */}

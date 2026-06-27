@@ -6,6 +6,7 @@ import { ProgressBar } from "./progress-bar";
 import { AlertCircle, CheckCircle2, FileText, Download, RotateCcw, FileImage } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { ToolChaining } from "@/components/tools/ToolChaining";
 
 interface RenderedPage {
   pageNumber: number;
@@ -317,6 +318,24 @@ export function PdfToJpgTool() {
               </div>
             ))}
           </div>
+          <ToolChaining
+            currentToolId="pdf-to-jpg"
+            fileBytes={(() => {
+              const firstPage = pages[0];
+              if (!firstPage) return null;
+              const base64 = firstPage.dataUrl.split(",")[1];
+              if (!base64) return null;
+              const binary = atob(base64);
+              const len = binary.length;
+              const bytes = new Uint8Array(len);
+              for (let i = 0; i < len; i++) {
+                bytes[i] = binary.charCodeAt(i);
+              }
+              return bytes.buffer;
+            })()}
+            fileName={`${file?.name.replace(".pdf", "")}_page_1.jpg`}
+            fileType="image/jpeg"
+          />
         </div>
       )}
 

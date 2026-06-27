@@ -41,9 +41,9 @@ const COMPLEMENTARY_PAIRS: [string, string][] = [
   ['video-to-gif',      'gif-to-mp4'],
   ['video-trimmer',     'audio-trimmer'],
   ['audio-converter',   'audio-trimmer'],
-  ['word-counter',      'text-case-converter'],
-  ['text-case-converter','word-counter'],
-  ['emi-calculator',    'amortization-schedule'],
+  ['word-counter',      'case-converter'],
+  ['case-converter',    'word-counter'],
+  ['loan-calculator',   'amortization-schedule'],
   ['gst-calculator',    'percentage-calculator'],
 ];
 

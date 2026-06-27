@@ -21,8 +21,37 @@ export async function POST(request: NextRequest) {
     try {
       const userRef = adminDb.collection("users").doc(userId);
       const userDoc = await userRef.get();
-      if (userDoc.exists) {
-        subscriptionTier = userDoc.data()?.subscriptionTier || "free";
+      const now = new Date();
+      const referralCode = `ref_${userId.slice(0, 8)}`;
+      
+      if (!userDoc.exists) {
+        await userRef.set({
+          uid: userId,
+          name: decodedToken.name || null,
+          email: decodedToken.email || "",
+          photoURL: decodedToken.picture || null,
+          emailVerified: decodedToken.email_verified || false,
+          subscriptionTier: "free",
+          subscriptionStatus: "none",
+          planType: null,
+          createdAt: now,
+          updatedAt: now,
+          totalLifetimeUsage: 0,
+          toolUsageCounts: {},
+          lastUsedTool: "None",
+          lastActiveAt: now,
+          referralCode,
+          invitedBy: null,
+          referralActivated: false,
+          referralsCompletedCount: 0,
+          proUntil: null,
+        });
+      } else {
+        const userData = userDoc.data();
+        subscriptionTier = userData?.subscriptionTier || "free";
+        if (!userData?.referralCode) {
+          await userRef.update({ referralCode });
+        }
       }
     } catch (firestoreError) {
       console.warn("[Session] Firestore access error, defaulting to free tier:", firestoreError);

@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { mapFirebaseError } from "@/utils/firebase-error-map";
+import { getAnonymousId } from "@/utils/anonymous-id";
+import { safeRedirect } from "@/utils/safe-redirect";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthHeader } from "@/components/auth/auth-header";
@@ -37,7 +39,10 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export function SignupForm() {
   const { signUp, loginWithGoogle, authInitializing } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const redirectUrl = safeRedirect(searchParams.get("redirect"));
 
   const {
     register,
@@ -49,9 +54,23 @@ export function SignupForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     try {
-      await signUp(data.email, data.password, data.name);
+      const credential = await signUp(data.email, data.password, data.name);
       toast.success("Your Utool account is ready.");
-      router.push("/dashboard");
+
+      const guestId = getAnonymousId();
+      if (guestId && credential?.user?.uid) {
+        try {
+          await fetch("/api/auth/merge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guestId, userId: credential.user.uid }),
+          });
+        } catch (mergeErr) {
+          console.error("Failed to merge guest account history:", mergeErr);
+        }
+      }
+
+      router.push(redirectUrl);
     } catch (err) {
       toast.error(mapFirebaseError(err));
     }
@@ -60,8 +79,23 @@ export function SignupForm() {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      await loginWithGoogle();
+      const credential = await loginWithGoogle();
       toast.success("Your Utool account is ready.");
+
+      const guestId = getAnonymousId();
+      if (guestId && credential?.user?.uid) {
+        try {
+          await fetch("/api/auth/merge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ guestId, userId: credential.user.uid }),
+          });
+        } catch (mergeErr) {
+          console.error("Failed to merge guest account history:", mergeErr);
+        }
+      }
+
+      router.push(redirectUrl);
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {

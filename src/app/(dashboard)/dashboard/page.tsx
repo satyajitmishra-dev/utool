@@ -267,7 +267,7 @@ export default function DashboardPage() {
             <History className="h-5 w-5 text-primary" />
             Tool Usage Distribution
           </h2>
-          <GlassCard hover={false} className="p-5 divide-y divide-border h-full max-h-[295px] overflow-y-auto">
+          <GlassCard hover={false} className="p-5 divide-y divide-border max-h-[295px] overflow-y-auto">
             {loading ? (
               <div className="space-y-4">
                 <Skeleton className="h-10 w-full" />

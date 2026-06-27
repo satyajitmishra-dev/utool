@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { PDFFile } from "@/types/pdf";
 import { toast } from "sonner";
+import { getHandoffFile, clearHandoffFile } from "@/utils/file-handoff";
 
 interface UsePDFUploadProps {
   tier?: "free" | "pro" | "enterprise";
@@ -140,6 +141,17 @@ export function usePDFUpload({
     },
     [addFiles]
   );
+
+  useEffect(() => {
+    async function loadHandoff() {
+      const file = await getHandoffFile();
+      if (file) {
+        await addFiles([file]);
+        await clearHandoffFile();
+      }
+    }
+    loadHandoff();
+  }, [addFiles]);
 
   return {
     files,

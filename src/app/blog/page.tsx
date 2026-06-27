@@ -52,7 +52,7 @@ export default function BlogCatalogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground">
+      <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground pt-24 md:pt-28">
         <main className="max-w-6xl w-full mx-auto px-6 py-10 space-y-12">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

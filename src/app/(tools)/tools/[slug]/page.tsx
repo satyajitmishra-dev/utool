@@ -162,7 +162,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
           <section className="border border-border rounded-3xl bg-card/40 p-6 md:p-10 shadow-sm relative overflow-hidden backdrop-blur-sm">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-500 to-indigo-500" />
             <div className="w-full flex flex-col items-stretch">
-              <ToolWorkspaceClient slug={slug} />
+              <ToolWorkspaceClient slug={tool.parentToolSlug || slug} />
             </div>
           </section>
 

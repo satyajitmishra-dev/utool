@@ -24,7 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       );
     }
 
-    const provider = converterProviders[id];
+    const baseId = config.parentToolSlug || id;
+    const provider = converterProviders[baseId];
     if (!provider) {
       return NextResponse.json(
         { error: "No provider configured for this converter" },

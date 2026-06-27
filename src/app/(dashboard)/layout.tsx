@@ -15,12 +15,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex flex-col md:flex-row min-h-screen bg-background text-foreground">
       <Sidebar />
 
       {/* Content */}
       <main className="flex-1 overflow-y-auto focus:outline-none">
-        <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="py-6 px-4 sm:px-6 lg:px-8 w-full max-w-7xl">
           {children}
         </div>
       </main>

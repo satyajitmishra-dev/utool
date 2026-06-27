@@ -12,6 +12,7 @@ import { AlertCircle, CheckCircle2, FileText, Download, RotateCcw, Lock, Percent
 import { motion } from "framer-motion";
 import { CompressionLevel } from "@/types/pdf";
 import { toast } from "sonner";
+import { ToolChaining } from "@/components/tools/ToolChaining";
 
 export function CompressTool() {
   const { limitStatus, loading: limitLoading, checkLimit, recordUsage } = useToolLimit();
@@ -218,66 +219,73 @@ export function CompressTool() {
 
         {/* 4. Success State */}
         {processingState === "success" && file && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass-card border border-emerald-100 bg-emerald-50/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[280px]"
-          >
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-5">
-              {wasReduced ? (
-                <Percent className="h-6 w-6" />
-              ) : (
-                <CheckCircle2 className="h-6 w-6" />
-              )}
-            </div>
-
-            <h3 className="text-lg font-bold text-foreground">
-              {wasReduced ? "Compression Successful!" : "Optimization Completed!"}
-            </h3>
-
-            {/* Size Comparison Card */}
-            <div className="mt-6 glass-card px-6 py-4 rounded-2xl border border-border shadow-sm flex items-center justify-center gap-6 max-w-sm">
-              <div className="text-left">
-                <span className="block text-4xs text-muted-foreground font-bold uppercase tracking-wider">Before</span>
-                <span className="text-xs font-bold text-muted-foreground font-mono">{formatSize(originalSize)}</span>
+          <>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass-card border border-emerald-100 bg-emerald-50/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center min-h-[280px]"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 mb-5">
+                {wasReduced ? (
+                  <Percent className="h-6 w-6" />
+                ) : (
+                  <CheckCircle2 className="h-6 w-6" />
+                )}
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              <div className="text-left">
-                <span className="block text-4xs text-indigo-400 font-bold uppercase tracking-wider">After</span>
-                <span className="text-xs font-bold text-indigo-600 font-mono">{formatSize(compressedSize)}</span>
-              </div>
-              {wasReduced && (
-                <div className="border-l border-border pl-4 py-1 flex flex-col items-center">
-                  <span className="text-[10px] font-extrabold text-emerald-600">-{savingsPercent}%</span>
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Saved</span>
+
+              <h3 className="text-lg font-bold text-foreground">
+                {wasReduced ? "Compression Successful!" : "Optimization Completed!"}
+              </h3>
+
+              {/* Size Comparison Card */}
+              <div className="mt-6 glass-card px-6 py-4 rounded-2xl border border-border shadow-sm flex items-center justify-center gap-6 max-w-sm">
+                <div className="text-left">
+                  <span className="block text-4xs text-muted-foreground font-bold uppercase tracking-wider">Before</span>
+                  <span className="text-xs font-bold text-muted-foreground font-mono">{formatSize(originalSize)}</span>
                 </div>
-              )}
-            </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <div className="text-left">
+                  <span className="block text-4xs text-indigo-400 font-bold uppercase tracking-wider">After</span>
+                  <span className="text-xs font-bold text-indigo-600 font-mono">{formatSize(compressedSize)}</span>
+                </div>
+                {wasReduced && (
+                  <div className="border-l border-border pl-4 py-1 flex flex-col items-center">
+                    <span className="text-[10px] font-extrabold text-emerald-600">-{savingsPercent}%</span>
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Saved</span>
+                  </div>
+                )}
+              </div>
 
-            <p className="mt-4 text-xs text-muted-foreground max-w-xs leading-relaxed">
-              {wasReduced
-                ? "Your compressed document is ready for download."
-                : "No further size reduction could be achieved. Unused structural components were cleaned up successfully."
-              }
-            </p>
+              <p className="mt-4 text-xs text-muted-foreground max-w-xs leading-relaxed">
+                {wasReduced
+                  ? "Your compressed document is ready for download."
+                  : "No further size reduction could be achieved. Unused structural components were cleaned up successfully."
+                }
+              </p>
 
-            <div className="mt-8 flex flex-wrap gap-3 justify-center">
-              <button
-                onClick={handleReset}
-                className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
-              >
-                <RotateCcw className="h-4 w-4" />
-                Compress Another File
-              </button>
-              <button
-                onClick={handleDownload}
-                className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 shadow shadow-emerald-100/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-1.5"
-              >
-                <Download className="h-4 w-4" />
-                Download Compressed PDF
-              </button>
-            </div>
-          </motion.div>
+              <div className="mt-8 flex flex-wrap gap-3 justify-center">
+                <button
+                  onClick={handleReset}
+                  className="rounded-2xl border border-border bg-card hover:bg-muted px-5 py-3 text-xs font-bold text-muted-foreground transition flex items-center gap-1.5"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Compress Another File
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="rounded-2xl bg-emerald-600 hover:bg-emerald-500 shadow shadow-emerald-100/50 px-6 py-3 text-xs font-bold text-white transition flex items-center gap-1.5"
+                >
+                  <Download className="h-4 w-4" />
+                  Download Compressed PDF
+                </button>
+              </div>
+            </motion.div>
+            <ToolChaining
+              currentToolId="pdf-compress"
+              fileBytes={downloadBytes}
+              fileName={`utool-compressed-${file.name}`}
+            />
+          </>
         )}
 
         {/* 6. Processing Failed State (can reset) */}
