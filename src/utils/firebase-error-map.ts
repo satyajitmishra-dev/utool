@@ -43,6 +43,8 @@ export function mapFirebaseError(error: any): string {
       return "Your password is too weak. Use at least 6 characters.";
     case "auth/network-request-failed":
       return "Check your internet connection and try again.";
+    case "auth/internal-error":
+      return "Internal authentication error. Please verify your connection or check if localhost is whitelisted in Firebase Auth Settings.";
     case "auth/too-many-requests":
       return "Too many failed attempts. Please wait a moment and try again.";
     case "auth/user-disabled":
