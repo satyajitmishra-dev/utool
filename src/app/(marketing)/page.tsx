@@ -76,41 +76,31 @@ export default function LandingPage() {
       {/* 2. Hero Section */}
       <HeroSection />
 
-      {/* 3. Live Product Preview (Dashboard Visual Mockup) */}
-      <ProductPreviewSection />
-
-      {/* 4. Social Proof / Metrics */}
+      {/* 3. Trust Numbers (Metrics) */}
       <MetricsSection />
 
-      {/* 5. Interactive Workflow Animation */}
-      <Section id="workflow" className="section-divider py-24 sm:py-32">
-        <SectionHeading
-          badge="Interactive Compiling"
-          title="Transform files at the speed of local hardware"
-          subtitle="Experience instant, local processing without latency. Drag, convert, and download without ever sending a byte to a external server."
-        />
-        <InteractiveWorkflow />
-      </Section>
+      {/* 4. Benefits Section */}
+      <BenefitsSection />
 
-      {/* 6. Use Cases by Identity */}
-      <UseCasesSection />
+      {/* 5. Popular Categories */}
+      <PopularCategoriesSection />
 
-      {/* 7. Bento Ecosystem Grid */}
-      <BentoEcosystemSection />
+      {/* 6. Featured Tools */}
+      <FeaturedToolsSection />
 
-      {/* 8. Trust & Privacy Layer */}
+      {/* 7. Why UTool Section */}
+      <WhyUToolSection />
+
+      {/* 8. Privacy Section (Trust & Privacy Layer) */}
       <TrustLayerSection />
 
-      {/* 9. Experience & Speed Layer */}
-      <ExperienceLayerSection />
+      {/* 9. Testimonials Section */}
+      <TestimonialsSection />
 
-      {/* 10. Pricing Matrices */}
-      <PricingSection />
-
-      {/* 11. FAQ Accordion */}
+      {/* 10. FAQ Accordion */}
       <FAQSection />
 
-      {/* 12. Final Call-to-Action */}
+      {/* 11. Final Call-to-Action */}
       <FinalCTASection />
     </div>
   );
@@ -122,42 +112,42 @@ const HERO_CONFIGS = {
     id: "wasm",
     badge: "WASM Compiling Engines",
     badgeIcon: Cpu,
-    title: "Powering Tools At The Speed Of",
-    gradientTitle: "Local Hardware.",
-    intro: "Convert and compress PDF archives, compile source formats, and design documents. 100% private execution running directly inside your client browser.",
-    bullets: ["• Run client-side scripts", "• Safe from data leaks", "• No sign-up required"],
-    primaryCta: "Open PDF Tools",
-    primaryLink: "/tools/pdf-tools",
-    secondaryCta: "Resume Architect",
-    secondaryLink: "/tools/resume-tools",
+    title: "Everything You Need.",
+    gradientTitle: "Nothing Leaves Your Device.",
+    intro: "Convert PDFs, edit images, optimize files, generate resumes, and use powerful developer tools directly in your browser. No uploads. No waiting. Complete privacy.",
+    bullets: ["⚡ Fast", "🔒 Private", "💻 Browser-based", "🌍 Free", "❤️ No Installation"],
+    primaryCta: "Start Using Tools",
+    primaryLink: "/tools",
+    secondaryCta: "Why Local Processing?",
+    secondaryLink: "/why-local-processing",
     glowClass: "bg-purple-500/[0.07]"
   },
   media: {
     id: "media",
     badge: "Media Workspace Module",
     badgeIcon: Sparkles,
-    title: "Everything You Need",
-    gradientTitle: "For Media.",
-    intro: "Download videos and audio where you have permission. Convert audio formats, compress large files, and extract clean soundtrack files in 1 click.",
-    bullets: ["• Download raw streams", "• Extract sound waves", "• Speed compression"],
-    primaryCta: "Open Media Workspace",
-    primaryLink: "/tools/media-workspace",
-    secondaryCta: "Explore Media Tools",
-    secondaryLink: "/tools/media-tools",
+    title: "Everything You Need.",
+    gradientTitle: "Nothing Leaves Your Device.",
+    intro: "Convert PDFs, edit images, optimize files, generate resumes, and use powerful developer tools directly in your browser. No uploads. No waiting. Complete privacy.",
+    bullets: ["⚡ Fast", "🔒 Private", "💻 Browser-based", "🌍 Free", "❤️ No Installation"],
+    primaryCta: "Start Using Tools",
+    primaryLink: "/tools",
+    secondaryCta: "Why Local Processing?",
+    secondaryLink: "/why-local-processing",
     glowClass: "bg-indigo-500/[0.07]"
   },
   ai: {
     id: "ai",
     badge: "AI Workspace Module",
     badgeIcon: Sparkles,
-    title: "Next-Gen Intelligent",
-    gradientTitle: "AI Workspaces.",
-    intro: "Generate voice transcripts using speech-to-text, upscale low-res cover images with super resolution neural nets, and remove background static.",
-    bullets: ["• AI Speech-to-text", "• Smart upscaling", "• Vocal enhancement"],
-    primaryCta: "Open AI Suite",
-    primaryLink: "/premium-tools",
-    secondaryCta: "AI Image Tools",
-    secondaryLink: "/tools/image-tools",
+    title: "Everything You Need.",
+    gradientTitle: "Nothing Leaves Your Device.",
+    intro: "Convert PDFs, edit images, optimize files, generate resumes, and use powerful developer tools directly in your browser. No uploads. No waiting. Complete privacy.",
+    bullets: ["⚡ Fast", "🔒 Private", "💻 Browser-based", "🌍 Free", "❤️ No Installation"],
+    primaryCta: "Start Using Tools",
+    primaryLink: "/tools",
+    secondaryCta: "Why Local Processing?",
+    secondaryLink: "/why-local-processing",
     glowClass: "bg-rose-500/[0.07]"
   }
 };
@@ -252,10 +242,28 @@ function HeroSection() {
                 <p className="text-[15px] sm:text-[17px] lg:text-[18px] text-muted-foreground leading-relaxed">
                   {activeConfig.intro}
                 </p>
-                <div className="flex flex-wrap justify-center lg:justify-start gap-x-4 gap-y-2 text-caption font-bold text-indigo-400/90 tracking-wider uppercase">
-                  {activeConfig.bullets.map((bullet, idx) => (
-                    <span key={idx}>{bullet}</span>
-                  ))}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
+                  {[
+                    { label: "Fast", icon: Zap, color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+                    { label: "Private", icon: Lock, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+                    { label: "Browser-based", icon: Laptop, color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+                    { label: "Free", icon: Globe, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+                    { label: "No Installation", icon: Heart, color: "text-rose-400 bg-rose-500/10 border-rose-500/20" }
+                  ].map((promise) => {
+                    const PromiseIcon = promise.icon;
+                    return (
+                      <div
+                        key={promise.label}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[11px] font-bold tracking-wider uppercase backdrop-blur-md transition-all duration-300 hover:scale-105",
+                          promise.color
+                        )}
+                      >
+                        <PromiseIcon className="h-3.5 w-3.5" />
+                        <span>{promise.label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -408,14 +416,15 @@ function ProductPreviewSection() {
   );
 }
 
-function AnimatedCounter({ value, label, desc }: { value: string; label: string; desc: string }) {
+function AnimatedCounter({ value, label, desc, icon: Icon }: { value: string; label: string; desc: string; icon?: any }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   
   // Parse numeric part and suffix
   const numMatch = value.match(/[\d,.]+/);
-  const suffix = value.replace(/[\d,.]+/, "");
-  const targetNum = numMatch ? parseFloat(numMatch[0].replace(/,/g, "")) : 0;
+  const hasNumeric = numMatch !== null;
+  const suffix = hasNumeric ? value.replace(/[\d,.]+/, "") : value;
+  const targetNum = hasNumeric ? parseFloat(numMatch[0].replace(/,/g, "")) : 0;
   
   const count = useMotionValue(0);
   const display = useTransform(count, (latest) => {
@@ -429,16 +438,27 @@ function AnimatedCounter({ value, label, desc }: { value: string; label: string;
   });
 
   useEffect(() => {
-    if (isInView) {
+    if (isInView && hasNumeric) {
       animate(count, targetNum, { duration: 2.5, ease: "easeOut" });
     }
-  }, [isInView, targetNum, count]);
+  }, [isInView, targetNum, count, hasNumeric]);
 
   return (
-    <div ref={ref} className="text-center space-y-2 p-4">
+    <div ref={ref} className="text-center space-y-3 p-4 flex flex-col items-center select-none">
+      {Icon && (
+        <div className="h-10 w-10 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary mb-2 shadow-xs">
+          <Icon className="h-5.5 w-5.5" />
+        </div>
+      )}
       <h3 className="text-display-l font-extrabold text-foreground tracking-tighter flex items-center justify-center">
-        <motion.span>{display}</motion.span>
-        <span>{suffix}</span>
+        {hasNumeric ? (
+          <>
+            <motion.span>{display}</motion.span>
+            <span>{suffix}</span>
+          </>
+        ) : (
+          <span>{value}</span>
+        )}
       </h3>
       <p className="text-body-s font-semibold text-foreground uppercase tracking-wider">
         {label}
@@ -453,20 +473,22 @@ function AnimatedCounter({ value, label, desc }: { value: string; label: string;
 /* ─── 4. SOCIAL PROOF / METRICS ─── */
 function MetricsSection() {
   const stats = [
-    { value: "4.8M+", label: "Files transformed", desc: "Compiled directly inside client browsers" },
-    { value: "24,000+", label: "Upload hours saved", desc: "Zero network transmission latency" },
-    { value: "100%", label: "Absolute Privacy", desc: "Files never hit external server paths" },
-    { value: "99.99%", label: "Active SLA Uptime", desc: "Edge-hosted local worker modules" },
+    { value: "100+", label: "Tools Available", desc: "Utility workflows for every day", icon: Layers },
+    { value: "100%", label: "Browser Processing", desc: "All conversions run inside your client", icon: Laptop },
+    { value: "0", label: "File Storage", desc: "Your data never hits our disks", icon: LockKeyhole },
+    { value: "Free", label: "Forever", desc: "No subscriptions for most tools", icon: Heart },
+    { value: "Fast", label: "Lightning Fast", desc: "Processed instantly at local CPU speeds", icon: Zap },
+    { value: "Private", label: "Privacy First", desc: "GDPR & HIPAA compliant by design", icon: Shield },
   ];
 
   return (
     <Section className="section-divider py-20 bg-background/50">
-      <div className="mx-auto max-w-5xl px-6 text-center">
+      <div className="mx-auto max-w-7xl px-6 text-center">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-card/60 px-3.5 py-1 text-xs font-semibold text-muted-foreground tracking-wide uppercase mb-8">
-          Trusted by digital builders
+          Trust by the numbers
         </span>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -476,7 +498,7 @@ function MetricsSection() {
               variants={fadeUp}
               custom={i}
             >
-              <AnimatedCounter value={stat.value} label={stat.label} desc={stat.desc} />
+              <AnimatedCounter value={stat.value} label={stat.label} desc={stat.desc} icon={stat.icon} />
             </motion.div>
           ))}
         </div>
@@ -1074,9 +1096,9 @@ function FinalCTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link href="/signup">
+            <Link href="/tools">
               <MagneticButton variant="primary" glow={true} className="px-10 py-4 text-body-m">
-                Open workspace
+                Start Using Tools
                 <ArrowRight className="h-4 w-4" />
               </MagneticButton>
             </Link>
@@ -1088,5 +1110,241 @@ function FinalCTASection() {
         </div>
       </div>
     </Container>
+  );
+}
+
+/* ─── NEW PHASE 0 HOME SECTIONS ─── */
+
+function BenefitsSection() {
+  const benefits = [
+    {
+      icon: Lock,
+      title: "Complete Privacy",
+      desc: "Your files never leave your device. All computations run in-memory within your local browser sandbox.",
+      color: "rgba(16, 185, 129, 0.1)"
+    },
+    {
+      icon: Zap,
+      title: "Instant Processing",
+      desc: "No waiting. No uploads. No server queues. Files are processed at the speed of your device CPU.",
+      color: "rgba(99, 102, 241, 0.1)"
+    },
+    {
+      icon: Globe,
+      title: "Works Everywhere",
+      desc: "Compatible with Windows, macOS, Linux, Android, and iOS. If you have a web browser, UTool just works.",
+      color: "rgba(59, 130, 246, 0.1)"
+    },
+    {
+      icon: Sparkles,
+      title: "Free & Simple",
+      desc: "No subscriptions required for core tools. Zero installation, zero signup barriers, pure utility.",
+      color: "rgba(245, 158, 11, 0.1)"
+    }
+  ];
+
+  return (
+    <Section id="benefits" className="section-divider py-24 bg-card/5">
+      <SectionHeading
+        badge="Benefits"
+        title="Utility that respects your time and privacy"
+        subtitle="Engineered with modern client-side runtimes to bypass standard cloud-processing hazards."
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto px-6">
+        {benefits.map((b, i) => {
+          const Icon = b.icon;
+          return (
+            <GlassCard key={b.title} className="p-8 space-y-4 rounded-3xl border-white/[0.06] flex flex-col justify-between" hover={true}>
+              <div className="space-y-4">
+                <div className="h-10 w-10 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-body-s font-bold text-foreground tracking-tight">{b.title}</h3>
+                <p className="text-caption text-muted-foreground leading-relaxed">{b.desc}</p>
+              </div>
+            </GlassCard>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
+function PopularCategoriesSection() {
+  const categories = [
+    { title: "PDF Workspace", desc: "Merge, split, and compress PDF documents 100% locally.", link: "/tools/pdf-tools", icon: FileText, border: "hover:border-red-500/30" },
+    { title: "Image Optimizer", desc: "Bulk compress, convert WebP, and resize images without quality loss.", link: "/tools/image-tools", icon: PenTool, border: "hover:border-blue-500/30" },
+    { title: "Developer Suite", desc: "Format JSON, minify code, and generate QR matrices securely.", link: "/tools/developer-tools", icon: Cpu, border: "hover:border-emerald-500/30" },
+    { title: "Resume Builder", desc: "Build ATS-friendly, single-column portfolios for recruiter review.", link: "/tools/resume-tools", icon: Briefcase, border: "hover:border-purple-500/30" },
+    { title: "Media Workspace", desc: "Extract clean audio streams and compress MP4/WebM files client-side.", link: "/tools/media-tools", icon: Activity, border: "hover:border-pink-500/30" }
+  ];
+
+  return (
+    <Section id="categories" className="section-divider py-24 bg-background">
+      <SectionHeading
+        badge="Popular Categories"
+        title="Designed for every modern workflow"
+        subtitle="Select a workspace category to open your browser-native tools suite."
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto px-6">
+        {categories.map((cat, i) => {
+          const Icon = cat.icon;
+          return (
+            <Link key={cat.title} href={cat.link} className="block group">
+              <GlassCard className={cn("p-6 space-y-4 rounded-3xl border-white/[0.06] transition-all duration-300 h-full", cat.border)} hover={true}>
+                <div className="h-10 w-10 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-body-s font-bold text-foreground group-hover:text-primary transition-colors">{cat.title}</h3>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{cat.desc}</p>
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 pt-2">
+                  <span>Open Suite</span>
+                  <ArrowRight className="h-3 w-3" />
+                </div>
+              </GlassCard>
+            </Link>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
+function FeaturedToolsSection() {
+  const featured = [
+    { name: "Merge PDF Documents", desc: "Combine PDF pages locally. Preserves vectors, images, and formatting.", link: "/tools/merge-pdf", badge: "PDF", icon: FileText },
+    { name: "Wi-Fi QR Code", desc: "Generate secure auto-login QR codes for guest networks. Offline compliant.", link: "/tools/qr-generator", badge: "QR", icon: QrCode },
+    { name: "ATS Resume Builder", desc: "Build professional recruiter-ready resumes from clean markdown layouts.", link: "/tools/resume-builder", badge: "Career", icon: Briefcase },
+    { name: "JSON Minifier", desc: "Instantly compact messy JSON data structures locally without security leaks.", link: "/tools/developer-tools", badge: "Developer", icon: Cpu }
+  ];
+
+  return (
+    <Section id="featured-tools" className="section-divider py-24 bg-card/5">
+      <SectionHeading
+        badge="Featured Tools"
+        title="High performance utility engines"
+        subtitle="Vetted browser-native tools that execute in milliseconds on your own device hardware."
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto px-6">
+        {featured.map((tool, i) => {
+          const Icon = tool.icon;
+          return (
+            <GlassCard key={tool.name} className="p-8 space-y-4 rounded-3xl border-white/[0.06] flex flex-col justify-between" hover={true}>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-primary">
+                    <Icon className="h-4.5 w-4.5" />
+                  </div>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2.5 py-0.5 rounded-full">
+                    {tool.badge}
+                  </span>
+                </div>
+                <h3 className="text-body-s font-bold text-foreground tracking-tight">{tool.name}</h3>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">{tool.desc}</p>
+              </div>
+              <Link href={tool.link} className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors pt-4 w-fit">
+                <span>Start Tool</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </GlassCard>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
+
+function WhyUToolSection() {
+  return (
+    <Section id="why-utool" className="section-divider py-24 bg-background">
+      <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6">
+          <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2.5 py-0.5 rounded-full">
+            Architecture
+          </span>
+          <h2 className="text-display-xs md:text-display-sm font-extrabold text-foreground leading-tight tracking-tight">
+            Why process files locally?
+          </h2>
+          <p className="text-body-sm text-muted-foreground leading-relaxed">
+            Traditional online utilities force you to upload your personal files—invoices, tax forms, employee resumes, ID cards—to cloud servers. This exposes you to database leaks, hacking risks, and violates compliance laws like GDPR.
+          </p>
+          <p className="text-body-sm text-muted-foreground leading-relaxed">
+            UTool is designed differently. By writing compiled C++ libraries in WebAssembly, we process everything inside your local browser memory sandbox. No file uploads. No server queues. Complete privacy.
+          </p>
+          <div className="pt-2">
+            <Link href="/why-local-processing">
+              <button className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-6 h-12 text-xs font-semibold text-foreground hover:bg-white/[0.08] transition-all cursor-pointer">
+                <span>Learn How Local Processing Works</span>
+                <ArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
+              </button>
+            </Link>
+          </div>
+        </div>
+        <div className="relative rounded-[2rem] border border-white/[0.06] bg-card/35 p-8 overflow-hidden shadow-lg space-y-6">
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+          <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Traditional Cloud vs. Local Processing</h4>
+          <div className="space-y-4">
+            <div className="flex gap-3">
+              <div className="h-6 w-6 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs shrink-0 font-bold">✕</div>
+              <div>
+                <p className="text-[11px] font-bold text-foreground">Cloud Processing</p>
+                <p className="text-[10px] text-muted-foreground">Uploads documents, processes on third-party servers, stores in temporary cache files, high latency.</p>
+              </div>
+            </div>
+            <div className="h-px bg-white/[0.04]" />
+            <div className="flex gap-3">
+              <div className="h-6 w-6 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs shrink-0 font-bold">✓</div>
+              <div>
+                <p className="text-[11px] font-bold text-foreground">Local Processing (UTool)</p>
+                <p className="text-[10px] text-muted-foreground">Files never leave your CPU, zero server retention, millisecond speeds, runs offline, GDPR compliant.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function TestimonialsSection() {
+  const testimonials = [
+    {
+      quote: "UTool is a lifesaver for security. As a legal consultant, I can't upload customer agreements to cloud compressors. UTool lets me do it all locally.",
+      author: "Sarah D., Legal Compliance Officer",
+      color: "rgba(99, 102, 241, 0.05)"
+    },
+    {
+      quote: "Stitching 200MB engineering files in under a second directly in my browser was mindblowing. No queues or network bottleneck limiters.",
+      author: "Marcus K., Senior Backend Developer",
+      color: "rgba(239, 68, 68, 0.05)"
+    },
+    {
+      quote: "We require our authors to use UTool's markdown resume editor. It ensures student data stays private and layouts are parsed by ATS software perfectly.",
+      author: "Prof. Elena G., Career Services Director",
+      color: "rgba(16, 185, 129, 0.05)"
+    }
+  ];
+
+  return (
+    <Section id="testimonials" className="section-divider py-24 bg-card/5">
+      <SectionHeading
+        badge="Testimonials"
+        title="Loved by teams, trusted by engineers"
+        subtitle="Read what security experts and developers say about local browser computing."
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto px-6">
+        {testimonials.map((t, i) => (
+          <GlassCard key={t.author} className="p-8 space-y-4 rounded-3xl border-white/[0.06] flex flex-col justify-between" hover={false}>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">"{t.quote}"</p>
+            <div className="flex items-center gap-3 pt-2">
+              <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                {t.author.substring(0, 2)}
+              </div>
+              <span className="text-[11px] font-bold text-foreground">{t.author}</span>
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+    </Section>
   );
 }

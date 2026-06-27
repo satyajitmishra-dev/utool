@@ -6,8 +6,8 @@ import { Box, Heart } from "lucide-react";
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/40 py-16 bg-card/10 select-none relative z-10 mt-auto">
-      <Container className="grid grid-cols-1 md:grid-cols-4 gap-12 text-left">
-        <div className="space-y-4">
+      <Container className="grid grid-cols-2 md:grid-cols-5 gap-12 text-left">
+        <div className="space-y-4 col-span-2 md:col-span-1">
           <div className="flex items-center gap-2">
             <div className="relative flex h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 text-white items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
               <div className="absolute inset-0 rounded-xl animate-pulse bg-white/10" />
@@ -27,32 +27,45 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Engines</h4>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Company</h4>
           <ul className="space-y-2.5 text-caption text-muted-foreground">
-            <li><Link href="/pdf-tools" className="hover:text-foreground transition-colors">PDF Optimizer</Link></li>
-            <li><Link href="/tools/qr-generator" className="hover:text-foreground transition-colors">QR Constructor</Link></li>
-            <li><Link href="/tools/url-shortener" className="hover:text-foreground transition-colors">Link Shortener</Link></li>
-            <li><Link href="/tools/resume-builder" className="hover:text-foreground transition-colors">Resume Creator</Link></li>
+            <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
+            <li><Link href="/careers" className="hover:text-foreground transition-colors">Careers</Link></li>
+            <li><Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
+            <li><Link href="/editorial-policy" className="hover:text-foreground transition-colors">Editorial Policy</Link></li>
+            <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Identity</h4>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Resources</h4>
           <ul className="space-y-2.5 text-caption text-muted-foreground">
-            <li><a href="#use-cases" className="hover:text-foreground transition-colors">For Developers</a></li>
-            <li><a href="#use-cases" className="hover:text-foreground transition-colors">For Creators</a></li>
-            <li><a href="#use-cases" className="hover:text-foreground transition-colors">For Freelancers</a></li>
-            <li><a href="#use-cases" className="hover:text-foreground transition-colors">For Students</a></li>
+            <li><Link href="/support" className="hover:text-foreground transition-colors">Help Center</Link></li>
+            <li><Link href="/why-local-processing" className="hover:text-foreground transition-colors">API & Specs</Link></li>
+            <li><Link href="/tools/developer-tools" className="hover:text-foreground transition-colors">Developers</Link></li>
+            <li><Link href="/changelog" className="hover:text-foreground transition-colors">Roadmap</Link></li>
+            <li><Link href="/changelog" className="hover:text-foreground transition-colors">Changelog</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Legal & Privacy</h4>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Legal</h4>
           <ul className="space-y-2.5 text-caption text-muted-foreground">
-            <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-            <li><Link href="/security" className="hover:text-foreground transition-colors">Security Rules</Link></li>
-            <li><Link href="/contact" className="hover:text-foreground transition-colors">Get Support</Link></li>
+            <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
+            <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link></li>
+            <li><Link href="/security" className="hover:text-foreground transition-colors">Security</Link></li>
+            <li><Link href="/cookies" className="hover:text-foreground transition-colors">Cookies</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground mb-4">Tools</h4>
+          <ul className="space-y-2.5 text-caption text-muted-foreground">
+            <li><Link href="/tools/pdf-tools" className="hover:text-foreground transition-colors">PDF</Link></li>
+            <li><Link href="/tools/image-tools" className="hover:text-foreground transition-colors">Image</Link></li>
+            <li><Link href="/tools/developer-tools" className="hover:text-foreground transition-colors">Developer</Link></li>
+            <li><Link href="/tools/resume-tools" className="hover:text-foreground transition-colors">Resume</Link></li>
+            <li><Link href="/tools/media-tools" className="hover:text-foreground transition-colors">Media</Link></li>
           </ul>
         </div>
       </Container>

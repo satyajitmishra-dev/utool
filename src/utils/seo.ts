@@ -7,6 +7,7 @@ interface ConstructMetadataProps {
   image?: string;
   icons?: string;
   noIndex?: boolean;
+  canonicalPath?: string;
 }
 
 export function constructMetadata({
@@ -15,11 +16,16 @@ export function constructMetadata({
   image = siteConfig.ogImage,
   icons = "/favicon.ico",
   noIndex = false,
+  canonicalPath,
 }: ConstructMetadataProps = {}): Metadata {
   const suffix = ` | ${siteConfig.name}`;
   const fullTitle = title
     ? (title.toLowerCase().endsWith(suffix.toLowerCase()) ? title : `${title}${suffix}`)
     : siteConfig.name;
+
+  const fullCanonicalUrl = canonicalPath
+    ? `${siteConfig.url.replace(/\/$/, "")}${canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`}`
+    : undefined;
 
   return {
     title: fullTitle,
@@ -27,7 +33,7 @@ export function constructMetadata({
     openGraph: {
       title: fullTitle,
       description,
-      url: siteConfig.url,
+      url: fullCanonicalUrl || siteConfig.url,
       siteName: siteConfig.name,
       images: [
         {
@@ -43,6 +49,9 @@ export function constructMetadata({
       description,
       images: [image],
       creator: "@utool",
+    },
+    alternates: {
+      canonical: fullCanonicalUrl || siteConfig.url,
     },
     icons: {
       icon: icons,

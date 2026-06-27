@@ -2,7 +2,8 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getToolBySlug } from "@/config/tool-registry";
+import { getToolBySlug, TOOL_REGISTRY } from "@/config/tool-registry";
+import { computeRelatedTools } from "@/lib/seo/internal-links";
 import { ConverterLayout } from "@/components/converter/ConverterLayout";
 import { generateSoftwareSchema, generateFAQSchema, generateBreadcrumbSchema } from "@/lib/seo/engine";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
@@ -17,7 +18,10 @@ import {
   Home,
   ChevronRight,
   LifeBuoy,
-  Heart,
+  AlertTriangle,
+  BookOpen,
+  Lock,
+  Layers,
 } from "lucide-react";
 
 import { ToolWorkspaceClient } from "@/components/tools/tool-workspace-client";
@@ -58,9 +62,16 @@ export default async function ProgrammaticToolPage({ params }: Props) {
   }
 
   // Define structured JSON-LD schemas
-  const appSchema = generateSoftwareSchema(tool as any); // Cast as any temporarily if types mismatch
+  const appSchema = generateSoftwareSchema(tool as any);
   const faqSchema = generateFAQSchema(tool as any);
   const breadcrumbSchema = generateBreadcrumbSchema(tool as any);
+
+  // Compute effective related tools: use registry-defined list if populated,
+  // otherwise fall back to the auto-computed internal linking system.
+  const effectiveRelatedTools =
+    tool.relatedTools && tool.relatedTools.length > 0
+      ? tool.relatedTools
+      : computeRelatedTools(tool, TOOL_REGISTRY, 6);
 
   // 2. Converters get the unified ConverterLayout
   if (tool.isConverter) {
@@ -84,12 +95,20 @@ export default async function ProgrammaticToolPage({ params }: Props) {
       <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-foreground">
         <main className="max-w-6xl w-full mx-auto px-6 py-10 space-y-16">
           {/* Breadcrumb Navigation */}
-          <nav className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider flex-wrap">
             <Link href="/" className="hover:text-foreground flex items-center gap-1 transition-colors">
               <Home className="h-3.5 w-3.5" /> Home
             </Link>
             <ChevronRight className="h-3 w-3" />
             <Link href="/tools" className="hover:text-foreground transition-colors">Tools</Link>
+            {tool.parentToolSlug && (
+              <>
+                <ChevronRight className="h-3 w-3" />
+                <Link href={`/tools/${tool.parentToolSlug}`} className="hover:text-foreground transition-colors capitalize">
+                  {tool.parentToolSlug.replace(/-/g, ' ')}
+                </Link>
+              </>
+            )}
             <ChevronRight className="h-3 w-3" />
             <span className="text-foreground font-bold">{tool.name}</span>
           </nav>
@@ -104,6 +123,12 @@ export default async function ProgrammaticToolPage({ params }: Props) {
                 <Badge variant="success" className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 border border-emerald-100">
                   <ShieldCheck className="h-3 w-3" /> 100% Secure & Client-Side
                 </Badge>
+                {/* Intent variant context badge */}
+                {tool.intentContext && (
+                  <Badge variant="outline" className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 border border-blue-200">
+                    <Layers className="h-3 w-3" /> {tool.intentContext}
+                  </Badge>
+                )}
               </div>
               <h1 className="text-[32px] md:text-[38px] font-black tracking-tight text-foreground leading-tight">
                 {tool.seoMeta.h1 || tool.name}
@@ -189,6 +214,52 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </section>
           )}
 
+          {/* Privacy Explanation */}
+          {tool.privacyExplanation && (
+            <section className="border-t border-border pt-10 space-y-4 max-w-4xl">
+              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <Lock className="h-5 w-5 text-emerald-500" /> Privacy & Security
+              </h2>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-6">
+                <p className="text-xs text-muted-foreground leading-relaxed">{tool.privacyExplanation}</p>
+              </div>
+            </section>
+          )}
+
+          {/* Common Mistakes */}
+          {tool.commonMistakes && tool.commonMistakes.length > 0 && (
+            <section className="border-t border-border pt-10 space-y-4 max-w-4xl">
+              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" /> Common Mistakes to Avoid
+              </h2>
+              <ul className="space-y-3">
+                {tool.commonMistakes.map((mistake, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-xs text-muted-foreground">
+                    <span className="flex-shrink-0 mt-0.5 h-4 w-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold">{idx + 1}</span>
+                    <span>{mistake}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Examples */}
+          {tool.examples && tool.examples.length > 0 && (
+            <section className="border-t border-border pt-10 space-y-6">
+              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" /> Usage Examples
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tool.examples.map((ex, idx) => (
+                  <div key={idx} className="border border-border rounded-2xl p-5 bg-card space-y-2 shadow-xs">
+                    <h4 className="text-sm font-bold text-foreground">{ex.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{ex.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* FAQ */}
           {tool.faqs && tool.faqs.length > 0 && (
             <section className="border-t border-border pt-10 space-y-6 max-w-4xl">
@@ -205,12 +276,12 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             </Link>
           </section>
 
-          {/* Related Tools */}
-          {tool.relatedTools && tool.relatedTools.length > 0 && (
+          {/* Related Tools — uses auto-computed internal links if relatedTools is empty */}
+          {effectiveRelatedTools.length > 0 && (
             <section className="border-t border-border pt-10 space-y-6">
               <h2 className="text-base font-bold tracking-tight text-foreground uppercase tracking-widest">Related Utilities</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tool.relatedTools.map((relSlug) => {
+                {effectiveRelatedTools.map((relSlug) => {
                   const relTool = getToolBySlug(relSlug);
                   if (!relTool) return null;
                   return (
@@ -226,6 +297,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
               </div>
             </section>
           )}
+
         </main>
       </div>
     </>

@@ -27,7 +27,20 @@ import {
   Activity,
   Zap,
   Globe,
-  Plus
+  Plus,
+  Crop,
+  Scale,
+  Music,
+  RotateCcw,
+  Trash2,
+  PenTool,
+  EyeOff,
+  FileImage,
+  Gauge,
+  Cpu,
+  Layers,
+  Shield,
+  Laptop
 } from "lucide-react";
 
 // Get unique categories from registry, plus "All" and "PRO"
@@ -36,13 +49,19 @@ const categories = ["All", "PRO", ...Array.from(new Set(TOOL_REGISTRY.map(t => t
 const categoryIcons: Record<string, string> = {
   All: "🌐",
   PDF: "📄",
-  Images: "🖼",
+  Image: "🖼️",
   Media: "🎬",
   Developer: "💻",
-  Design: "🎨",
+  AI: "🤖",
+  Text: "📝",
+  Documents: "📁",
+  Calculators: "🧮",
   Converters: "🔄",
-  Utilities: "🛠",
-  Data: "📊",
+  Color: "🎨",
+  SEO: "🔍",
+  Security: "🛡️",
+  Finance: "💵",
+  Utilities: "🛠️",
   PRO: "👑"
 };
 
@@ -64,30 +83,60 @@ function getToolIcon(iconTag: string) {
     case "Sliders": return Sliders;
     case "Video": return Video;
     case "FileCheck": return FileCheck;
+    case "Crop": return Crop;
+    case "Scale": return Scale;
+    case "Music": return Music;
+    case "RotateCcw": return RotateCcw;
+    case "Trash2": return Trash2;
+    case "PenTool": return PenTool;
+    case "EyeOff": return EyeOff;
+    case "FileImage": return FileImage;
+    case "Gauge": return Gauge;
+    case "Cpu": return Cpu;
+    case "Layers": return Layers;
+    case "Shield": return Shield;
+    case "Laptop": return Laptop;
     default: return Sparkles;
   }
 }
 
 function LocalToolCard({ tool, idx }: { tool: RegistryTool; idx: number }) {
-  let gradientClass = "from-indigo-500 to-blue-500";
-  let catBadgeColor = "bg-indigo-500/10 text-indigo-600 border-indigo-500/20";
-  
-  if (tool.category === "PDF") {
-    gradientClass = "from-red-500 to-rose-600";
-    catBadgeColor = "bg-red-500/10 text-red-600 border-red-500/20";
-  } else if (tool.category === "Image") {
-    gradientClass = "from-blue-500 to-sky-600";
-    catBadgeColor = "bg-blue-500/10 text-blue-600 border-blue-500/20";
-  } else if (tool.category === "Media") {
-    gradientClass = "from-pink-500 to-rose-500";
-    catBadgeColor = "bg-pink-500/10 text-pink-600 border-pink-500/20";
-  } else if (tool.category === "Utilities" || tool.category === "Data") {
-    gradientClass = "from-emerald-500 to-teal-600";
-    catBadgeColor = "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
-  } else if (tool.category === "Converters") {
-    gradientClass = "from-violet-500 to-fuchsia-600";
-    catBadgeColor = "bg-violet-500/10 text-violet-600 border-violet-500/20";
-  }
+  const categoryGradients: Record<string, string> = {
+    PDF: "from-red-500 to-rose-600",
+    Image: "from-blue-500 to-sky-600",
+    Media: "from-pink-500 to-rose-500",
+    Developer: "from-indigo-500 to-blue-500",
+    AI: "from-purple-500 to-indigo-600",
+    Text: "from-amber-500 to-orange-600",
+    Documents: "from-emerald-500 to-teal-600",
+    Calculators: "from-cyan-500 to-blue-600",
+    Converters: "from-violet-500 to-fuchsia-600",
+    Color: "from-teal-500 to-emerald-600",
+    SEO: "from-orange-500 to-amber-600",
+    Security: "from-zinc-700 to-slate-800",
+    Finance: "from-green-500 to-emerald-600",
+    Utilities: "from-emerald-500 to-teal-600",
+  };
+
+  const categoryBadgeColors: Record<string, string> = {
+    PDF: "bg-red-500/10 text-red-600 border-red-500/20",
+    Image: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    Media: "bg-pink-500/10 text-pink-600 border-pink-500/20",
+    Developer: "bg-indigo-500/10 text-indigo-600 border-indigo-500/20",
+    AI: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+    Text: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    Documents: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    Calculators: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
+    Converters: "bg-violet-500/10 text-violet-600 border-violet-500/20",
+    Color: "bg-teal-500/10 text-teal-600 border-teal-500/20",
+    SEO: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+    Security: "bg-zinc-700/10 text-zinc-600 border-zinc-700/20",
+    Finance: "bg-green-500/10 text-green-600 border-green-500/20",
+    Utilities: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+  };
+
+  const gradientClass = categoryGradients[tool.category] || "from-indigo-500 to-blue-500";
+  const catBadgeColor = categoryBadgeColors[tool.category] || "bg-indigo-500/10 text-indigo-600 border-indigo-500/20";
 
   const IconComponent = getToolIcon(tool.iconTag);
   let status = "live";

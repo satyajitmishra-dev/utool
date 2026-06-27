@@ -1,6 +1,6 @@
 import { RegistryTool } from '@/types/tool-registry';
 
-export const TOOL_REGISTRY: RegistryTool[] = [
+const STATIC_TOOL_REGISTRY: RegistryTool[] = [
   {
     "id": "merge-pdf",
     "slug": "merge-pdf",
@@ -1812,6 +1812,457 @@ export const TOOL_REGISTRY: RegistryTool[] = [
     "relatedTools": []
   }
 ];
+
+import { ToolCategory } from '@/types/tool-registry';
+import { ALL_INTENT_VARIANTS } from './registry/intent-variants';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Category-aware dynamic tool generator
+// Produces distinct, non-generic content for each tool category.
+// ─────────────────────────────────────────────────────────────────────────────
+function generateDynamicTool(base: {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  primaryTag: string;
+  category: ToolCategory;
+  iconTag: string;
+  isConverter?: boolean;
+  supportedInputFormats?: string[];
+  supportedOutputFormats?: string[];
+}): RegistryTool {
+  const { name, description: desc, category: cat } = base;
+
+  // ── Category-specific intro paragraphs ──────────────────────────────────
+  const introMap: Partial<Record<ToolCategory, string>> = {
+    PDF: `Working with PDF documents shouldn't require cloud uploads or expensive software. ${name} runs entirely inside your browser using WebAssembly — so your files never leave your machine, processing starts instantly, and there are no server-side size limits or subscription paywalls.`,
+    Image: `Image processing that respects your privacy. ${name} converts and edits your photos locally in your browser — no file upload, no server processing, no waiting. Your originals stay on your device at all times.`,
+    Developer: `${name} helps developers format, validate, and transform data directly in the browser. No backend calls, no rate limits — results appear in milliseconds as you type or paste your input.`,
+    Media: `Edit and convert media files without giving up your content to a third-party server. ${name} processes audio and video directly in your browser tab using the WebAssembly codec suite, keeping your creative assets private.`,
+    AI: `Harness AI-powered assistance without sacrificing speed or data privacy. ${name} delivers intelligent results in seconds, processing your input client-side wherever possible.`,
+    Text: `${name} handles text formatting, analysis, and transformation entirely in your browser. Paste any amount of text and get instant results — no copy limits, no signup, no data retention.`,
+    Converters: `${name} converts your files or data 100% in-browser with zero uploads. The WebAssembly engine reads your input locally and writes the output directly to your download — bypassing any server entirely.`,
+    Calculators: `${name} performs calculations instantly in your browser. Enter your values and get results in real time — no account needed, no data sent anywhere, works offline once loaded.`,
+    Color: `${name} gives designers and developers precise color values instantly. All calculations run locally in the browser — paste a color code and get every format you need in one click.`,
+    SEO: `${name} helps you analyse and improve your site's search performance. Input your data and get actionable results immediately — no API keys, no rate limits on free usage.`,
+    Security: `${name} handles sensitive cryptographic operations locally in your browser. No private key, password, or hash is ever transmitted to our servers — security operations run in the sandboxed browser environment.`,
+    Finance: `${name} performs financial calculations precisely and instantly. Input your figures and get clear, formatted results in real time — useful for both quick estimates and detailed planning.`,
+    Documents: `${name} processes document formats directly in your browser. Your content stays on your device throughout — no upload required, no cloud processing, full offline capability after page load.`,
+    Utilities: `${name} is a lightweight browser utility that runs instantly without any installation or sign-up. Open the page, use the tool, and close it — it's that simple.`,
+  };
+
+  // ── Category-specific how-it-works ─────────────────────────────────────
+  const howItWorksMap: Partial<Record<ToolCategory, string[]>> = {
+    PDF: [
+      `Upload your PDF file or drop it into the workspace — it loads into browser memory, not a server.`,
+      `Configure any options such as page range, quality level, or output format.`,
+      `Click the action button. WebAssembly processes the document locally on your CPU.`,
+      `Download the output PDF directly to your device.`,
+    ],
+    Image: [
+      `Select your image file from your device or drag it into the upload zone.`,
+      `Adjust parameters — resize dimensions, quality slider, format, or filters.`,
+      `The browser engine processes the image locally. Preview updates in real time.`,
+      `Click Download to save your processed image.`,
+    ],
+    Developer: [
+      `Paste your code, data string, or configuration into the input panel.`,
+      `The tool parses and processes your input instantly as you type.`,
+      `Review the formatted, validated, or converted output on the right panel.`,
+      `Copy the result to your clipboard or download it as a file.`,
+    ],
+    Converters: [
+      `Select your source file or paste the input data into the workspace.`,
+      `Choose the target format or output settings from the options panel.`,
+      `Click Convert — the WebAssembly engine transforms your data in milliseconds.`,
+      `Download or copy the converted output.`,
+    ],
+    Security: [
+      `Enter your text, file, or credentials into the secure input field.`,
+      `The cryptographic function runs locally in your browser's sandboxed memory.`,
+      `Copy the generated hash, token, or encrypted output.`,
+      `Your input data is cleared from memory when you close or refresh the page.`,
+    ],
+    Calculators: [
+      `Enter your input values into the clearly labelled fields.`,
+      `Results calculate automatically in real time as you type.`,
+      `Review the breakdown and summary in the output panel.`,
+      `Copy or screenshot the results for your records.`,
+    ],
+    Finance: [
+      `Enter your financial figures — principal, rate, period, or other parameters.`,
+      `The calculator updates instantly, showing the computed result and a full breakdown.`,
+      `Review the amortization table or growth chart if available.`,
+      `Export or screenshot your results for reporting.`,
+    ],
+  };
+
+  // ── Category-specific FAQs ───────────────────────────────────────────────
+  const extraFaqsMap: Partial<Record<ToolCategory, Array<{question: string; answer: string}>>> = {
+    PDF: [
+      { question: `Does ${name} work with password-protected PDFs?`, answer: `PDFs with user-level password protection must be unlocked before processing. Use the utool Unlock PDF tool first, then re-open them in ${name}.` },
+      { question: `Will ${name} preserve fonts and vector elements?`, answer: `Yes. utool's PDF engine preserves vector fonts, embedded images, active hyperlinks, and structural elements without rasterizing or degrading the document.` },
+    ],
+    Image: [
+      { question: `What image formats does ${name} support?`, answer: `utool supports PNG, JPG, JPEG, WebP, GIF, BMP, TIFF, and SVG across its image tools. Specific format support varies per tool and is shown in the upload dropzone.` },
+      { question: `Will ${name} affect the original image on my device?`, answer: `Never. utool reads your image into browser memory without modifying the original file. The processed output is a new file that you download separately.` },
+    ],
+    Developer: [
+      { question: `Can ${name} handle large code files?`, answer: `Yes. The browser-native engine processes text and data entirely in memory. There is no server-side file size limit — only your device's available RAM.` },
+      { question: `Does ${name} support multiple programming languages or formats?`, answer: `Support varies by tool. Check the tool's input panel for accepted formats. Most developer tools accept plain text, JSON, XML, YAML, HTML, CSS, and JavaScript.` },
+    ],
+    Security: [
+      { question: `Are my passwords or hashes stored by utool?`, answer: `Absolutely not. Security tools on utool run in your browser's isolated sandbox. No input data is transmitted to our servers or retained after you close the page.` },
+    ],
+  };
+
+  // ── Category-specific long-form content ─────────────────────────────────
+  const longFormMap: Partial<Record<ToolCategory, Array<{sectionTitle: string; paragraphs: string[]}>>> = {
+    PDF: [{
+      sectionTitle: `The Advantage of Browser-Native PDF Processing`,
+      paragraphs: [
+        `Traditional PDF tools require uploading your documents to third-party cloud servers for processing. This creates unnecessary privacy risks — especially for legal contracts, financial statements, medical records, and business documents that may contain personally identifiable information.`,
+        `utool's ${name} solves this by running the entire PDF operation inside your browser using a WebAssembly-compiled PDF engine. Your document loads into sandboxed browser memory, gets processed there, and the result is downloaded directly — never touching any external infrastructure.`,
+      ]
+    }],
+    Image: [{
+      sectionTitle: `Client-Side Image Processing: Speed and Privacy Combined`,
+      paragraphs: [
+        `Image processing on the web has historically required server infrastructure — you upload your photo, it gets processed by a remote server, and you download the result. This approach leaks your photos to external systems and creates upload/download latency.`,
+        `utool flips this model. ${name} uses a WebAssembly image codec compiled from production-grade C++ libraries (like libvips and sharp) to process your images directly in the browser. The result is instant processing, zero privacy risk, and no file size limits imposed by server cost constraints.`,
+      ]
+    }],
+    Developer: [{
+      sectionTitle: `Why Developers Choose Browser-Native Tools`,
+      paragraphs: [
+        `Developer tools that run server-side create friction: rate limits, API key requirements, data privacy concerns, and latency. For quick formatting, hashing, or conversion tasks, these hurdles slow down workflow unnecessarily.`,
+        `${name} runs entirely in your browser. Paste your input, get your result immediately — no authentication, no rate limits, no concerns about what happens to your code or data on the other end.`,
+      ]
+    }],
+    Security: [{
+      sectionTitle: `Security Tool Privacy: Why Local Execution Matters`,
+      paragraphs: [
+        `Cryptographic operations should never be performed on a server you don't control. Sending a password, private key, or sensitive hash to a third-party API introduces a fundamental security contradiction — you're trusting someone else with the data you're trying to secure.`,
+        `${name} performs all operations in your browser's isolated sandbox. The cryptographic primitives are implemented using the Web Crypto API and WebAssembly — the same standards used by your operating system and browser for built-in security features.`,
+      ]
+    }],
+    Finance: [{
+      sectionTitle: `Financial Calculations You Can Trust`,
+      paragraphs: [
+        `${name} uses standard financial formulas without rounding errors or approximations. All computation runs locally in JavaScript with IEEE 754 double-precision arithmetic, giving you the same accuracy you'd expect from a spreadsheet or financial calculator.`,
+        `Your financial input — loan amounts, interest rates, personal income figures — is never sent to any server. The entire calculation happens in your browser, so your financial data stays completely private.`,
+      ]
+    }],
+    Calculators: [{
+      sectionTitle: `Instant, Accurate Calculations in Your Browser`,
+      paragraphs: [
+        `${name} updates results in real time as you type, using validated mathematical formulas. All calculations run locally in your browser — no server round-trip means zero latency and complete offline capability.`,
+        `Unlike many online calculators that are basic and ad-heavy, utool's ${name} provides a clean, professional interface with formatted output, clear formula breakdowns, and copy-to-clipboard functionality for easy use in reports and documents.`,
+      ]
+    }],
+  };
+
+  const defaultIntro = `${name} runs entirely in your browser using WebAssembly — your data is processed locally with zero uploads, zero server contact, and zero waiting. Unlike cloud-based alternatives, utool guarantees that your files and inputs stay private on your device throughout the entire operation.`;
+  const defaultHowItWorks = [
+    `Open the ${name} tool page in your browser.`,
+    `Select your file or paste your input into the workspace.`,
+    `Review and adjust settings — all processing previews update in real time.`,
+    `Download or copy your result directly to your device.`,
+  ];
+  const defaultFaqs = [
+    {
+      question: `Is it safe to use ${name} on utool?`,
+      answer: `Yes, 100% secure. All processing runs locally inside your browser using WebAssembly. No data is transmitted to our servers, stored, or logged.`,
+    },
+    {
+      question: `Do I need to install software to use ${name}?`,
+      answer: `No installation needed. utool runs directly in Chrome, Firefox, Edge, and Safari on Windows, macOS, Linux, iOS, and Android.`,
+    },
+    {
+      question: `Can I use ${name} offline?`,
+      answer: `Yes. Once the page has loaded, all processing runs locally. You can disconnect from the internet and continue using the tool without interruption.`,
+    },
+    {
+      question: `Is there a file size limit?`,
+      answer: `No server-imposed limits. Processing runs on your own device, so limits are determined only by your available browser memory.`,
+    },
+  ];
+  const defaultLongForm = [{
+    sectionTitle: `Why ${name} is Better Than Server-Based Alternatives`,
+    paragraphs: [
+      `Traditional web tools process your data on external cloud servers, introducing upload latency, privacy risks, and arbitrary file size limits. utool eliminates these problems by running ${name} entirely inside your browser.`,
+      `The result: instant processing (no upload wait), complete privacy (no server contact), and no limits (no server costs to recover through paywalls). Whether you use ${name} once a week or dozens of times per day, the experience is consistently fast, free, and private.`,
+    ]
+  }];
+
+  return {
+    ...base,
+    isActive: true,
+    seoMeta: {
+      title: `${name} Online Free — Secure, Private & No Upload Required | utool`,
+      description: `${desc} Runs 100% in your browser — no uploads, no size limits, no sign-up. Free forever. Powered by WebAssembly for instant, private results.`,
+      keywords: [name.toLowerCase(), cat.toLowerCase(), 'no upload', 'browser tool', 'free', 'privacy-first', 'webassembly'],
+      h1: `${name} — Free Online Tool`,
+    },
+    intro: introMap[cat] ?? defaultIntro,
+    howItWorks: howItWorksMap[cat] ?? defaultHowItWorks,
+    benefits: [
+      {
+        title: '100% Client-Side Privacy',
+        desc: 'Your data never leaves your browser. Everything is processed in the local sandbox using WebAssembly, keeping your files and inputs safe from third-party exposure.',
+      },
+      {
+        title: 'No Size Limits or Paywalls',
+        desc: 'Since processing runs on your own device CPU, there are no server-side file size caps or subscription paywalls to work around.',
+      },
+      {
+        title: 'Works on All Devices',
+        desc: 'utool runs in any modern browser on Windows, macOS, Linux, iOS, and Android — no installation, no account, no friction.',
+      },
+    ],
+    faqs: [
+      ...defaultFaqs,
+      ...(extraFaqsMap[cat] ?? []),
+    ],
+    longFormContent: longFormMap[cat] ?? defaultLongForm,
+    relatedTools: [],
+  };
+}
+
+const DYNAMIC_TOOL_BASES: Array<{
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  primaryTag: string;
+  category: ToolCategory;
+  iconTag: string;
+  isConverter?: boolean;
+  supportedInputFormats?: string[];
+  supportedOutputFormats?: string[];
+}> = [
+  // PDF
+  { id: "merge-multiple-pdfs", slug: "merge-multiple-pdfs", name: "Merge Multiple PDFs", description: "Combine multiple PDF documents together in any sequence.", primaryTag: "PDF", category: "PDF", iconTag: "Layers" },
+  { id: "merge-password-pdfs", slug: "merge-password-pdfs", name: "Merge Password-Protected PDFs", description: "Unlock and merge password-encrypted PDF files online.", primaryTag: "PDF", category: "PDF", iconTag: "Lock" },
+  { id: "merge-large-pdfs", slug: "merge-large-pdfs", name: "Merge Large PDFs", description: "Combine massive PDF documents locally without size limits.", primaryTag: "PDF", category: "PDF", iconTag: "Maximize2" },
+  { id: "merge-scanned-pdfs", slug: "merge-scanned-pdfs", name: "Merge Scanned PDFs", description: "Compile scanned pages and documents into a clean PDF file.", primaryTag: "PDF", category: "PDF", iconTag: "FileText" },
+  { id: "merge-pdfs-offline", slug: "merge-pdfs-offline", name: "Merge PDFs Offline", description: "Run local browser compilations to merge PDF documents fully offline.", primaryTag: "PDF", category: "PDF", iconTag: "Layers" },
+  { id: "rotate-pdf", slug: "rotate-pdf", name: "Rotate PDF", description: "Rotate PDF pages and adjust document orientation locally.", primaryTag: "PDF", category: "PDF", iconTag: "RotateCcw" },
+  { id: "delete-pdf-pages", slug: "delete-pdf-pages", name: "Delete PDF Pages", description: "Remove unwanted pages from your PDF file dynamically.", primaryTag: "PDF", category: "PDF", iconTag: "Trash2" },
+  { id: "extract-pdf-pages", slug: "extract-pdf-pages", name: "Extract PDF Pages", description: "Isolate and save specific pages from any PDF document.", primaryTag: "PDF", category: "PDF", iconTag: "Maximize2" },
+  { id: "repair-pdf", slug: "repair-pdf", name: "Repair PDF", description: "Fix corrupt PDF file headers and recover document elements.", primaryTag: "PDF", category: "PDF", iconTag: "Activity" },
+  { id: "sign-pdf", slug: "sign-pdf", name: "Sign PDF", description: "Add secure electronic signatures and initials to PDF contracts.", primaryTag: "PDF", category: "PDF", iconTag: "PenTool" },
+  { id: "redact-pdf", slug: "redact-pdf", name: "Redact PDF", description: "Permanently black out and sanitize sensitive information in PDFs.", primaryTag: "PDF", category: "PDF", iconTag: "EyeOff" },
+  { id: "organize-pdf", slug: "organize-pdf", name: "Organize PDF", description: "Rearrange, sort, and reorder pages in your PDF file visually.", primaryTag: "PDF", category: "PDF", iconTag: "Sliders" },
+
+  // Image
+  { id: "png-to-pdf-converter", slug: "png-to-pdf", name: "PNG to PDF Converter", description: "Convert PNG images into standard PDF documents.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "webp-to-pdf-converter", slug: "webp-to-pdf", name: "WebP to PDF Converter", description: "Convert WebP images into high-fidelity PDF documents.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "heic-to-pdf", slug: "heic-to-pdf", name: "HEIC to PDF Converter", description: "Convert iPhone HEIC photos into high-fidelity PDF documents.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "gif-to-pdf", slug: "gif-to-pdf", name: "GIF to PDF Converter", description: "Compile animated or static GIF files into readable PDFs.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "tiff-to-pdf", slug: "tiff-to-pdf", name: "TIFF to PDF Converter", description: "Convert large TIFF graphics into standard PDF document files.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "svg-to-pdf", slug: "svg-to-pdf", name: "SVG to PDF Converter", description: "Convert scalable vector SVG illustrations to PDF format.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "bmp-to-pdf", slug: "bmp-to-pdf", name: "BMP to PDF Converter", description: "Convert bitmap BMP images into high-quality PDF files.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "ico-to-pdf", slug: "ico-to-pdf", name: "ICO to PDF Converter", description: "Convert website ICO favicon objects into PDF records.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "raw-to-pdf", slug: "raw-to-pdf", name: "RAW to PDF Converter", description: "Convert digital camera RAW photos into PDF layouts.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "avif-to-pdf", slug: "avif-to-pdf", name: "AVIF to PDF Converter", description: "Convert modern AVIF images into standard PDF documents.", primaryTag: "Image", category: "Image", iconTag: "FileImage" },
+  { id: "pdf-to-png", slug: "pdf-to-png", name: "PDF to PNG Extractor", description: "Extract pages of any PDF document as high-resolution PNGs.", primaryTag: "Image", category: "Image", iconTag: "Image" },
+  { id: "pdf-to-webp", slug: "pdf-to-webp", name: "PDF to WebP Extractor", description: "Convert PDF pages into lightweight modern WebP images.", primaryTag: "Image", category: "Image", iconTag: "Image" },
+  { id: "pdf-to-svg", slug: "pdf-to-svg", name: "PDF to SVG Converter", description: "Export PDF page vectors as scalable SVG illustrations.", primaryTag: "Image", category: "Image", iconTag: "Image" },
+  { id: "image-crop", slug: "image-crop", name: "Image Cropper", description: "Crop and adjust image dimensions online with exact aspect ratios.", primaryTag: "Image", category: "Image", iconTag: "Crop" },
+  { id: "image-blur", slug: "image-blur", name: "Image Blur", description: "Apply blur filters and anonymize sections of your images locally.", primaryTag: "Image", category: "Image", iconTag: "EyeOff" },
+  { id: "image-sharpen", slug: "image-sharpen", name: "Image Sharpen", description: "Enhance details and sharpen fuzzy edges in your photos.", primaryTag: "Image", category: "Image", iconTag: "Sparkles" },
+  { id: "image-upscale", slug: "image-upscale", name: "Image Upscaler", description: "Increase image resolution using client-side details interpolation.", primaryTag: "Image", category: "Image", iconTag: "Maximize2" },
+  { id: "image-watermark", slug: "image-watermark", name: "Image Watermark", description: "Add overlay text or logo watermarks to protect your photos.", primaryTag: "Image", category: "Image", iconTag: "Sliders" },
+  { id: "exif-removal", slug: "exif-removal", name: "EXIF Metadata Remover", description: "Strip camera info, GPS coordinates, and private EXIF tags from photos.", primaryTag: "Image", category: "Image", iconTag: "Shield" },
+  { id: "convert-color-space", slug: "convert-color-space", name: "Color Space Converter", description: "Convert image files between RGB, CMYK, and grayscale profiles.", primaryTag: "Image", category: "Image", iconTag: "Sliders" },
+  { id: "batch-rename-images", slug: "batch-rename-images", name: "Batch Rename Images", description: "Rename groups of photos matching dynamic patterns locally.", primaryTag: "Image", category: "Image", iconTag: "Type" },
+
+  // Developer Tools
+  { id: "json-validator", slug: "json-validator", name: "JSON Validator", description: "Validate and debug JSON data with clear syntax error lines.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "json-compare", slug: "json-compare", name: "JSON Compare & Diff", description: "Compare two JSON payloads and highlight nested differences.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "xml-formatter", slug: "xml-formatter", name: "XML Formatter", description: "Prettify, format, and indent XML elements dynamically.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "xml-validator", slug: "xml-validator", name: "XML Validator", description: "Check XML documents for schema formatting compliance.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "xml-to-json", slug: "xml-to-json", name: "XML to JSON Converter", description: "Convert XML schemas into structured JSON objects.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "json-to-xml", slug: "json-to-xml", name: "JSON to XML Converter", description: "Convert JSON key-values into structured XML syntax.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "yaml-validator", slug: "yaml-validator", name: "YAML Validator", description: "Validate syntax of YAML configuration files.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "json-to-yaml", slug: "json-to-yaml", name: "JSON to YAML Converter", description: "Format standard JSON payloads into YAML scripts.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "base64-image-encoder", slug: "base64-image-encoder", name: "Base64 Image Encoder", description: "Convert PNG, JPG, or SVG graphics into Base64 DataURI strings.", primaryTag: "Developer", category: "Developer", iconTag: "Image" },
+  { id: "jwt-decoder", slug: "jwt-decoder", name: "JWT Decoder", description: "Decode and inspect headers, payload, and signatures of JWT tokens.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "jwt-generator", slug: "jwt-generator", name: "JWT Generator", description: "Generate JSON Web Tokens (JWT) for testing Auth configurations.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "regex-tester", slug: "regex-tester", name: "Regex Tester", description: "Test regular expressions in real-time with sample input logs.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "regex-generator", slug: "regex-generator", name: "Regex Generator", description: "Generate regular expression patterns based on text descriptions.", primaryTag: "Developer", category: "Developer", iconTag: "Sparkles" },
+  { id: "uuid-generator", slug: "uuid-generator", name: "UUID Generator", description: "Generate custom batches of unique UUID identifiers.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "uuid-v4-generator", slug: "uuid-v4-generator", name: "UUID v4 Generator", description: "Generate RFC-compliant cryptographically secure UUID version 4 IDs.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "hash-md5-generator", slug: "hash-md5-generator", name: "MD5 Hash Generator", description: "Calculate secure MD5 cryptographic hash keys locally.", primaryTag: "Developer", category: "Developer", iconTag: "Lock" },
+  { id: "hash-sha256-generator", slug: "hash-sha256-generator", name: "SHA-256 Hash Generator", description: "Generate secure SHA-256 check sums for verify files.", primaryTag: "Developer", category: "Developer", iconTag: "Lock" },
+  { id: "checksum-calculator", slug: "checksum-calculator", name: "Checksum Calculator", description: "Verify files checksum matching SHA-1, SHA-256 or MD5 signatures.", primaryTag: "Developer", category: "Developer", iconTag: "Lock" },
+  { id: "color-picker", slug: "color-picker", name: "Color Picker", description: "Select colors from eye-droppers and copy Hex/RGB codes.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "cron-builder", slug: "cron-builder", name: "Cron Expression Builder", description: "Build scheduled cron jobs schedules visually.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "cron-parser", slug: "cron-parser", name: "Cron Expression Parser", description: "Translate cron expressions into human-readable schedules.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "diff-checker", slug: "diff-checker", name: "Diff Checker & Compare", description: "Compare two text snippets and see highlighted line differences.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "markdown-preview", slug: "markdown-preview", name: "Markdown Live Preview", description: "Render Markdown syntax into styled HTML in real-time.", primaryTag: "Developer", category: "Developer", iconTag: "Eye" },
+  { id: "html-formatter", slug: "html-formatter", name: "HTML Formatter", description: "Format, beautify and properly indent markup HTML code.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "css-minifier", slug: "css-minifier", name: "CSS Minifier", description: "Compress and minify CSS styles to optimize page sizes.", primaryTag: "Developer", category: "Developer", iconTag: "Minimize2" },
+  { id: "js-beautifier", slug: "js-beautifier", name: "JavaScript Beautifier", description: "Format, un-minify, and prettify raw JavaScript scripts.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "url-encoder", slug: "url-encoder", name: "URL Encoder", description: "Percent-encode parameters and special characters in links.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "url-decoder", slug: "url-decoder", name: "URL Decoder", description: "Decode percent-encoded URL links and query queries.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "sql-formatter", slug: "sql-formatter", name: "SQL Query Formatter", description: "Beautify, uppercase keywords and format database SQL queries.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+  { id: "sql-minifier", slug: "sql-minifier", name: "SQL Query Minifier", description: "Minify and strip comments from SQL code for clean logs.", primaryTag: "Developer", category: "Developer", iconTag: "Minimize2" },
+  { id: "text-diff", slug: "text-diff", name: "Text Diff Checker", description: "See side-by-side textual diff mappings in browser.", primaryTag: "Developer", category: "Developer", iconTag: "Sliders" },
+  { id: "user-agent-parser", slug: "user-agent-parser", name: "User Agent Parser", description: "Inspect browser, OS, and hardware parameters from agent strings.", primaryTag: "Developer", category: "Developer", iconTag: "Laptop" },
+  { id: "ip-lookup", slug: "ip-lookup", name: "IP Address Lookup", description: "Find country, city and network info of any IP address.", primaryTag: "Developer", category: "Developer", iconTag: "Globe" },
+  { id: "dns-lookup", slug: "dns-lookup", name: "DNS Lookup Utility", description: "Perform A, AAAA, MX, TXT and CNAME lookups in browser.", primaryTag: "Developer", category: "Developer", iconTag: "Globe" },
+  { id: "port-scanner", slug: "port-scanner", name: "Online Port Scanner", description: "Scan common TCP ports of targets to test firewall rules.", primaryTag: "Developer", category: "Developer", iconTag: "Activity" },
+  { id: "subnet-calculator", slug: "subnet-calculator", name: "IP Subnet Calculator", description: "Calculate subnet masks, CIDR network ranges, and host limits.", primaryTag: "Developer", category: "Developer", iconTag: "Terminal" },
+
+  // AI Productivity
+  { id: "cover-letter-generator", slug: "cover-letter-generator", name: "Cover Letter Generator", description: "Generate custom, highly persuasive cover letters in seconds.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "speech-to-text", slug: "speech-to-text", name: "Speech to Text Converter", description: "Convert raw voice recordings or microphone input into text.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "image-ocr", slug: "image-ocr", name: "Image OCR Scanner", description: "Extract editable text from pictures, receipts, and scans.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "pdf-summarizer", slug: "pdf-summarizer", name: "PDF Summarizer", description: "Generate key takeaways and outline summaries of large PDFs.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "meeting-notes", slug: "meeting-notes", name: "Meeting Notes AI", description: "Structure transcript logs into summaries, goals and action items.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "text-simplifier", slug: "text-simplifier", name: "Text Simplifier", description: "Rewrite jargon and complex texts into simple, plain wording.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "grammar-checker", slug: "grammar-checker", name: "AI Grammar Checker", description: "Correct syntax, spelling and proofread text instantly.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "paragraph-writer", slug: "paragraph-writer", name: "AI Paragraph Writer", description: "Write persuasive, engaging paragraphs on any topic.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "essay-writer", slug: "essay-writer", name: "AI Essay Writer", description: "Draft structural essays and reviews with clear headings.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "ai-code-generator", slug: "ai-code-generator", name: "AI Code Generator", description: "Generate CSS, JS, Python, HTML or SQL code arrays from prompts.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "code-explainer", slug: "code-explainer", name: "AI Code Explainer", description: "Deconstruct and explain programming logic in human terms.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "text-to-speech", slug: "text-to-speech", name: "AI Text to Speech", description: "Convert written script files into natural-sounding voice files.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+  { id: "image-prompt-generator", slug: "image-prompt-generator", name: "AI Image Prompt Generator", description: "Formulate descriptive artwork prompts for Midjourney or Stable Diffusion.", primaryTag: "AI", category: "AI", iconTag: "Sparkles" },
+
+  // Media Tools
+  { id: "audio-converter", slug: "audio-converter", name: "Audio Converter", description: "Convert audio files between MP3, WAV, M4A, OGG, and FLAC.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "audio-trimmer", slug: "audio-trimmer", name: "Audio Trimmer & Cutter", description: "Cut and trim MP3 audio files directly in your browser.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "audio-joiner", slug: "audio-joiner", name: "Audio Joiner & Merger", description: "Combine multiple audio files into a single output track.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "video-to-gif", slug: "video-to-gif", name: "Video to GIF Converter", description: "Convert MP4 or WebM video clips into looping animated GIFs.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "video-trimmer", slug: "video-trimmer", name: "Video Trimmer", description: "Cut and isolate sections of video files client-side.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "mute-video", slug: "mute-video", name: "Mute Video", description: "Strip audio tracks from video files locally.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "mp3-to-wav", slug: "mp3-to-wav", name: "MP3 to WAV Converter", description: "Convert compressed MP3 files into raw WAV tracks.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "wav-to-mp3", slug: "wav-to-mp3", name: "WAV to MP3 Converter", description: "Convert raw WAV audio files into lightweight MP3 tracks.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "mp4-to-mp3", slug: "mp4-to-mp3", name: "MP4 to MP3 Extractor", description: "Extract audio tracks from MP4 video files locally.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "webm-to-mp4", slug: "webm-to-mp4", name: "WebM to MP4 Converter", description: "Convert modern web-friendly WebM videos into MP4 format.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "screen-recorder", slug: "screen-recorder", name: "Screen Recorder", description: "Record browser tabs, windows or full screens locally.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "voice-recorder", slug: "voice-recorder", name: "Voice Recorder", description: "Record audio from your microphone and download as MP3.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "video-compressor", slug: "video-compressor", name: "Video Compressor", description: "Compress video files by adjusting bitrates and frames.", primaryTag: "Media", category: "Media", iconTag: "Video" },
+  { id: "audio-compressor", slug: "audio-compressor", name: "Audio Compressor", description: "Reduce MP3/WAV sizes by shifting bitrates locally.", primaryTag: "Media", category: "Media", iconTag: "Music" },
+  { id: "metronome", slug: "metronome", name: "BPM Metronome", description: "Play audio click trackers with custom BPM and tempos.", primaryTag: "Media", category: "Media", iconTag: "Activity" },
+  { id: "guitar-tuner", slug: "guitar-tuner", name: "Guitar Tuner", description: "Tune string instruments using your microphone receiver.", primaryTag: "Media", category: "Media", iconTag: "Activity" },
+
+  // Text Tools
+  { id: "word-counter", slug: "word-counter", name: "Word Counter", description: "Count words, letters, paragraphs, and read times in real-time.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "character-counter", slug: "character-counter", name: "Character Counter", description: "Count characters with and without space limits.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "line-counter", slug: "line-counter", name: "Line Counter", description: "Calculate the exact line count of raw text snippets.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "case-converter", slug: "case-converter", name: "Case Converter", description: "Convert texts to uppercase, lowercase, titlecase or sentencecase.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "text-reverser", slug: "text-reverser", name: "Text Reverser", description: "Reverse characters, words or entire lines of text.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "binary-to-text", slug: "binary-to-text", name: "Binary to Text Converter", description: "Decode binary code arrays back into readable texts.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "text-to-binary", slug: "text-to-binary", name: "Text to Binary Converter", description: "Encode raw text sentences into binary code bytes.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "morse-code-encoder", slug: "morse-code-encoder", name: "Morse Code Encoder", description: "Translate text characters into Morse code dots and dashes.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "morse-code-decoder", slug: "morse-code-decoder", name: "Morse Code Decoder", description: "Translate Morse code signals back into readable characters.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "lorem-ipsum-generator", slug: "lorem-ipsum-generator", name: "Lorem Ipsum Generator", description: "Create customized placeholder text arrays for mockups.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "random-word-generator", slug: "random-word-generator", name: "Random Word Generator", description: "Generate lists of random nouns, adjectives or verbs.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "text-sorter", slug: "text-sorter", name: "Text Sorter", description: "Sort text list lines alphabetically or numerically.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "remove-duplicate-lines", slug: "remove-duplicate-lines", name: "Remove Duplicate Lines", description: "Clean text by stripping identical repeating lines.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "strip-html-tags", slug: "strip-html-tags", name: "HTML Tags Stripper", description: "Strip all markup elements and isolate raw text logs.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "slug-generator", slug: "slug-generator", name: "URL Slug Generator", description: "Convert headings into SEO-friendly web link slugs.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+  { id: "find-and-replace", slug: "find-and-replace", name: "Find and Replace", description: "Replace specific strings in texts with custom matches.", primaryTag: "Text", category: "Text", iconTag: "Type" },
+
+  // Document Tools
+  { id: "docx-to-pdf", slug: "docx-to-pdf", name: "DOCX to PDF Converter", description: "Convert Microsoft Word documents into secure PDF files.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "odt-to-pdf", slug: "odt-to-pdf", name: "ODT to PDF Converter", description: "Convert OpenOffice ODT documents into standard PDFs.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "rtf-to-pdf", slug: "rtf-to-pdf", name: "RTF to PDF Converter", description: "Convert rich text formatting files into secure PDF layouts.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "pdf-to-docx", slug: "pdf-to-docx", name: "PDF to DOCX Converter", description: "Convert PDF documents into editable Microsoft Word files.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "epub-reader", slug: "epub-reader", name: "EPUB Reader", description: "Read EPUB e-books in your web browser locally.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "text-to-pdf", slug: "text-to-pdf", name: "TXT to PDF Converter", description: "Convert raw text file logs into secure PDF documents.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "html-to-pdf", slug: "html-to-pdf", name: "HTML to PDF Converter", description: "Print or export HTML codes as document files.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "excel-to-csv", slug: "excel-to-csv", name: "Excel to CSV Converter", description: "Convert Excel worksheets into comma-separated value tables.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "csv-to-excel", slug: "csv-to-excel", name: "CSV to Excel Converter", description: "Compile CSV table structures into Excel worksheets.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "xml-reader", slug: "xml-reader", name: "XML Reader & Viewer", description: "View and browse structured XML files in tree forms.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+  { id: "csv-reader", slug: "csv-reader", name: "CSV Table Reader", description: "Open and analyze CSV data in visual table sheets.", primaryTag: "Documents", category: "Documents", iconTag: "FileText" },
+
+  // Calculators
+  { id: "scientific-calculator", slug: "scientific-calculator", name: "Scientific Calculator", description: "Solve trigonometry, log, and complex math equations online.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "percentage-calculator", slug: "percentage-calculator", name: "Percentage Calculator", description: "Find percentage gains, ratios, and relative changes instantly.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "age-calculator", slug: "age-calculator", name: "Age Calculator", description: "Calculate age, days lived, and weekday milestones from birthdates.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "date-calculator", slug: "date-calculator", name: "Date Calculator", description: "Calculate date intervals and relative days from date points.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "gpa-calculator", slug: "gpa-calculator", name: "GPA Calculator", description: "Translate grades and credits into weighted average GPA indexes.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "loan-calculator", slug: "loan-calculator", name: "EMI Loan Calculator", description: "Calculate monthly EMI repayments and principal-interest flows.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "compound-interest", slug: "compound-interest", name: "Compound Interest Calculator", description: "Model compound returns and yield gains over time horizons.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "mortgage-calculator", slug: "mortgage-calculator", name: "Mortgage Calculator", description: "Evaluate home mortgage loan sizes, taxes, and monthly bills.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "bmi-calculator", slug: "bmi-calculator", name: "BMI Calculator", description: "Calculate body mass index values for health assessments.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "calorie-calculator", slug: "calorie-calculator", name: "Calorie Calculator", description: "Estimate daily energy burns and weight-goal intake limits.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "tax-calculator", slug: "tax-calculator", name: "Income Tax Calculator", description: "Estimate brackets tax liability and net pay levels.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "discount-calculator", slug: "discount-calculator", name: "Discount Calculator", description: "Calculate price cuts, savings, and net costs after discounts.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "tip-calculator", slug: "tip-calculator", name: "Tip Calculator", description: "Calculate food tips, bills split and custom percentages.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "fraction-calculator", slug: "fraction-calculator", name: "Fraction Calculator", description: "Add, subtract, multiply, and divide standard fractions.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+  { id: "matrix-calculator", slug: "matrix-calculator", name: "Matrix Calculator", description: "Solve matrix determinant, transpose, inverse and multiplication.", primaryTag: "Calculators", category: "Calculators", iconTag: "Gauge" },
+
+  // Unit Converters
+  { id: "length-converter", slug: "length-converter", name: "Length Unit Converter", description: "Convert measurements between meters, feet, inches, and miles.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "weight-converter", slug: "weight-converter", name: "Weight Unit Converter", description: "Convert weight scales between grams, kilograms, pounds, and ounces.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "temperature-converter", slug: "temperature-converter", name: "Temperature Converter", description: "Convert values between Celsius, Fahrenheit, and Kelvin scales.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "area-converter", slug: "area-converter", name: "Area Unit Converter", description: "Convert surfaces sizes between square meters, feet, and acres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "volume-converter", slug: "volume-converter", name: "Volume Unit Converter", description: "Convert volumes between liters, gallons, cups, and cubic units.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "speed-converter", slug: "speed-converter", name: "Speed Unit Converter", description: "Convert velocity between km/h, mph, knots, and m/s.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "time-converter", slug: "time-converter", name: "Time Unit Converter", description: "Convert times between seconds, hours, days, and years.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "storage-converter", slug: "storage-converter", name: "Digital Storage Converter", description: "Convert byte arrays between MB, GB, TB, and KB blocks.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "currency-converter", slug: "currency-converter", name: "Currency Exchange Converter", description: "Estimate cross-rate valuations for global currencies.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "pressure-converter", slug: "pressure-converter", name: "Pressure Unit Converter", description: "Convert pressures between bar, psi, pascals, and atmospheres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "angle-converter", slug: "angle-converter", name: "Angle Unit Converter", description: "Convert degrees to radians, gradians, and standard circles.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "energy-converter", slug: "energy-converter", name: "Energy Unit Converter", description: "Convert joules to calories, watt-hours, and BTUs.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "power-converter", slug: "power-converter", name: "Power Unit Converter", description: "Convert horsepower to watts, kilowatts, and BTUs/hr.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+
+  // Color Tools
+  { id: "hex-to-rgb", slug: "hex-to-rgb", name: "Hex to RGB Converter", description: "Convert hexadecimal web colors to RGB coordinates.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "rgb-to-hex", slug: "rgb-to-hex", name: "RGB to Hex Converter", description: "Convert RGB values into standard CSS hexadecimal codes.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "hex-to-hsl", slug: "hex-to-hsl", name: "Hex to HSL Converter", description: "Convert hex color strings to Hue, Saturation, Lightness profiles.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "hsl-to-hex", slug: "hsl-to-hex", name: "HSL to Hex Converter", description: "Convert HSL values into web-ready hexadecimal CSS strings.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "cmyk-to-rgb", slug: "cmyk-to-rgb", name: "CMYK to RGB Converter", description: "Convert print-centric CMYK values to screen RGB vectors.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "rgb-to-cmyk", slug: "rgb-to-cmyk", name: "RGB to CMYK Converter", description: "Convert RGB colors into standard CMYK printing codes.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "contrast-checker", slug: "contrast-checker", name: "WCAG Color Contrast Checker", description: "Check contrast ratios of foreground/background text combinations.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "color-blender", slug: "color-blender", name: "Color Blender", description: "Mix two colors together to generate transition steps.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "shade-generator", slug: "shade-generator", name: "Color Shade Generator", description: "Generate tints and shades corresponding to any base color.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+  { id: "color-blindness-simulator", slug: "color-blindness-simulator", name: "Color Blindness Simulator", description: "Simulate color blindness profiles (deuteranopia, protanopia).", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
+
+  // SEO Tools
+  { id: "robots-txt-generator", slug: "robots-txt-generator", name: "Robots.txt Generator", description: "Generate robots.txt rules for search engines and crawlers.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "sitemap-xml-generator", slug: "sitemap-xml-generator", name: "Sitemap XML Generator", description: "Build valid sitemap index schemas for your website links.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "redirect-checker", slug: "redirect-checker", name: "HTTP Redirect Checker", description: "Follow and check redirect status code chains of URLs.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "header-checker", slug: "header-checker", name: "HTTP Response Header Checker", description: "Inspect response headers and server configuration parameters.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "ssl-checker", slug: "ssl-checker", name: "SSL Certificate Checker", description: "Verify validity, expiration, and security signatures of SSLs.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "whois-lookup", slug: "whois-lookup", name: "Domain WHOIS Lookup", description: "Check register and expiry records of domains.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "schema-generator", slug: "schema-generator", name: "Schema Markup Generator", description: "Generate JSON-LD structured schemas for tools, blogs, or sites.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+  { id: "keyword-density", slug: "keyword-density", name: "Keyword Density Analyzer", description: "Scan texts to calculate relative frequencies of keywords.", primaryTag: "SEO", category: "SEO", iconTag: "Globe" },
+
+  // Security Tools
+  { id: "password-generator", slug: "password-generator", name: "Password Generator", description: "Generate cryptographically secure random password arrays.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "password-strength", slug: "password-strength", name: "Password Strength Evaluator", description: "Check password entropy and calculate cracking timelines.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "jwt-parser", slug: "jwt-parser", name: "JWT Claims Parser", description: "Extract headers and verify signature validation profiles.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "html-escape", slug: "html-escape", name: "HTML Entity Encoder", description: "Escape HTML characters to secure inputs from XSS.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "html-unescape", slug: "html-unescape", name: "HTML Entity Decoder", description: "Decode escaped HTML entities back to raw tags.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "hash-sha512", slug: "hash-sha512", name: "SHA-512 Hash Generator", description: "Generate standard 512-bit SHA cryptographic checksums.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+  { id: "bcrypt-generator", slug: "bcrypt-generator", name: "Bcrypt Hash Generator", description: "Generate salted Bcrypt passwords hash keys for security testing.", primaryTag: "Security", category: "Security", iconTag: "Lock" },
+
+  // Finance Tools
+  { id: "simple-interest", slug: "simple-interest", name: "Simple Interest Calculator", description: "Calculate simple interest returns based on principal and terms.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "future-value", slug: "future-value", name: "Future Value Calculator", description: "Evaluate final asset returns with growth rates over time.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "roi-calculator", slug: "roi-calculator", name: "ROI Investment Calculator", description: "Evaluate net gains and return on investment percentages.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "cagr-calculator", slug: "cagr-calculator", name: "CAGR Growth Calculator", description: "Find compound annual growth rate values of assets.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "break-even-calculator", slug: "break-even-calculator", name: "Break-Even Calculator", description: "Find units and sales revenue needed to cover fixed and variable costs.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+  { id: "amortization-schedule", slug: "amortization-schedule", name: "Amortization Calculator", description: "Generate monthly compound mortgage and principal schedules.", primaryTag: "Finance", category: "Finance", iconTag: "Scale" },
+];
+
+const DYNAMIC_TOOLS: RegistryTool[] = DYNAMIC_TOOL_BASES.map(generateDynamicTool);
+
+// Merge: static richly-authored tools + category-aware dynamic stubs + pSEO intent-variant pages
+// De-duplicate by slug so no existing tool is overwritten by a variant.
+export const TOOL_REGISTRY: RegistryTool[] = (() => {
+  const base = [...STATIC_TOOL_REGISTRY, ...DYNAMIC_TOOLS];
+  const existingSlugs = new Set(base.map(t => t.slug));
+  const variants = ALL_INTENT_VARIANTS.filter(v => !existingSlugs.has(v.slug));
+  return [...base, ...variants];
+})();
 
 export function getToolBySlug(slug: string): RegistryTool | undefined {
   return TOOL_REGISTRY.find(t => t.slug === slug);

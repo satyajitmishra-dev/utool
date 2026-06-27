@@ -44,6 +44,51 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async headers() {
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://checkout.razorpay.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: https://api.dicebear.com https://www.clarity.ms https://*.clarity.ms https://*.google-analytics.com;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://*.google-analytics.com https://*.clarity.ms https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.razorpay.com;
+      frame-src 'self' https://api.razorpay.com;
+      media-src 'self';
+      object-src 'none';
+    `.replace(/\s{2,}/g, ' ').trim();
+
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: cspHeader,
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

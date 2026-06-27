@@ -1,0 +1,22 @@
+{
+  "name": "UTool — Privacy-First Workspace",
+  "short_name": "UTool",
+  "description": "100+ Fast Browser Tools. No Uploads. No Tracking. Complete privacy.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#4f46e5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { generateBlogMetadata } from "@/utils/seo";
 import { blogPosts } from "@/config/blog-data";
 import { getToolBySlug } from "@/config/tool-registry";
+import { getAuthorByName } from "@/config/authors";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/ui/glass-card";
 import {
@@ -37,6 +38,7 @@ export default async function BlogPostReaderPage({ params }: Props) {
   }
 
   const toolData = post.ctaToolSlug ? getToolBySlug(post.ctaToolSlug) : null;
+  const authorData = getAuthorByName(post.author);
 
   // Article Schema
   const articleSchema = {
@@ -145,10 +147,23 @@ export default async function BlogPostReaderPage({ params }: Props) {
               {post.h1}
             </h1>
             <div className="flex items-center gap-2 pt-2">
-              <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground shadow-2xs">
-                <User className="h-4.5 w-4.5" />
-              </div>
-              <span className="text-xs font-bold text-foreground">{post.author}</span>
+              {authorData ? (
+                <Link href={`/authors/${authorData.slug}`} className="flex items-center gap-2 group">
+                  <div className="h-8 w-8 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-extrabold text-[10px] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                    {authorData.avatar}
+                  </div>
+                  <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                    {post.author}
+                  </span>
+                </Link>
+              ) : (
+                <>
+                  <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground shadow-2xs">
+                    <User className="h-4.5 w-4.5" />
+                  </div>
+                  <span className="text-xs font-bold text-foreground">{post.author}</span>
+                </>
+              )}
             </div>
           </div>
 
@@ -195,19 +210,34 @@ export default async function BlogPostReaderPage({ params }: Props) {
           {/* E-E-A-T Author Information Card */}
           <footer className="border-t border-border pt-8 mt-12">
             <GlassCard className="p-6 flex flex-col sm:flex-row gap-5 items-start bg-muted/20">
-              <div className="h-12 w-12 rounded-2xl bg-muted border border-border flex items-center justify-center text-muted-foreground shadow-2xs shrink-0">
-                <User className="h-6 w-6" />
+              <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-extrabold text-xs flex items-center justify-center shadow-2xs shrink-0">
+                {authorData ? authorData.avatar : "ER"}
               </div>
               <div className="space-y-2.5">
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-foreground">{post.author}</span>
+                  <span className="text-xs font-bold text-foreground">
+                    {authorData ? (
+                      <Link href={`/authors/${authorData.slug}`} className="hover:text-primary transition-colors">
+                        {post.author}
+                      </Link>
+                    ) : (
+                      post.author
+                    )}
+                  </span>
                   <span className="text-4xs font-bold uppercase tracking-widest text-primary mt-0.5">
                     Verified Expert Contributor
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  This guide was written by {post.author.split(",")[0]}, a vetted specialist in document infrastructure and digital tools. All recommendations are validated against standards to guarantee layout precision, security configuration compliance, and applicant parsing success.
+                  {authorData ? authorData.bio : `This guide was written by ${post.author.split(",")[0]}, a vetted specialist in document infrastructure and digital tools. All recommendations are validated against standards to guarantee layout precision, security configuration compliance, and applicant parsing success.`}
                 </p>
+                {authorData && (
+                  <div className="flex gap-4 pt-1 text-[11px] font-semibold text-primary">
+                    <a href={authorData.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline">LinkedIn</a>
+                    <a href={authorData.github} target="_blank" rel="noopener noreferrer" className="hover:underline">GitHub</a>
+                    <a href={authorData.website} target="_blank" rel="noopener noreferrer" className="hover:underline">Website</a>
+                  </div>
+                )}
                 <div className="flex gap-2 text-4xs font-semibold text-muted-foreground items-center bg-card rounded-lg px-2.5 py-1.5 border border-border w-fit">
                   <ShieldAlert className="h-3.5 w-3.5 text-primary" />
                   Processed 100% locally in-browser for ultimate security
