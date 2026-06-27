@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
+import { AnnouncementBanner } from "@/components/dashboard/AnnouncementBanner";
 import { VerificationModal } from "@/components/dashboard/VerificationModal";
 import { LiveUsageCard } from "@/components/dashboard/LiveUsageCard";
 import { RealtimeStats } from "@/components/dashboard/RealtimeStats";
@@ -106,6 +107,9 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Verification Warning Banner */}
       <VerificationBanner />
+
+      {/* Announcement Banner */}
+      <AnnouncementBanner />
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">

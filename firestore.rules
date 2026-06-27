@@ -46,12 +46,33 @@ service cloud.firestore {
     }
 
     // ==========================================
-    // 5. SUPPORT TICKETS
+    // 5. SUPPORT TICKETS (Legacy)
     // ==========================================
     match /support_tickets/{ticketId} {
       allow create: if true; 
       allow read, update: if isAdmin() || (resource.data.uid != null && isOwner(resource.data.uid));
       allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 5B. NEW SUPPORT TICKETS & MESSAGES
+    // ==========================================
+    match /supportTickets/{ticketId} {
+      allow create: if true;
+      allow read, update: if isAdmin() || (resource.data.userId != null && isOwner(resource.data.userId));
+      allow delete: if isAdmin();
+    }
+
+    match /ticketMessages/{messageId} {
+      allow create: if true;
+      allow read: if isAdmin() || (request.auth != null);
+      allow update, delete: if isAdmin();
+    }
+
+    match /toolReviews/{reviewId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin() || (resource.data.userId != null && isOwner(resource.data.userId));
     }
 
     // ==========================================

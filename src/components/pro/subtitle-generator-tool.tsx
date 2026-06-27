@@ -6,6 +6,7 @@ import { usePro } from "@/hooks/use-pro";
 import { UploadZone } from "@/components/tools/pdf/upload-zone";
 import { UpgradeBanner } from "@/components/pro/upgrade-banner";
 import { Button } from "@/components/ui/button";
+import { ProcessButton } from "@/components/ui/process-button";
 import { GlassCard } from "@/components/ui/glass-card";
 import {
   Video,
@@ -29,6 +30,8 @@ export function SubtitleGeneratorTool() {
     result,
     status,
     errorMessage,
+    progress,
+    progressLabel,
     selectFile,
     processMedia,
     downloadSrt,
@@ -128,15 +131,13 @@ export function SubtitleGeneratorTool() {
 
               {/* Action Button */}
               {isPro ? (
-                <Button
-                  variant="premium"
-                  className="w-full h-11 rounded-xl font-bold shadow-md shadow-primary/10 flex items-center justify-center gap-2"
+                <ProcessButton
                   onClick={processMedia}
-                  loading={status === "processing"}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Generate Subtitles
-                </Button>
+                  isProcessing={status === "processing"}
+                  progress={progress}
+                  progressLabel={progressLabel}
+                  idleLabel="Generate Subtitles"
+                />
               ) : (
                 <Button
                   variant="premium"

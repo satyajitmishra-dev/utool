@@ -6,6 +6,7 @@ import { usePro } from "@/hooks/use-pro";
 import { UploadZone } from "@/components/tools/pdf/upload-zone";
 import { UpgradeBanner } from "@/components/pro/upgrade-banner";
 import { Button } from "@/components/ui/button";
+import { ProcessButton } from "@/components/ui/process-button";
 import { GlassCard } from "@/components/ui/glass-card";
 import {
   Sparkles,
@@ -28,6 +29,8 @@ export function BackgroundRemoverTool() {
     processedBlob,
     status,
     errorMessage,
+    progress,
+    progressLabel,
     selectFile,
     processImage,
     downloadImage,
@@ -112,15 +115,13 @@ export function BackgroundRemoverTool() {
 
               {/* Action Button */}
               {isPro ? (
-                <Button
-                  variant="premium"
-                  className="w-full h-11 rounded-xl font-bold shadow-md shadow-primary/10 flex items-center justify-center gap-2"
+                <ProcessButton
                   onClick={processImage}
-                  loading={status === "processing"}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Remove Background
-                </Button>
+                  isProcessing={status === "processing"}
+                  progress={progress}
+                  progressLabel={progressLabel}
+                  idleLabel="Remove Background"
+                />
               ) : (
                 <Button
                   variant="premium"

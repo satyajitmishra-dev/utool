@@ -7,6 +7,7 @@ import { UploadZone } from "@/components/tools/pdf/upload-zone";
 import { UpgradeBanner } from "@/components/pro/upgrade-banner";
 import { ProFeature } from "@/components/pro/pro-feature";
 import { Button } from "@/components/ui/button";
+import { ProcessButton } from "@/components/ui/process-button";
 import { GlassCard } from "@/components/ui/glass-card";
 import {
   ImageIcon,
@@ -31,6 +32,8 @@ export function ImageResizerTool() {
     status,
     result,
     errorMessage,
+    progress,
+    progressLabel,
     setOptions,
     selectFile,
     processImage,
@@ -184,15 +187,13 @@ export function ImageResizerTool() {
 
               {/* Process Button */}
               {isPro ? (
-                <Button
-                  variant="premium"
-                  className="w-full h-11 rounded-xl font-bold shadow-md shadow-primary/10 flex items-center justify-center gap-2"
+                <ProcessButton
                   onClick={processImage}
-                  loading={status === "processing"}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Process & Resize
-                </Button>
+                  isProcessing={status === "processing"}
+                  progress={progress}
+                  progressLabel={progressLabel}
+                  idleLabel="Process & Resize"
+                />
               ) : (
                 <Button
                   variant="premium"

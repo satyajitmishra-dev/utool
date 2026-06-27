@@ -96,6 +96,7 @@ export interface ToolCardProps {
   tag: string;
   status: "live" | "beta" | "coming-soon" | "pro";
   isPremium?: boolean;
+  requiresAuth?: boolean;
   index?: number;
 }
 
@@ -107,6 +108,7 @@ export function ToolCard({
   tag,
   status,
   isPremium = false,
+  requiresAuth = false,
   index = 0,
 }: ToolCardProps) {
   const isComingSoon = status === "coming-soon";
@@ -177,6 +179,11 @@ export function ToolCard({
               <>
                 <Lock className="h-3 w-3 text-warning" />
                 Pro Feature
+              </>
+            ) : requiresAuth ? (
+              <>
+                <Lock className="h-3 w-3 text-amber-500" />
+                Login Required
               </>
             ) : (
               "Free Access"

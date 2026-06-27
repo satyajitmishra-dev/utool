@@ -66,10 +66,10 @@ export default function ContactPage() {
         <div className="border border-border rounded-3xl p-6 bg-card space-y-4 max-w-xl shadow-xs">
           <h3 className="text-sm font-bold text-foreground">utool HQ & Entity Details</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            utool is owned and operated by Satyajitmishra Dev Technologies. We develop serverless infrastructure, browser-only compilers, and utility engines designed to respect user privacy and eliminate cloud data risk.
+            utool is owned and operated by utool Technologies. We develop serverless infrastructure, browser-only compilers, and utility engines designed to respect user privacy and eliminate cloud data risk.
           </p>
           <div className="text-[10px] text-muted-foreground/80 font-mono space-y-1">
-            <p><strong>Address:</strong> Technology Incubator Sector, DLF Cyber City, Bhubaneswar, India</p>
+            <p><strong>Address:</strong> Barasat Kulpi Road, West Bengal, India</p>
             <p><strong>Business Registration:</strong> IN-OR2026DEVSM12</p>
           </div>
         </div>

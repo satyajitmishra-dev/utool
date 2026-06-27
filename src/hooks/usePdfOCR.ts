@@ -11,14 +11,17 @@ export function usePdfOCR() {
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   const selectFile = (selectedFile: File) => {
     setFile(selectedFile);
     setStatus("idle");
     setExtractedText(null);
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
 
-    // Create local preview object URL (images can render directly, PDFs can display in iframe/pdfpreview)
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
   };
@@ -31,7 +34,8 @@ export function usePdfOCR() {
 
     setStatus("processing");
     setErrorMessage(null);
-    const toastId = toast.loading("Preparing files...");
+    setProgress(0);
+    setProgressLabel("Preparing files...");
 
     try {
       let res: Response;
@@ -39,13 +43,15 @@ export function usePdfOCR() {
 
       if (file.size > threshold30Mb) {
         // --- CLOUDFLARE R2 UPLOAD PATH ---
-        toast.loading(`Uploading to private storage... 0%`, { id: toastId });
+        setProgressLabel("Uploading to storage...");
 
-        const { fileKey } = await uploadFileToR2(file, (progress) => {
-          toast.loading(`Uploading to private storage... ${progress}%`, { id: toastId });
+        const { fileKey } = await uploadFileToR2(file, (uploadProgress) => {
+          setProgress(Math.round(uploadProgress * 0.7));
+          setProgressLabel("Uploading to storage...");
         });
 
-        toast.loading("Extracting text using OCR.Space API...", { id: toastId });
+        setProgress(75);
+        setProgressLabel("Extracting text via OCR...");
         res = await fetch("/api/tools/pdf-ocr", {
           method: "POST",
           headers: {
@@ -59,16 +65,26 @@ export function usePdfOCR() {
         });
       } else {
         // --- STANDARD DIRECT MULTIPART FLOW ---
-        toast.loading("Uploading and extracting text using OCR.Space API...", { id: toastId });
+        setProgress(15);
+        setProgressLabel("Uploading & extracting text...");
 
         const formData = new FormData();
         formData.append("file", file);
+
+        const ticker = setInterval(() => {
+          setProgress((p) => Math.min(p + 3, 85));
+        }, 800);
 
         res = await fetch("/api/tools/pdf-ocr", {
           method: "POST",
           body: formData,
         });
+
+        clearInterval(ticker);
       }
+
+      setProgress(90);
+      setProgressLabel("Parsing response...");
 
       const body = await res.json();
 
@@ -77,14 +93,18 @@ export function usePdfOCR() {
       }
 
       setExtractedText(body.data.parsedText);
+      setProgress(100);
+      setProgressLabel("Complete!");
       setStatus("success");
-      toast.success("Text extracted successfully!", { id: toastId });
+      toast.success("Text extracted successfully!");
     } catch (err: any) {
       console.error("[usePdfOCR] Error:", err);
       const msg = err.message || "An unexpected error occurred.";
       setErrorMessage(msg);
       setStatus("error");
-      toast.error(msg, { id: toastId });
+      setProgress(0);
+      setProgressLabel("");
+      toast.error(msg);
     }
   };
 
@@ -119,6 +139,8 @@ export function usePdfOCR() {
     setExtractedText(null);
     setStatus("idle");
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
   };
 
   return {
@@ -127,6 +149,8 @@ export function usePdfOCR() {
     extractedText,
     status,
     errorMessage,
+    progress,
+    progressLabel,
     isUploadingR2,
     uploadProgressR2,
     selectFile,

@@ -12,6 +12,8 @@ import {
   sendTicketReplyEmail,
   sendFeedbackReceiptEmail,
 } from "@/lib/email";
+import { SupportServerService } from "@/modules/support/server/support-service";
+import { TicketCategory, TicketPriority, UserTier, TicketStatus } from "@/modules/support/types";
 
 // Helper to check if user is an admin
 export async function isAdmin(uid: string): Promise<boolean> {
@@ -168,33 +170,58 @@ export async function submitTicketAction(prevState: any, formData: FormData) {
       screenshotUrl = await uploadScreenshot(screenshotFile);
     }
 
-    const ticketId = adminDb.collection("support_tickets").doc().id;
-    const ticketData: Record<string, any> = {
-      uid: user?.uid || null,
-      name: validated.name,
-      email: validated.email,
-      toolSlug: validated.toolSlug || null,
-      issueType: validated.issueType,
-      subject: validated.subject,
-      message: validated.message,
-      screenshotUrl: screenshotUrl || null,
-      priority: validated.priority,
-      status: "open",
-      createdAt: FieldValue.serverTimestamp(),
-      replies: [],
-      timeline: [
-        {
-          id: `created-${Date.now()}`,
-          type: "created",
-          actorName: validated.name,
-          actorRole: "user",
-          message: "created the ticket",
-          createdAt: new Date().toISOString(),
-        }
-      ],
+    const categoryMap: Record<string, TicketCategory> = {
+      bug_report: "Bug Report",
+      billing: "Billing",
+      feature_request: "Feature Request",
+      tool_error: "Bug Report",
+      general: "General",
+    };
+    const priorityMap: Record<string, TicketPriority> = {
+      low: "Low",
+      medium: "Medium",
+      high: "High",
     };
 
-    await adminDb.collection("support_tickets").doc(ticketId).set(ticketData);
+    const category = categoryMap[validated.issueType] || "General";
+    const priority = priorityMap[validated.priority] || "Medium";
+
+    let tier: UserTier = "Free";
+    if (!user) {
+      tier = "Guest";
+    } else {
+      const userIsAdmin = await isAdmin(user.uid);
+      if (userIsAdmin) {
+        tier = "Admin";
+      } else if (user.tier === 'Pro') {
+        tier = "Pro";
+      }
+    }
+
+    const ticketData: any = {
+      userId: user?.uid || null,
+      email: validated.email,
+      name: validated.name,
+      screenshotUrl: screenshotUrl || null,
+      tier,
+      category,
+      priority,
+      subject: validated.subject,
+    };
+    if (validated.toolSlug) {
+      ticketData.toolSlug = validated.toolSlug;
+    }
+
+    const ticket = await SupportServerService.createTicket(ticketData);
+    const ticketId = ticket.id;
+
+    // Add initial message to the message collection
+    await SupportServerService.addMessage(
+      ticketId,
+      user?.uid || 'guest',
+      'User',
+      validated.message
+    );
 
     // Send Receipt Email to User
     await sendTicketReceiptEmail({
@@ -348,25 +375,31 @@ export async function replyToTicketAction(ticketId: string, replyMessage: string
 // 4. TICKET STATUS TRANSITION (ADMIN ONLY)
 // ==========================================
 
-export async function updateTicketStatusAction(ticketId: string, status: "open" | "in_progress" | "resolved") {
+export async function updateTicketStatusAction(ticketId: string, status: TicketStatus | "open" | "in_progress" | "resolved") {
   try {
     const user = await getAuthUser();
     if (!user || !(await isAdmin(user.uid))) {
       return { success: false, error: "Unauthorized. Admin privileges required." };
     }
 
+    let mappedStatus: TicketStatus = "Open";
+    if (status === "open") mappedStatus = "Open";
+    else if (status === "in_progress") mappedStatus = "Investigating";
+    else if (status === "resolved") mappedStatus = "Resolved";
+    else mappedStatus = status;
+
     const newEvent = {
-      id: `status-${Date.now()}-${status}`,
+      id: `status-${Date.now()}-${mappedStatus}`,
       type: "status_change",
       actorName: user.name || "Support Lead",
       actorRole: "admin",
-      message: `changed status to ${status.replace("_", " ")}`,
+      message: `changed status to ${mappedStatus}`,
       createdAt: new Date().toISOString(),
     };
 
-    await adminDb.collection("support_tickets").doc(ticketId).update({
-      status,
-      updatedAt: FieldValue.serverTimestamp(),
+    await adminDb.collection("supportTickets").doc(ticketId).update({
+      status: mappedStatus,
+      updatedAt: Date.now(),
       timeline: FieldValue.arrayUnion(newEvent),
     });
 
@@ -501,7 +534,20 @@ export async function deleteTicketAction(ticketId: string) {
       return { success: false, error: "Unauthorized. Admin privileges required." };
     }
 
-    await adminDb.collection("support_tickets").doc(ticketId).delete();
+    // Delete ticket document
+    await adminDb.collection("supportTickets").doc(ticketId).delete();
+
+    // Delete associated messages in ticketMessages
+    const messagesSnapshot = await adminDb
+      .collection("ticketMessages")
+      .where("ticketId", "==", ticketId)
+      .get();
+    
+    const batch = adminDb.batch();
+    messagesSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
 
     revalidatePath("/dashboard/support");
     revalidatePath("/admin/support");

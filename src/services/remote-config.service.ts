@@ -22,6 +22,12 @@ const DEFAULTS = {
   toolzy_enterprise_discount_enabled: true,
   toolzy_enterprise_discount_percentage: 85,
   toolzy_discount_end_date: "2026-07-01T23:59:59Z",
+  // Dashboard announcement banner config
+  dashboard_banner_enabled: true,
+  dashboard_banner_text: "The new browser-native Media Workspace is coming soon! Get ready for advanced video editing, audio extraction, and fast media compression.",
+  dashboard_banner_type: "premium", // "info" | "warning" | "success" | "premium"
+  dashboard_banner_link: "/tools/media-workspace",
+  dashboard_banner_link_text: "Sneak Peek",
 };
 
 let initPromise: Promise<boolean> | null = null;
@@ -143,6 +149,37 @@ export function getDiscountConfig() {
   }
 }
 
+export function getBannerConfig() {
+  if (typeof window === "undefined") {
+    return {
+      enabled: DEFAULTS.dashboard_banner_enabled,
+      text: DEFAULTS.dashboard_banner_text,
+      type: DEFAULTS.dashboard_banner_type,
+      link: DEFAULTS.dashboard_banner_link,
+      linkText: DEFAULTS.dashboard_banner_link_text,
+    };
+  }
+
+  try {
+    const rc = getRemoteConfig(app);
+    const enabled = getValue(rc, "dashboard_banner_enabled").asBoolean() ?? DEFAULTS.dashboard_banner_enabled;
+    const text = getValue(rc, "dashboard_banner_text").asString() || DEFAULTS.dashboard_banner_text;
+    const type = getValue(rc, "dashboard_banner_type").asString() || DEFAULTS.dashboard_banner_type;
+    const link = getValue(rc, "dashboard_banner_link").asString() || DEFAULTS.dashboard_banner_link;
+    const linkText = getValue(rc, "dashboard_banner_link_text").asString() || DEFAULTS.dashboard_banner_link_text;
+
+    return { enabled, text, type, link, linkText };
+  } catch (error) {
+    return {
+      enabled: DEFAULTS.dashboard_banner_enabled,
+      text: DEFAULTS.dashboard_banner_text,
+      type: DEFAULTS.dashboard_banner_type,
+      link: DEFAULTS.dashboard_banner_link,
+      linkText: DEFAULTS.dashboard_banner_link_text,
+    };
+  }
+}
+
 function formatTimeRemaining(endTimeStr: string): { text: string; isExpired: boolean } {
   if (!endTimeStr) return { text: "", isExpired: true };
   const end = new Date(endTimeStr).getTime();
@@ -188,6 +225,13 @@ export function useRemoteConfig() {
     endDate: DEFAULTS.toolzy_discount_end_date,
     isExpired: false,
   });
+  const [banner, setBanner] = useState({
+    enabled: DEFAULTS.dashboard_banner_enabled,
+    text: DEFAULTS.dashboard_banner_text,
+    type: DEFAULTS.dashboard_banner_type,
+    link: DEFAULTS.dashboard_banner_link,
+    linkText: DEFAULTS.dashboard_banner_link_text,
+  });
   const [timeRemaining, setTimeRemaining] = useState("");
 
   useEffect(() => {
@@ -196,12 +240,14 @@ export function useRemoteConfig() {
     // Update state to client-side remote config state immediately after hydration completes
     setPricing(getPricingConfig());
     setDiscount(getDiscountConfig());
+    setBanner(getBannerConfig());
 
     const setup = async () => {
       await initializeRemoteConfig();
       if (!active) return;
       setPricing(getPricingConfig());
       setDiscount(getDiscountConfig());
+      setBanner(getBannerConfig());
       setLoading(false);
     };
 
@@ -267,5 +313,6 @@ export function useRemoteConfig() {
         discountPercentage: pricing.lifetimeDiscount,
       },
     },
+    bannerConfig: banner,
   };
 }

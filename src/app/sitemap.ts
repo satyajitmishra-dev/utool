@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { toolsSeoData } from "@/config/tools-seo-data";
+import { TOOL_REGISTRY } from "@/config/tool-registry";
 import { blogPosts } from "@/config/blog-data";
 import { siteConfig } from "@/config/site";
 
@@ -34,8 +34,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // 2. Programmatic Tool pages
-  const toolRoutes = Object.keys(toolsSeoData).map((slug) => ({
-    url: `${baseUrl}/tools/${slug}`,
+  const toolRoutes = TOOL_REGISTRY.map((tool) => ({
+    url: `${siteConfig.url}/tools/${tool.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.9,

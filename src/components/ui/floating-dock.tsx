@@ -38,8 +38,8 @@ export function FloatingDock() {
         <div
           className={cn(
             "flex w-full max-w-5xl items-center justify-between transition-all duration-500",
-            scrolled
-              ? "rounded-full border border-white/[0.06] bg-card/65 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] px-6 py-2.5"
+          scrolled
+              ? "rounded-full border border-border/80 bg-card/65 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] px-6 py-2.5"
               : "border-b border-transparent bg-transparent px-6 py-4"
           )}
         >
@@ -59,7 +59,7 @@ export function FloatingDock() {
               utool<span className="text-indigo-500 font-black">.</span>
             </span>
           </Link>
-
+ 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
@@ -73,25 +73,28 @@ export function FloatingDock() {
               </a>
             ))}
           </nav>
-
+ 
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-4">
             <ThemeToggle />
             <Link href="/signup">
-              <button className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-card/40 hover:bg-white/[0.06] text-body-s font-semibold px-5 py-2 transition-all active:scale-95 cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+              <button 
+                suppressHydrationWarning 
+                className="flex items-center gap-1.5 rounded-full border border-border/80 bg-card/40 hover:bg-muted/80 text-body-s font-semibold px-5 py-2 transition-all active:scale-95 cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+              >
                 Open workspace
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </Link>
           </div>
-
+ 
           {/* Mobile menu toggle */}
           <div className="flex md:hidden items-center gap-3">
             <ThemeToggle />
             <button
               suppressHydrationWarning
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-card/40 text-foreground hover:bg-white/[0.06] active:scale-95 transition-all"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-card/40 text-foreground hover:bg-muted/80 active:scale-95 transition-all"
             >
               {mobileMenuOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
             </button>

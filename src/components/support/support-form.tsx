@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { submitTicketAction } from "@/app/actions/support";
 import { cn } from "@/utils/cn";
-import { toolsSeoData } from "@/config/tools-seo-data";
+import { TOOL_REGISTRY } from "@/config/tool-registry";
 
 interface SupportFormProps {
   defaultToolSlug?: string;
@@ -118,9 +118,9 @@ export function SupportForm({ defaultToolSlug, onSuccess, className }: SupportFo
   };
 
   // Compile list of available tools for select dropdown
-  const tools = Object.keys(toolsSeoData).map((key) => ({
-    slug: key,
-    name: toolsSeoData[key].name,
+  const tools = TOOL_REGISTRY.map((tool) => ({
+    slug: tool.slug,
+    name: tool.name,
   }));
 
   return (

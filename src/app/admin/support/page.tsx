@@ -2,7 +2,7 @@ import React from "react";
 import { getAuthUser } from "@/lib/auth-server";
 import { isAdmin } from "@/app/actions/support";
 import { adminDb } from "@/lib/firebase-admin";
-import { SupportAdminClient } from "@/components/support/support-admin-client";
+import { AdminSupportClient } from "@/modules/support/components/admin-support-client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ShieldAlert, ArrowLeft, Terminal } from "lucide-react";
@@ -24,29 +24,28 @@ export default async function AdminSupportPage() {
   let tickets: any[] = [];
   try {
     const snapshot = await adminDb
-      .collection("support_tickets")
-      .orderBy("createdAt", "desc")
+      .collection("supportTickets")
+      .orderBy("updatedAt", "desc")
       .get();
 
     tickets = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
-        uid: data.uid,
-        name: data.name,
-        email: data.email,
+        uid: data.userId || null,
+        name: data.name || null,
+        email: data.email || null,
         toolSlug: data.toolSlug || null,
-        issueType: data.issueType,
-        subject: data.subject,
-        message: data.message,
+        issueType: data.category || "general",
+        subject: data.subject || "",
+        message: data.message || "",
         screenshotUrl: data.screenshotUrl || null,
-        priority: data.priority,
-        status: data.status,
-        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
-        replies: (data.replies || []).map((reply: any) => ({
-          ...reply,
-          createdAt: reply.createdAt || new Date().toISOString(),
-        })),
+        priority: data.priority || "Medium",
+        status: data.status || "Open",
+        createdAt: typeof data.createdAt === 'number' 
+          ? new Date(data.createdAt).toISOString() 
+          : data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        replies: [],
         timeline: (data.timeline || []).map((evt: any) => ({
           ...evt,
           createdAt: evt.createdAt || new Date().toISOString(),
@@ -114,12 +113,7 @@ export default async function AdminSupportPage() {
       </div>
 
       {/* Main Admin Client Interface */}
-      <SupportAdminClient
-        initialTickets={tickets}
-        initialReviews={reviews}
-        adminName={user.name || "Support Lead"}
-        adminEmail={user.email || ""}
-      />
+      <AdminSupportClient />
     </div>
   );
 }

@@ -27,12 +27,16 @@ export function useImageResizer() {
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [result, setResult] = useState<ImageResizerResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   const selectFile = (selectedFile: File) => {
     setFile(selectedFile);
     setStatus("idle");
     setResult(null);
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
 
     // Create preview
     const url = URL.createObjectURL(selectedFile);
@@ -58,7 +62,8 @@ export function useImageResizer() {
 
     setStatus("processing");
     setErrorMessage(null);
-    const toastId = toast.loading("Preparing files...");
+    setProgress(0);
+    setProgressLabel("Preparing files...");
 
     try {
       let res: Response;
@@ -66,13 +71,15 @@ export function useImageResizer() {
 
       if (file.size > threshold30Mb) {
         // --- CLOUDFLARE R2 UPLOAD PATH ---
-        toast.loading(`Uploading to private storage... 0%`, { id: toastId });
-        
-        const { fileKey } = await uploadFileToR2(file, (progress) => {
-          toast.loading(`Uploading to private storage... ${progress}%`, { id: toastId });
+        setProgressLabel("Uploading to storage...");
+
+        const { fileKey } = await uploadFileToR2(file, (uploadProgress) => {
+          setProgress(Math.round(uploadProgress * 0.7));
+          setProgressLabel("Uploading to storage...");
         });
 
-        toast.loading("Processing image resize via Cloudinary...", { id: toastId });
+        setProgress(75);
+        setProgressLabel("Resizing image...");
         res = await fetch("/api/tools/image-resizer", {
           method: "POST",
           headers: {
@@ -91,8 +98,9 @@ export function useImageResizer() {
         });
       } else {
         // --- STANDARD DIRECT MULTIPART FLOW ---
-        toast.loading("Uploading and resizing image via Cloudinary...", { id: toastId });
-        
+        setProgress(15);
+        setProgressLabel("Resizing image...");
+
         const formData = new FormData();
         formData.append("file", file);
         formData.append("width", options.width.toString());
@@ -101,11 +109,20 @@ export function useImageResizer() {
         formData.append("quality", options.quality.toString());
         formData.append("format", options.format);
 
+        const ticker = setInterval(() => {
+          setProgress((p) => Math.min(p + 3, 85));
+        }, 800);
+
         res = await fetch("/api/tools/image-resizer", {
           method: "POST",
           body: formData,
         });
+
+        clearInterval(ticker);
       }
+
+      setProgress(90);
+      setProgressLabel("Parsing response...");
 
       const body = await res.json();
 
@@ -114,14 +131,18 @@ export function useImageResizer() {
       }
 
       setResult(body.data);
+      setProgress(100);
+      setProgressLabel("Complete!");
       setStatus("success");
-      toast.success("Image transformed successfully!", { id: toastId });
+      toast.success("Image transformed successfully!");
     } catch (err: any) {
       console.error("[useImageResizer] Error:", err);
       const msg = err.message || "An unexpected error occurred.";
       setErrorMessage(msg);
       setStatus("error");
-      toast.error(msg, { id: toastId });
+      setProgress(0);
+      setProgressLabel("");
+      toast.error(msg);
     }
   };
 
@@ -163,6 +184,8 @@ export function useImageResizer() {
     setStatus("idle");
     setResult(null);
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
   };
 
   return {
@@ -172,6 +195,8 @@ export function useImageResizer() {
     status,
     result,
     errorMessage,
+    progress,
+    progressLabel,
     isUploadingR2,
     uploadProgressR2,
     setOptions,

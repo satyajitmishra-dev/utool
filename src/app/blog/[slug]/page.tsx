@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { generateBlogMetadata } from "@/utils/seo";
 import { blogPosts } from "@/config/blog-data";
-import { toolsSeoData } from "@/config/tools-seo-data";
+import { getToolBySlug } from "@/config/tool-registry";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/ui/glass-card";
 import {
@@ -36,7 +36,7 @@ export default async function BlogPostReaderPage({ params }: Props) {
     notFound();
   }
 
-  const toolData = toolsSeoData[post.ctaToolSlug];
+  const toolData = post.ctaToolSlug ? getToolBySlug(post.ctaToolSlug) : null;
 
   // Article Schema
   const articleSchema = {

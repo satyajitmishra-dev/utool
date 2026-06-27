@@ -59,14 +59,14 @@ export function constructMetadata({
   };
 }
 
-import { toolsSeoData } from "@/config/tools-seo-data";
+import { getToolBySlug } from "@/config/tool-registry";
 import { blogPosts } from "@/config/blog-data";
 
 /**
  * Generates search-optimized metadata for programmatic tool pages.
  */
 export function generateToolMetadata(slug: string): Metadata {
-  const tool = toolsSeoData[slug];
+  const tool = getToolBySlug(slug);
   if (!tool) {
     return constructMetadata({
       title: "Developer & PDF Utilities",
@@ -75,8 +75,8 @@ export function generateToolMetadata(slug: string): Metadata {
   }
 
   return constructMetadata({
-    title: tool.title,
-    description: tool.description,
+    title: tool.seoMeta.title,
+    description: tool.seoMeta.description,
   });
 }
 

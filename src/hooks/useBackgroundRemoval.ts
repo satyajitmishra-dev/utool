@@ -12,6 +12,8 @@ export function useBackgroundRemoval() {
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   const selectFile = (selectedFile: File) => {
     setFile(selectedFile);
@@ -19,8 +21,9 @@ export function useBackgroundRemoval() {
     setProcessedBlob(null);
     setProcessedUrl(null);
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
 
-    // Create local object URL for previewing original
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
   };
@@ -33,7 +36,8 @@ export function useBackgroundRemoval() {
 
     setStatus("processing");
     setErrorMessage(null);
-    const toastId = toast.loading("Preparing files...");
+    setProgress(0);
+    setProgressLabel("Preparing files...");
 
     try {
       let res: Response;
@@ -41,13 +45,15 @@ export function useBackgroundRemoval() {
 
       if (file.size > threshold30Mb) {
         // --- CLOUDFLARE R2 UPLOAD PATH ---
-        toast.loading(`Uploading to private storage... 0%`, { id: toastId });
+        setProgressLabel("Uploading to storage...");
 
-        const { fileKey } = await uploadFileToR2(file, (progress) => {
-          toast.loading(`Uploading to private storage... ${progress}%`, { id: toastId });
+        const { fileKey } = await uploadFileToR2(file, (uploadProgress) => {
+          setProgress(Math.round(uploadProgress * 0.7));
+          setProgressLabel("Uploading to storage...");
         });
 
-        toast.loading("Removing background via Clipdrop API...", { id: toastId });
+        setProgress(75);
+        setProgressLabel("Removing background...");
         res = await fetch("/api/tools/background-remover", {
           method: "POST",
           headers: {
@@ -61,16 +67,26 @@ export function useBackgroundRemoval() {
         });
       } else {
         // --- STANDARD DIRECT MULTIPART FLOW ---
-        toast.loading("Uploading and removing background via Clipdrop API...", { id: toastId });
+        setProgress(15);
+        setProgressLabel("Removing background...");
 
         const formData = new FormData();
         formData.append("file", file);
+
+        const ticker = setInterval(() => {
+          setProgress((p) => Math.min(p + 3, 85));
+        }, 800);
 
         res = await fetch("/api/tools/background-remover", {
           method: "POST",
           body: formData,
         });
+
+        clearInterval(ticker);
       }
+
+      setProgress(90);
+      setProgressLabel("Rendering result...");
 
       if (!res.ok) {
         let errorMsg = "Failed to process background removal.";
@@ -81,20 +97,23 @@ export function useBackgroundRemoval() {
         throw new Error(errorMsg);
       }
 
-      // Read response as binary blob (PNG)
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
 
       setProcessedBlob(blob);
       setProcessedUrl(url);
+      setProgress(100);
+      setProgressLabel("Complete!");
       setStatus("success");
-      toast.success("Background removed successfully!", { id: toastId });
+      toast.success("Background removed successfully!");
     } catch (err: any) {
       console.error("[useBackgroundRemoval] Error:", err);
       const msg = err.message || "An unexpected error occurred.";
       setErrorMessage(msg);
       setStatus("error");
-      toast.error(msg, { id: toastId });
+      setProgress(0);
+      setProgressLabel("");
+      toast.error(msg);
     }
   };
 
@@ -123,6 +142,8 @@ export function useBackgroundRemoval() {
     setProcessedBlob(null);
     setStatus("idle");
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
   };
 
   return {
@@ -132,6 +153,8 @@ export function useBackgroundRemoval() {
     processedBlob,
     status,
     errorMessage,
+    progress,
+    progressLabel,
     isUploadingR2,
     uploadProgressR2,
     selectFile,

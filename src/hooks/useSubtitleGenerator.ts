@@ -48,12 +48,16 @@ export function useSubtitleGenerator() {
   const [result, setResult] = useState<WhisperApiResponse | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   const selectFile = (selectedFile: File) => {
     setFile(selectedFile);
     setStatus("idle");
     setResult(null);
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
 
     // Create object URL for audio/video tag playback preview
     const url = URL.createObjectURL(selectedFile);
@@ -68,7 +72,8 @@ export function useSubtitleGenerator() {
 
     setStatus("processing");
     setErrorMessage(null);
-    const toastId = toast.loading("Preparing files...");
+    setProgress(0);
+    setProgressLabel("Preparing files...");
 
     try {
       let res: Response;
@@ -76,13 +81,15 @@ export function useSubtitleGenerator() {
 
       if (file.size > threshold30Mb) {
         // --- CLOUDFLARE R2 UPLOAD PATH ---
-        toast.loading(`Uploading to private storage... 0%`, { id: toastId });
+        setProgressLabel("Uploading to storage...");
 
-        const { fileKey } = await uploadFileToR2(file, (progress) => {
-          toast.loading(`Uploading to private storage... ${progress}%`, { id: toastId });
+        const { fileKey } = await uploadFileToR2(file, (uploadProgress) => {
+          setProgress(Math.round(uploadProgress * 0.7)); // 0-70% for upload
+          setProgressLabel("Uploading to storage...");
         });
 
-        toast.loading("Transcribing speech via Groq Whisper API...", { id: toastId });
+        setProgress(75);
+        setProgressLabel("Transcribing speech...");
         res = await fetch("/api/tools/subtitle-generator", {
           method: "POST",
           headers: {
@@ -96,16 +103,27 @@ export function useSubtitleGenerator() {
         });
       } else {
         // --- STANDARD DIRECT MULTIPART FLOW ---
-        toast.loading("Uploading and transcribing speech via Groq Whisper API...", { id: toastId });
+        setProgress(15);
+        setProgressLabel("Uploading & transcribing...");
 
         const formData = new FormData();
         formData.append("file", file);
+
+        // Simulate progress ticks during API wait
+        const ticker = setInterval(() => {
+          setProgress((p) => Math.min(p + 3, 85));
+        }, 800);
 
         res = await fetch("/api/tools/subtitle-generator", {
           method: "POST",
           body: formData,
         });
+
+        clearInterval(ticker);
       }
+
+      setProgress(90);
+      setProgressLabel("Parsing response...");
 
       const body = await res.json();
 
@@ -114,14 +132,18 @@ export function useSubtitleGenerator() {
       }
 
       setResult(body.data);
+      setProgress(100);
+      setProgressLabel("Complete!");
       setStatus("success");
-      toast.success("Media transcribed successfully!", { id: toastId });
+      toast.success("Media transcribed successfully!");
     } catch (err: any) {
       console.error("[useSubtitleGenerator] Error:", err);
       const msg = err.message || "An unexpected error occurred.";
       setErrorMessage(msg);
       setStatus("error");
-      toast.error(msg, { id: toastId });
+      setProgress(0);
+      setProgressLabel("");
+      toast.error(msg);
     }
   };
 
@@ -168,6 +190,8 @@ export function useSubtitleGenerator() {
     setResult(null);
     setStatus("idle");
     setErrorMessage(null);
+    setProgress(0);
+    setProgressLabel("");
   };
 
   return {
@@ -176,6 +200,8 @@ export function useSubtitleGenerator() {
     result,
     status,
     errorMessage,
+    progress,
+    progressLabel,
     isUploadingR2,
     uploadProgressR2,
     selectFile,

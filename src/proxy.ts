@@ -50,6 +50,20 @@ async function fetchUserFromFirestore(userId: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hostname = request.headers.get('host') || '';
+
+  // Handle media workspace subdomains
+  const isMediaWorkspace = 
+    hostname === 'mediawork.utool.in' || 
+    hostname === 'media.utool.in' || 
+    hostname.startsWith('mediawork.') || 
+    hostname.startsWith('media.');
+
+  if (isMediaWorkspace && pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/media';
+    return NextResponse.rewrite(url);
+  }
 
   // Retrieve Firebase session cookie
   const sessionCookie = request.cookies.get("__session")?.value;
