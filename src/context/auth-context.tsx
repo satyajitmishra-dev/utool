@@ -10,6 +10,8 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   sendPasswordResetEmail,
   updateProfile,
   sendEmailVerification,
@@ -19,6 +21,9 @@ import { auth, db } from "@/config/firebase";
 import { useRouter } from "next/navigation";
 import { Membership } from "@/types/pro";
 import { subscribeToUserProfile } from "@/lib/firebase/dashboard";
+import { toast } from "sonner";
+import { getAnonymousId } from "@/utils/anonymous-id";
+import { safeRedirect } from "@/utils/safe-redirect";
 
 
 export interface AuthContextType {
@@ -120,6 +125,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [authInitializing]);
 
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const credential = await getRedirectResult(auth);
+        if (credential?.user) {
+          console.log("[Auth] Successfully signed in via redirect:", credential.user.uid);
+          
+          // 1. Sync session cookie
+          await syncSessionCookie(credential.user);
+          
+          // 2. Perform guest merge if guestId exists
+          const guestId = getAnonymousId();
+          if (guestId) {
+            try {
+              await fetch("/api/auth/merge", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ guestId, userId: credential.user.uid }),
+              });
+              console.log("[Auth] Merged guest ID with redirect user");
+            } catch (mergeErr) {
+              console.error("[Auth] Failed to merge guest history after redirect:", mergeErr);
+            }
+          }
+
+          toast.success("Welcome back to Utool.");
+
+          // 3. Redirect to the destination page if specified in the query parameters
+          if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const redirectParam = params.get("redirect");
+            const destination = safeRedirect(redirectParam);
+            router.push(destination);
+          }
+        }
+      } catch (error: any) {
+        console.error("[Auth] Redirect sign-in error:", error);
+        toast.error(error.message || "Failed to sign in with Google.");
+      }
+    };
+    handleRedirect();
+  }, [router]);
+
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
@@ -175,12 +223,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    const isMobile = typeof window !== "undefined" && 
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      setLoading(true);
+      await signInWithRedirect(auth, provider);
+      return new Promise<never>(() => {});
+    }
+
     try {
       setLoading(true);
       const credential = await signInWithPopup(auth, provider);
       await syncSessionCookie(credential.user);
       return credential;
-    } catch (error) {
+    } catch (error: any) {
+      console.error("[Auth] Google popup sign-in failed:", error);
+      if (error.code === "auth/popup-blocked" || error.code === "auth/cancelled-popup-request") {
+        console.log("[Auth] Popup blocked or cancelled, falling back to redirect...");
+        await signInWithRedirect(auth, provider);
+        return new Promise<never>(() => {});
+      }
       throw error;
     } finally {
       setLoading(false);
