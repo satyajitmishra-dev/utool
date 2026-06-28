@@ -208,9 +208,6 @@ export function Sidebar() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Spacer for content offset */}
-      <div className={cn("hidden md:block flex-shrink-0 transition-all duration-300", collapsed ? "w-[68px]" : "w-64")} />
     </>
   );
 }

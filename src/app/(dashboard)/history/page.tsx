@@ -89,7 +89,7 @@ export default function HistoryPage() {
       {/* 1. Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-display-sm font-bold tracking-tight text-foreground flex items-center gap-3">
+          <h1 className="text-h1 font-bold tracking-tight text-foreground flex items-center gap-3">
             <History className="h-7 w-7 text-primary" />
             Execution History
           </h1>
@@ -142,9 +142,11 @@ export default function HistoryPage() {
                 <tbody className="divide-y divide-border text-foreground">
                   {filteredLogs.map((log) => (
                     <tr key={log.id} className="hover:bg-muted/10 transition-colors">
-                      <td className="p-4 pl-6 font-bold text-foreground flex items-center gap-2.5">
-                        <Terminal className="h-4 w-4 text-primary" />
-                        {log.tool}
+                      <td className="p-4 pl-6 font-bold text-foreground">
+                        <div className="flex items-center gap-2.5">
+                          <Terminal className="h-4 w-4 text-primary" />
+                          <span>{log.tool}</span>
+                        </div>
                       </td>
                       <td className="p-4 text-xs text-muted-foreground">{log.time}</td>
                       <td className="p-4 text-center">
