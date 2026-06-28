@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { GlassCard } from "@/components/ui/glass-card";
-import { DollarSign, Percent, Calendar, HelpCircle, ChevronDown, ChevronUp, Table } from "lucide-react";
+import { IndianRupee, Percent, Calendar, HelpCircle, ChevronDown, ChevronUp, Table } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AmortizationRow {
@@ -14,7 +14,7 @@ interface AmortizationRow {
 }
 
 export function EmiCalculator() {
-  const [principal, setPrincipal] = useState(100000);
+  const [principal, setPrincipal] = useState(1000000);
   const [interestRate, setInterestRate] = useState(8.5);
   const [tenure, setTenure] = useState(15);
   const [isTenureYears, setIsTenureYears] = useState(true);
@@ -137,7 +137,7 @@ export function EmiCalculator() {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-                  <DollarSign className="h-3.5 w-3.5 text-primary" /> Loan Amount
+                  <IndianRupee className="h-3.5 w-3.5 text-primary" /> Loan Amount
                 </label>
                 <input
                   type="number"
@@ -148,16 +148,16 @@ export function EmiCalculator() {
               </div>
               <input
                 type="range"
-                min="5000"
-                max="1000000"
-                step="5000"
+                min="100000"
+                max="10000000"
+                step="50000"
                 value={principal}
                 onChange={(e) => setPrincipal(Number(e.target.value))}
                 className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
               <div className="flex justify-between text-[9px] text-muted-foreground font-bold">
-                <span>$5,000</span>
-                <span>$1M</span>
+                <span>₹1 Lakh</span>
+                <span>₹1 Crore</span>
               </div>
             </div>
 
@@ -261,7 +261,7 @@ export function EmiCalculator() {
               Equated Monthly Installment (EMI)
             </span>
             <div className="text-4xl md:text-5xl font-black text-foreground">
-              ${emi.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{emi.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground">per month</p>
           </GlassCard>
@@ -270,18 +270,18 @@ export function EmiCalculator() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 border border-border rounded-2xl bg-card flex flex-col justify-center space-y-1">
               <span className="text-[9px] font-bold text-muted-foreground uppercase">Principal Loan</span>
-              <span className="text-base font-extrabold text-foreground">${principal.toLocaleString()}</span>
+              <span className="text-base font-extrabold text-foreground">₹{principal.toLocaleString("en-IN")}</span>
             </div>
             <div className="p-4 border border-border rounded-2xl bg-card flex flex-col justify-center space-y-1">
               <span className="text-[9px] font-bold text-muted-foreground uppercase">Total Interest</span>
               <span className="text-base font-extrabold text-foreground">
-                ${totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                ₹{totalInterest.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
               </span>
             </div>
             <div className="p-4 border border-border rounded-2xl bg-card flex flex-col justify-center space-y-1">
               <span className="text-[9px] font-bold text-muted-foreground uppercase">Total Payment</span>
               <span className="text-base font-extrabold text-foreground">
-                ${totalPayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                ₹{totalPayment.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
               </span>
             </div>
           </div>
@@ -362,14 +362,14 @@ export function EmiCalculator() {
                       {schedule.map((row) => (
                         <tr key={row.period} className="hover:bg-muted/10">
                           <td className="py-2 px-3 font-bold text-foreground">{row.period}</td>
-                          <td className="py-2 px-3">${row.emi.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          <td className="py-2 px-3">₹{row.emi.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</td>
                           <td className="py-2 px-3 text-emerald-600 dark:text-emerald-400">
-                            ${row.principal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            ₹{row.principal.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                           </td>
                           <td className="py-2 px-3 text-rose-600 dark:text-rose-400">
-                            ${row.interest.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            ₹{row.interest.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                           </td>
-                          <td className="py-2 px-3 text-foreground">${row.balance.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          <td className="py-2 px-3 text-foreground">₹{row.balance.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</td>
                         </tr>
                       ))}
                     </tbody>

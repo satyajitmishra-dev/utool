@@ -564,7 +564,8 @@ export function AdminToolsDashboardClient({ initialTools }: AdminToolsDashboardC
       </div>
 
       {/* 4. Virtualized Table Container */}
-      <div className="border border-border/80 bg-card/25 rounded-3xl overflow-hidden shadow-xs">
+      <div className="border border-border/80 bg-card/25 rounded-3xl overflow-hidden shadow-xs overflow-x-auto">
+        <div className="min-w-[1000px]">
         {/* Table Header */}
         <div className="grid grid-cols-[40px_1.5fr_1.2fr_1fr_1.5fr_1fr_0.8fr] gap-4 bg-muted/65 border-b border-border/80 px-6 py-4 text-xs font-bold text-muted-foreground select-none">
           <div className="flex items-center">
@@ -716,6 +717,7 @@ export function AdminToolsDashboardClient({ initialTools }: AdminToolsDashboardC
               No tools matched your current filters.
             </div>
           )}
+        </div>
         </div>
       </div>
 

@@ -243,14 +243,25 @@ export async function getToolAuditLogs(toolId: string): Promise<ToolAuditLog[]> 
     const snapshot = await adminDb
       .collection("tool_audit_logs")
       .where("toolId", "==", toolId)
-      .orderBy("timestamp", "desc")
-      .limit(50)
       .get();
 
-    return snapshot.docs.map((doc) => ({
+    const logs = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     })) as ToolAuditLog[];
+
+    // Sort in memory by timestamp descending to avoid needing a Firestore composite index
+    logs.sort((a, b) => {
+      const timeA = typeof a.timestamp === "number" 
+        ? a.timestamp 
+        : (a.timestamp as any)?.toDate?.()?.getTime() || (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+      const timeB = typeof b.timestamp === "number" 
+        ? b.timestamp 
+        : (b.timestamp as any)?.toDate?.()?.getTime() || (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+      return timeB - timeA;
+    });
+
+    return logs.slice(0, 50);
   } catch (error) {
     console.error(`Failed to fetch audit logs for tool ${toolId}:`, error);
     return [];

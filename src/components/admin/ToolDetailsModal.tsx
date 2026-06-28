@@ -174,10 +174,10 @@ export function ToolDetailsModal({
       title={`Configure: ${tool.name}`}
       description={`Lifecycle & metadata management for slug: ${tool.slug}`}
       size="lg"
-      className="max-h-[85vh] flex flex-col p-6 text-foreground"
+      className="max-h-[85vh] flex flex-col p-6 text-foreground overflow-hidden"
     >
       {/* Sliding Tab headers */}
-      <div className="flex border-b border-border/80 pb-3 gap-2 overflow-x-auto select-none mt-2">
+      <div className="flex border-b border-border/80 pb-3 gap-2 overflow-x-auto select-none mt-2 shrink-0">
         {[
           { id: "overview" as const, label: "Overview", icon: FileText },
           { id: "implementation" as const, label: "Implementation", icon: Sliders },
@@ -504,7 +504,7 @@ export function ToolDetailsModal({
       </div>
 
       {/* Save Reason Input + Action Buttons */}
-      <div className="border-t border-border/80 pt-5 mt-auto flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+      <div className="border-t border-border/80 pt-5 mt-auto flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 shrink-0">
         {activeTab !== "history" ? (
           <div className="flex-1 max-w-md flex flex-col gap-1">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">

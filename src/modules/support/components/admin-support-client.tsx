@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MessageSquare, Star, Trash, Edit, CheckCircle, AlertTriangle, MessageCircle, X } from "lucide-react";
+import { MessageSquare, Star, Trash, Edit, CheckCircle, AlertTriangle, MessageCircle, X, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SupportTicket, TicketMessage, ToolReview } from "@/modules/support/types";
 import { useAuth } from "@/context/auth-context";
@@ -125,9 +125,9 @@ export function AdminSupportClient() {
   if (loading) return <div className="p-8 text-center">Loading Admin Dashboard...</div>;
 
   return (
-    <div className="flex h-[calc(100vh-140px)] border border-border rounded-3xl overflow-hidden bg-card/40 backdrop-blur-xl shadow-sm">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-140px)] border border-border rounded-3xl overflow-hidden bg-card/40 backdrop-blur-xl shadow-sm">
       {/* Sidebar: Navigation & List */}
-      <div className="w-80 border-r border-border bg-card flex flex-col">
+      <div className={`w-full md:w-80 border-b md:border-b-0 md:border-r border-border bg-card flex flex-col shrink-0 h-full ${activeTicket ? "hidden md:flex" : "flex"}`}>
         <div className="flex border-b border-border">
           <button 
             className={`flex-1 p-3 text-sm font-bold text-center border-b-2 transition-colors ${activeTab === 'tickets' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-muted-foreground hover:bg-muted/30'}`}
@@ -196,15 +196,23 @@ export function AdminSupportClient() {
       </div>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col bg-background/50">
+      <div className={`flex-1 flex flex-col bg-background/50 h-full ${activeTicket && activeTab === 'tickets' ? "flex" : "hidden md:flex"}`}>
         {activeTab === 'tickets' && activeTicket ? (
           <>
             <div className="p-4 border-b border-border bg-card/80 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold">{activeTicket.subject}</h3>
-                <p className="text-xs text-muted-foreground">User: {activeTicket.email} • Tier: {activeTicket.tier}</p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setActiveTicket(null)}
+                  className="md:hidden p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition"
+                >
+                  <ArrowLeft className="h-4.5 w-4.5" />
+                </button>
+                <div>
+                  <h3 className="font-bold text-sm md:text-base leading-tight">{activeTicket.subject}</h3>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">User: {activeTicket.email} • Tier: {activeTicket.tier}</p>
+                </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 shrink-0">
                 <Button variant="outline" size="sm" className="h-8" onClick={handleMarkResolved} disabled={activeTicket.status === 'Resolved'}>Mark Resolved</Button>
               </div>
             </div>

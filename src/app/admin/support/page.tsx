@@ -88,7 +88,7 @@ export default async function AdminSupportPage() {
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Breadcrumb / Nav */}
-      <div className="flex justify-between items-center gap-4 border-b border-border/80 pb-5">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-border/80 pb-5">
         <div className="space-y-1">
           <Link
             href="/"
@@ -106,7 +106,7 @@ export default async function AdminSupportPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono bg-muted/40 border border-border px-3 py-1.5 rounded-lg">
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono bg-muted/40 border border-border px-3 py-1.5 rounded-lg w-fit">
           <Terminal className="h-3.5 w-3.5" />
           <span>Operator: {user.name || user.email}</span>
         </div>
