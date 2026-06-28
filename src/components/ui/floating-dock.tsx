@@ -21,10 +21,10 @@ export function FloatingDock() {
   }, []);
 
   const navLinks = [
-    { label: "Workspace", href: "#tools" },
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "FAQ", href: "#faq" },
+    { label: "Workspace", href: "/#tools" },
+    { label: "Features", href: "/#features" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "FAQ", href: "/#faq" },
   ];
 
   return (
@@ -38,7 +38,7 @@ export function FloatingDock() {
         <div
           className={cn(
             "flex w-full max-w-5xl items-center justify-between transition-all duration-500",
-          scrolled
+            scrolled
               ? "rounded-full border border-border/80 bg-card/65 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] px-6 py-2.5"
               : "border-b border-transparent bg-transparent px-6 py-4"
           )}
@@ -59,27 +59,27 @@ export function FloatingDock() {
               utool<span className="text-indigo-500 font-black">.</span>
             </span>
           </Link>
- 
+
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="text-body-s font-medium text-muted-foreground hover:text-foreground transition-colors relative py-1.5 group"
               >
                 {link.label}
                 <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary -translate-x-1/2 rounded-full transition-all group-hover:w-1/2" />
-              </a>
+              </Link>
             ))}
           </nav>
- 
+
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-4">
             <ThemeToggle />
             <Link href="/signup">
-              <button 
-                suppressHydrationWarning 
+              <button
+                suppressHydrationWarning
                 className="flex items-center gap-1.5 rounded-full border border-border/80 bg-card/40 hover:bg-muted/80 text-body-s font-semibold px-5 py-2 transition-all active:scale-95 cursor-pointer hover:shadow-[0_0_20px_rgba(99,102,241,0.15)]"
               >
                 Open workspace
@@ -87,7 +87,7 @@ export function FloatingDock() {
               </button>
             </Link>
           </div>
- 
+
           {/* Mobile menu toggle */}
           <div className="flex md:hidden items-center gap-3">
             <ThemeToggle />
@@ -114,14 +114,14 @@ export function FloatingDock() {
           >
             <nav className="flex flex-col gap-6 text-[22px] font-semibold tracking-tight">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-muted-foreground hover:text-foreground transition-colors border-b border-border/50 pb-4"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </nav>
 
