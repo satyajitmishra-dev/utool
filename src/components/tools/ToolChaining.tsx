@@ -32,6 +32,54 @@ export function ToolChaining({
 
   // Recommendations configuration lookup
   const recommendationsMap: Record<string, Recommendation[]> = {
+    "docx-to-pdf": [
+      {
+        id: "pdf-compress",
+        name: "Compress PDF",
+        description: "Reduce file size while keeping visual quality.",
+        route: "/pdf-tools/compress",
+        icon: <Minimize2 className="h-5 w-5 text-indigo-400" />,
+      },
+      {
+        id: "pdf-to-jpg",
+        name: "PDF to JPG",
+        description: "Convert PDF document pages into clean JPG images.",
+        route: "/pdf-tools/pdf-to-jpg",
+        icon: <Image className="h-5 w-5 text-sky-400" />,
+      },
+    ],
+    "xlsx-to-pdf": [
+      {
+        id: "pdf-compress",
+        name: "Compress PDF",
+        description: "Reduce file size while keeping visual quality.",
+        route: "/pdf-tools/compress",
+        icon: <Minimize2 className="h-5 w-5 text-indigo-400" />,
+      },
+      {
+        id: "pdf-to-jpg",
+        name: "PDF to JPG",
+        description: "Convert PDF document pages into clean JPG images.",
+        route: "/pdf-tools/pdf-to-jpg",
+        icon: <Image className="h-5 w-5 text-sky-400" />,
+      },
+    ],
+    "pptx-to-pdf": [
+      {
+        id: "pdf-compress",
+        name: "Compress PDF",
+        description: "Reduce file size while keeping visual quality.",
+        route: "/pdf-tools/compress",
+        icon: <Minimize2 className="h-5 w-5 text-indigo-400" />,
+      },
+      {
+        id: "pdf-to-jpg",
+        name: "PDF to JPG",
+        description: "Convert PDF document pages into clean JPG images.",
+        route: "/pdf-tools/pdf-to-jpg",
+        icon: <Image className="h-5 w-5 text-sky-400" />,
+      },
+    ],
     "pdf-merge": [
       {
         id: "pdf-compress",

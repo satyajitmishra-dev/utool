@@ -89,6 +89,10 @@ const PdfOcrTool = dynamic(
   () => import("@/components/pro/pdf-ocr-tool").then((mod) => mod.PdfOcrTool),
   { ssr: false }
 );
+const DocumentConverterTool = dynamic(
+  () => import("@/components/tools/pdf/document-converter-tool").then((mod) => mod.DocumentConverterTool),
+  { ssr: false }
+);
 
 
 
@@ -174,6 +178,13 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <SubtitleGeneratorTool />;
     case "pdf-ocr":
       return <PdfOcrTool />;
+    case "docx-to-pdf":
+    case "pdf-to-docx":
+    case "xlsx-to-pdf":
+    case "pdf-to-xlsx":
+    case "pptx-to-pdf":
+    case "pdf-to-pptx":
+      return <DocumentConverterTool initialTool={slug} />;
     default:
       return <div className="text-center py-10 text-muted-foreground text-xs font-semibold">Workspace not configured for this slug.</div>;
   }
