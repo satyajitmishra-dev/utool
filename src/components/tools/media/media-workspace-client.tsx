@@ -165,9 +165,25 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   }
 }
 
-export function MediaWorkspaceClient() {
-  const [activeCategory, setActiveCategory] = useState<keyof typeof CATEGORIES>("DASHBOARD");
-  const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
+export function MediaWorkspaceClient({ initialToolId }: { initialToolId?: string }) {
+  const initialTool = initialToolId ? TOOLS.find(t => t.id === initialToolId) : null;
+  const [activeCategory, setActiveCategory] = useState<keyof typeof CATEGORIES>(
+    initialTool ? (initialTool.category as keyof typeof CATEGORIES) : "DASHBOARD"
+  );
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(
+    initialTool ? initialTool.id : null
+  );
+
+  // Sync initialToolId selection
+  useEffect(() => {
+    if (initialToolId) {
+      const tool = TOOLS.find(t => t.id === initialToolId);
+      if (tool) {
+        setActiveCategory(tool.category as keyof typeof CATEGORIES);
+        setSelectedToolId(tool.id);
+      }
+    }
+  }, [initialToolId]);
 
   // Command Palette Ctrl + K
   const [searchOpen, setSearchOpen] = useState(false);
@@ -230,6 +246,29 @@ export function MediaWorkspaceClient() {
   const [audioConvFile, setAudioConvFile] = useState<File | null>(null);
   const [audioConverting, setAudioConverting] = useState(false);
   const [audioConvResult, setAudioConvResult] = useState<string | null>(null);
+  const [audioConvPreviewUrl, setAudioConvPreviewUrl] = useState<string | null>(null);
+
+  const handleSetAudioConvFile = (file: File | null) => {
+    if (audioConvPreviewUrl) {
+      URL.revokeObjectURL(audioConvPreviewUrl);
+    }
+    setAudioConvFile(file);
+    setAudioConvResult(null);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setAudioConvPreviewUrl(url);
+    } else {
+      setAudioConvPreviewUrl(null);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioConvPreviewUrl) {
+        URL.revokeObjectURL(audioConvPreviewUrl);
+      }
+    };
+  }, [audioConvPreviewUrl]);
 
   // Active Downloader Queue
   const [queue, setQueue] = useState<QueueItem[]>([]);
@@ -917,7 +956,7 @@ export function MediaWorkspaceClient() {
                       <>
                         <button
                           onClick={() => {
-                            setAudioConvFile(sandboxFile);
+                            handleSetAudioConvFile(sandboxFile);
                             setSelectedToolId("audio-converter");
                             setActiveCategory("CONVERT");
                           }}
@@ -1478,8 +1517,7 @@ export function MediaWorkspaceClient() {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      setAudioConvFile(file);
-                      setAudioConvResult(null);
+                      handleSetAudioConvFile(file);
                     }
                   }}
                   className="block w-full rounded-xl border border-border bg-card/60 px-4 py-3 text-xs text-foreground file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-primary file:text-primary-foreground file:font-bold file:text-[10px] cursor-pointer"
@@ -1488,6 +1526,16 @@ export function MediaWorkspaceClient() {
 
               {audioConvFile && (
                 <div className="space-y-4 animate-scale-in">
+                  {/* Input Audio Preview */}
+                  {audioConvPreviewUrl && (
+                    <div className="space-y-2 p-4 bg-muted/20 rounded-2xl border border-border">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                        Original Audio Preview
+                      </span>
+                      <audio src={audioConvPreviewUrl} controls className="w-full h-10 outline-none rounded bg-transparent" />
+                    </div>
+                  )}
+
                   {audioConverting ? (
                     <div className="py-6 text-center text-xs text-muted-foreground">Decoding audio bytes locally...</div>
                   ) : (
@@ -1501,17 +1549,27 @@ export function MediaWorkspaceClient() {
                   )}
 
                   {audioConvResult && (
-                    <div className="p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-scale-in">
-                      <div>
-                        <p className="text-xs font-bold text-foreground">Conversion successful!</p>
+                    <div className="space-y-4 animate-scale-in">
+                      {/* Output Audio Preview */}
+                      <div className="space-y-2 p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/20">
+                        <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider block">
+                          Converted WAV Preview
+                        </span>
+                        <audio src={audioConvResult} controls className="w-full h-10 outline-none rounded bg-transparent" />
                       </div>
-                      <a
-                        href={audioConvResult}
-                        download={`${audioConvFile.name.substring(0, audioConvFile.name.lastIndexOf(".")) || audioConvFile.name}-converted.wav`}
-                        className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition active:scale-95 shadow-md flex items-center gap-1.5"
-                      >
-                        <Download className="h-4 w-4" /> Download WAV File
-                      </a>
+
+                      <div className="p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                          <p className="text-xs font-bold text-foreground">Conversion successful!</p>
+                        </div>
+                        <a
+                          href={audioConvResult}
+                          download={`${audioConvFile.name.substring(0, audioConvFile.name.lastIndexOf(".")) || audioConvFile.name}-converted.wav`}
+                          className="py-2.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition active:scale-95 shadow-md flex items-center gap-1.5"
+                        >
+                          <Download className="h-4 w-4" /> Download WAV File
+                        </a>
+                      </div>
                     </div>
                   )}
                 </div>

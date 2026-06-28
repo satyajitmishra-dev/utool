@@ -42,7 +42,9 @@ import {
   FileText,
   Sliders,
   Scale,
-  Cpu
+  Cpu,
+  Camera,
+  Video
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════
@@ -1211,12 +1213,70 @@ function PopularCategoriesSection() {
 }
 
 function FeaturedToolsSection() {
-  const featured = [
-    { name: "Merge PDF Documents", desc: "Combine PDF pages locally. Preserves vectors, images, and formatting.", link: "/tools/merge-pdf", badge: "PDF", icon: FileText },
-    { name: "Wi-Fi QR Code", desc: "Generate secure auto-login QR codes for guest networks. Offline compliant.", link: "/tools/qr-generator", badge: "QR", icon: QrCode },
-    { name: "ATS Resume Builder", desc: "Build professional recruiter-ready resumes from clean markdown layouts.", link: "/tools/resume-builder", badge: "Career", icon: Briefcase },
-    { name: "JSON Minifier", desc: "Instantly compact messy JSON data structures locally without security leaks.", link: "/tools/developer-tools", badge: "Developer", icon: Cpu }
-  ];
+  const [filter, setFilter] = useState<"all" | "live" | "coming-soon">("all");
+  const [tools, setTools] = useState<any[]>([
+    { slug: "merge-pdf", name: "Merge PDF Documents", desc: "Combine PDF pages locally. Preserves vectors, images, and formatting.", badge: "PDF", icon: FileText, status: "Live", completion: 100 },
+    { slug: "qr-generator", name: "Wi-Fi QR Code", desc: "Generate secure auto-login QR codes for guest networks. Offline compliant.", badge: "QR", icon: QrCode, status: "Live", completion: 100 },
+    { slug: "resume-builder", name: "ATS Resume Builder", desc: "Build professional recruiter-ready resumes from clean markdown layouts.", badge: "Career", icon: Briefcase, status: "Live", completion: 100 },
+    { slug: "pdf-ocr", name: "PDF OCR Engine", desc: "Extract text from scanned PDFs locally using browser-based OCR.", badge: "Pro", icon: Cpu, status: "Testing", completion: 90 },
+    { slug: "image-compressor", name: "Image Compressor", desc: "Reduce photo sizes locally without losing quality.", badge: "Image", icon: Camera, status: "Live", completion: 100 },
+    { slug: "background-remover", name: "AI Background Remover", desc: "Remove image backgrounds locally in-browser using web-native models.", badge: "AI", icon: Sparkles, status: "In Progress", completion: 60 },
+    { slug: "subtitle-generator", name: "AI Subtitle Generator", desc: "Generate captions for videos locally using WebAssembly engines.", badge: "Video", icon: Video, status: "In Progress", completion: 40 },
+    { slug: "env-validator", name: "Environment Validator", desc: "Check and validate .env files securely with offline checking.", badge: "Developer", icon: Terminal, status: "Live", completion: 100 }
+  ]);
+
+  useEffect(() => {
+    // Fetch live statuses from API to overlay
+    fetch("/api/tools?limit=100")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.tools) {
+          setTools((prev) =>
+            prev.map((t) => {
+              const matched = data.tools.find((d: any) => d.slug === t.slug);
+              if (matched) {
+                return {
+                  ...t,
+                  status: matched.status,
+                  completion: matched.completion,
+                  priority: matched.priority,
+                };
+              }
+              return t;
+            })
+          );
+        }
+      })
+      .catch((err) => console.error("Error fetching live tool statuses for home page:", err));
+  }, []);
+
+  const filteredTools = tools.filter((tool) => {
+    if (tool.status === "Hidden") return false;
+    if (filter === "live") return tool.status === "Live";
+    if (filter === "coming-soon") return tool.status !== "Live";
+    return true;
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Live":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">🟢 Live</span>;
+      case "Testing":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">🔵 Testing</span>;
+      case "In Progress":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">🟠 Progress</span>;
+      case "Planned":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">🟣 Planned</span>;
+      case "Beta":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">👑 Beta</span>;
+      case "Deprecated":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded-full border border-zinc-500/20">⚠️ Deprecated</span>;
+      case "Broken":
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">🔴 Broken</span>;
+      default:
+        return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded-full border border-zinc-500/20">⚫ Hidden</span>;
+    }
+  };
 
   return (
     <Section id="featured-tools" className="section-divider py-24 bg-card/5">
@@ -1225,31 +1285,89 @@ function FeaturedToolsSection() {
         title="High performance utility engines"
         subtitle="Vetted browser-native tools that execute in milliseconds on your own device hardware."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto px-6">
-        {featured.map((tool, i) => {
-          const Icon = tool.icon;
-          return (
-            <GlassCard key={tool.name} className="p-8 space-y-4 rounded-3xl border-white/[0.06] flex flex-col justify-between" hover={true}>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-primary">
-                    <Icon className="h-4.5 w-4.5" />
-                  </div>
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2.5 py-0.5 rounded-full">
-                    {tool.badge}
-                  </span>
-                </div>
-                <h3 className="text-body-s font-bold text-foreground tracking-tight">{tool.name}</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{tool.desc}</p>
-              </div>
-              <Link href={tool.link} className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors pt-4 w-fit">
-                <span>Start Tool</span>
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-            </GlassCard>
-          );
-        })}
+
+      {/* Filter Tabs */}
+      <div className="flex justify-center gap-3 mb-12">
+        {[
+          { id: "all" as const, label: "All Tools" },
+          { id: "live" as const, label: "Live & Working" },
+          { id: "coming-soon" as const, label: "Coming Soon" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={cn(
+              "rounded-full px-5 py-2 text-xs font-bold transition-all duration-300 cursor-pointer border select-none",
+              filter === tab.id
+                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105"
+                : "bg-white/[0.04] text-muted-foreground border-white/[0.08] hover:bg-white/[0.08] hover:text-foreground"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+
+      <motion.div
+        layout
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto px-6"
+      >
+        <AnimatePresence mode="popLayout">
+          {filteredTools.map((tool) => {
+            const Icon = tool.icon;
+            return (
+              <motion.div
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                key={tool.slug}
+                className="h-full"
+              >
+                <GlassCard className="p-8 space-y-4 rounded-3xl border-white/[0.06] flex flex-col justify-between h-full" hover={true}>
+                  <div className="space-y-4 w-full">
+                    {/* Top elements */}
+                    <div className="flex items-center justify-between">
+                      <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-primary">
+                        <Icon className="h-4.5 w-4.5" />
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {getStatusBadge(tool.status)}
+                      </div>
+                    </div>
+
+                    {/* Titles */}
+                    <div>
+                      <h3 className="text-body-s font-bold text-foreground tracking-tight">{tool.name}</h3>
+                      <p className="text-[10px] text-primary/70 font-semibold mt-1">
+                        {tool.completion}% Complete
+                      </p>
+                      
+                      {/* Animated completion progress bar */}
+                      <div className="w-full bg-white/[0.05] h-1.5 rounded-full overflow-hidden mt-1.5 border border-white/[0.02]">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${tool.completion}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{tool.desc}</p>
+                  </div>
+                  
+                  <Link href={`/tools/${tool.slug}`} className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors pt-4 w-fit">
+                    <span>Start Tool</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </GlassCard>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </motion.div>
     </Section>
   );
 }

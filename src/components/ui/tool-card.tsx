@@ -98,6 +98,8 @@ export interface ToolCardProps {
   isPremium?: boolean;
   requiresAuth?: boolean;
   index?: number;
+  lifecycleStatus?: "Live" | "In Progress" | "Testing" | "Planned" | "Beta" | "Deprecated" | "Broken" | "Hidden";
+  completion?: number;
 }
 
 /* ─── Component ─── */
@@ -110,6 +112,8 @@ export function ToolCard({
   isPremium = false,
   requiresAuth = false,
   index = 0,
+  lifecycleStatus,
+  completion,
 }: ToolCardProps) {
   const isComingSoon = status === "coming-soon";
   const Icon = resolveIcon(tag);
@@ -122,6 +126,27 @@ export function ToolCard({
       case "pro": return "pro" as const;
     }
   })();
+
+  const getLifecycleBadge = (lifecycle: string) => {
+    switch (lifecycle) {
+      case "Live":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-md">🟢 Live</span>;
+      case "Testing":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2 py-0.5 rounded-md">🔵 Testing</span>;
+      case "In Progress":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-orange-500/10 text-orange-600 border border-orange-500/20 px-2 py-0.5 rounded-md">🟠 Progress</span>;
+      case "Planned":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-purple-500/10 text-purple-600 border border-purple-500/20 px-2 py-0.5 rounded-md">🟣 Planned</span>;
+      case "Beta":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-cyan-500/10 text-cyan-600 border border-cyan-500/20 px-2 py-0.5 rounded-md">👑 Beta</span>;
+      case "Deprecated":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-zinc-500/10 text-zinc-600 border border-zinc-500/20 px-2 py-0.5 rounded-md">⚠️ Depr</span>;
+      case "Broken":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-red-500/10 text-red-600 border border-red-500/20 px-2 py-0.5 rounded-md">🔴 Broken</span>;
+      default:
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-zinc-500/10 text-zinc-600 border border-zinc-500/20 px-2 py-0.5 rounded-md">⚫ Hidden</span>;
+    }
+  };
 
   const Wrapper = isComingSoon ? "div" : Link;
   const wrapperProps = isComingSoon ? {} : { href };
@@ -152,9 +177,13 @@ export function ToolCard({
                   Pro
                 </Badge>
               )}
-              <Badge variant={statusVariant}>
-                {status === "coming-soon" ? "Soon" : status}
-              </Badge>
+              {lifecycleStatus ? (
+                getLifecycleBadge(lifecycleStatus)
+              ) : (
+                <Badge variant={statusVariant}>
+                  {status === "coming-soon" ? "Soon" : status}
+                </Badge>
+              )}
             </div>
           </div>
 
@@ -167,6 +196,21 @@ export function ToolCard({
           <h3 className="font-bold text-foreground text-lg tracking-tight group-hover:text-primary transition-colors duration-300">
             {title}
           </h3>
+          
+          {completion !== undefined && (
+            <div className="mt-2.5 mb-2 w-full">
+              <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground mb-1">
+                <span>{completion}% Complete</span>
+              </div>
+              <div className="w-full bg-muted/60 h-1.5 rounded-full overflow-hidden border border-border/20">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                  style={{ width: `${completion}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           <p className="text-body-s text-muted-foreground mt-2 leading-relaxed">
             {description}
           </p>

@@ -2,7 +2,10 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getToolBySlug, TOOL_REGISTRY } from "@/config/tool-registry";
+import {
+  getMergedToolBySlug,
+  getMergedToolRegistry,
+} from "@/services/tool-lifecycle.service";
 import { computeRelatedTools } from "@/lib/seo/internal-links";
 import { ConverterLayout } from "@/components/converter/ConverterLayout";
 import { generateSoftwareSchema, generateFAQSchema, generateBreadcrumbSchema } from "@/lib/seo/engine";
@@ -25,6 +28,7 @@ import {
 } from "lucide-react";
 
 import { ToolWorkspaceClient } from "@/components/tools/tool-workspace-client";
+import { ComingSoonWorkspace } from "@/components/tools/ComingSoonWorkspace";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -33,9 +37,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getMergedToolBySlug(slug);
   
-  if (!tool) {
+  if (!tool || tool.status === "Hidden") {
     return { title: 'Not Found' };
   }
   
@@ -56,8 +60,8 @@ export default async function ProgrammaticToolPage({ params }: Props) {
   const { slug } = await params;
 
   // 1. Check if tool exists in unified registry
-  const tool = getToolBySlug(slug);
-  if (!tool) {
+  const tool = await getMergedToolBySlug(slug);
+  if (!tool || tool.status === "Hidden") {
     notFound();
   }
 
@@ -66,15 +70,17 @@ export default async function ProgrammaticToolPage({ params }: Props) {
   const faqSchema = generateFAQSchema(tool as any);
   const breadcrumbSchema = generateBreadcrumbSchema(tool as any);
 
-  // Compute effective related tools: use registry-defined list if populated,
-  // otherwise fall back to the auto-computed internal linking system.
+  // Compute effective related tools
+  const allMergedTools = await getMergedToolRegistry();
   const effectiveRelatedTools =
     tool.relatedTools && tool.relatedTools.length > 0
       ? tool.relatedTools
-      : computeRelatedTools(tool, TOOL_REGISTRY, 6);
+      : computeRelatedTools(tool, allMergedTools, 6);
 
-  // 2. Converters get the unified ConverterLayout
-  if (tool.isConverter) {
+  const isReady = tool.status === "Live" || tool.status === "Beta";
+
+  // 2. Converters get the unified ConverterLayout only if ready
+  if (tool.isConverter && isReady) {
     return (
       <>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appSchema) }} />
@@ -85,7 +91,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
     );
   }
 
-  // 3. Render utilities with standard SEO layouts
+  // 3. Render utilities or under-development tools with standard SEO layouts
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -162,7 +168,16 @@ export default async function ProgrammaticToolPage({ params }: Props) {
           <section className="border border-border rounded-3xl bg-card/40 p-6 md:p-10 shadow-sm relative overflow-hidden backdrop-blur-sm">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-purple-500 to-indigo-500" />
             <div className="w-full flex flex-col items-stretch">
-              <ToolWorkspaceClient slug={tool.parentToolSlug || slug} />
+              {isReady ? (
+                <ToolWorkspaceClient slug={tool.parentToolSlug || slug} />
+              ) : (
+                <ComingSoonWorkspace
+                  toolId={tool.slug}
+                  toolName={tool.name}
+                  completion={tool.completion ?? 0}
+                  expectedFeatures={tool.expectedFeatures}
+                />
+              )}
             </div>
           </section>
 
@@ -282,7 +297,7 @@ export default async function ProgrammaticToolPage({ params }: Props) {
               <h2 className="text-base font-bold tracking-tight text-foreground uppercase tracking-widest">Related Utilities</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {effectiveRelatedTools.map((relSlug) => {
-                  const relTool = getToolBySlug(relSlug);
+                  const relTool = allMergedTools.find(t => t.slug === relSlug);
                   if (!relTool) return null;
                   return (
                     <Link key={relSlug} href={`/tools/${relSlug}`} className="flex justify-between items-center border border-border hover:border-primary/25 rounded-2xl p-5 bg-card hover:bg-muted/30 transition-all shadow-xs">

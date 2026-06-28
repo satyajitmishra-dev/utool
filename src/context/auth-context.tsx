@@ -38,6 +38,7 @@ export interface AuthContextType {
   loginWithGoogle: () => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  isAdmin: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,6 +47,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [membership, setMembership] = useState<Membership>({ plan: "free", active: false });
+  const [isAdminState, setIsAdminState] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authInitializing, setAuthInitializing] = useState(true);
   const router = useRouter();
@@ -54,12 +56,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) {
       setMembership({ plan: "free", active: false });
+      setIsAdminState(false);
       return;
     }
 
     const unsubscribe = subscribeToUserProfile(
       user.uid,
       (profileData) => {
+        const isEmailAdmin = user.email?.toLowerCase().trim() === "satyajitmishra1412@gmail.com";
+        const isProfileAdmin = 
+          (profileData as any)?.role === "admin" || 
+          (profileData as any)?.subscriptionTier === "admin";
+        setIsAdminState(isEmailAdmin || isProfileAdmin);
+
         if (profileData) {
           setMembership({
             plan: profileData.subscriptionTier === "pro" ? "pro" : "free",
@@ -263,6 +272,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // 3. Clear local state
       setUser(null);
+      setIsAdminState(false);
       
       // 4. Redirect home
       router.push("/");
@@ -291,6 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithGoogle,
         logout,
         resetPassword,
+        isAdmin: isAdminState,
       }}
     >
       {children}

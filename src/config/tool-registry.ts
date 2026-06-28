@@ -2258,7 +2258,7 @@ const DYNAMIC_TOOL_BASES: Array<{
   { id: "gst-calculator", slug: "gst-calculator", name: "GST Calculator", description: "Calculate GST tax additions or extractions locally.", primaryTag: "Calculator", category: "Calculators", iconTag: "Gauge" }
 ];
 
-const DYNAMIC_TOOLS: RegistryTool[] = DYNAMIC_TOOL_BASES.map(generateDynamicTool);
+export const DYNAMIC_TOOLS: RegistryTool[] = DYNAMIC_TOOL_BASES.map(generateDynamicTool);
 
 // Merge: static richly-authored tools + category-aware dynamic stubs + pSEO intent-variant pages
 // De-duplicate by slug so no existing tool is overwritten by a variant.
@@ -2268,6 +2268,59 @@ export const TOOL_REGISTRY: RegistryTool[] = (() => {
   const variants = ALL_INTENT_VARIANTS.filter(v => !existingSlugs.has(v.slug));
   return [...base, ...variants];
 })();
+
+export const FUNCTIONAL_SLUGS = new Set([
+  "merge-pdf", "split-pdf", "compress-pdf", "protect-pdf", "unlock-pdf",
+  "image-to-pdf", "jpg-to-pdf", "png-to-pdf", "webp-to-pdf", "heic-to-pdf",
+  "pdf-to-jpg", "pdf-to-png",
+  "qr-generator", "url-shortener", "resume-builder", "webp-converter",
+  "json-formatter", "css-gradient-generator", "env-validator", "word-counter",
+  "case-converter", "lorem-ipsum-generator", "text-to-binary", "slug-generator",
+  "password-generator", "hash-sha256-generator", "diff-checker", "uuid-generator",
+  "markdown-preview", "css-minifier", "percentage-calculator", "bmi-calculator",
+  "age-calculator", "loan-calculator", "gst-calculator", "base64-encoder-decoder",
+  "url-encoder", "regex-tester", "heic-to-jpg", "svg-to-png",
+  "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
+  "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer"
+]);
+
+export function getDefaultToolStatus(tool: RegistryTool): Partial<RegistryTool> {
+  const isLive = FUNCTIONAL_SLUGS.has(tool.slug);
+  const featuredSlugs = ["merge-pdf", "qr-generator", "resume-builder", "image-compressor", "pdf-ocr"];
+  const popularSlugs = ["merge-pdf", "split-pdf", "image-compressor", "url-shortener", "password-generator"];
+  const newSlugs = ["pdf-ocr", "background-remover", "subtitle-generator"];
+
+  const status = isLive ? "Live" : "Planned";
+  const completion = isLive ? 100 : 0;
+  
+  return {
+    status,
+    priority: isLive ? "Medium" : "Low",
+    completion,
+    frontend: isLive,
+    backend: isLive,
+    api: isLive,
+    mobile: isLive,
+    seo: isLive,
+    tested: isLive,
+    productionReady: isLive,
+    lastUpdated: new Date().toISOString(),
+    estimatedCompletion: "",
+    developerNotes: isLive ? "Initial release complete. Fully functional." : "Planned implementation.",
+    version: isLive ? "1.0.0" : "0.1.0",
+    featured: featuredSlugs.includes(tool.slug),
+    popular: popularSlugs.includes(tool.slug),
+    new: newSlugs.includes(tool.slug),
+    route: `/tools/${tool.slug}`,
+    icon: tool.iconTag,
+    expectedFeatures: [
+      { name: "Upload", completed: isLive },
+      { name: "Processing", completed: isLive },
+      { name: "Download", completed: isLive },
+      { name: "Batch Support", completed: isLive }
+    ]
+  };
+}
 
 export function getToolBySlug(slug: string): RegistryTool | undefined {
   return TOOL_REGISTRY.find(t => t.slug === slug);

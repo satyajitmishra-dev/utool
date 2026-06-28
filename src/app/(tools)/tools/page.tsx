@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { cn } from "@/utils/cn";
-import { TOOL_REGISTRY } from "@/config/tool-registry";
+import { TOOL_REGISTRY, FUNCTIONAL_SLUGS } from "@/config/tool-registry";
 import { RegistryTool, ToolCategory } from "@/types/tool-registry";
 import {
   Search,
@@ -42,21 +42,6 @@ import {
   Shield,
   Laptop
 } from "lucide-react";
-
-const FUNCTIONAL_SLUGS = new Set([
-  "merge-pdf", "split-pdf", "compress-pdf", "protect-pdf", "unlock-pdf",
-  "image-to-pdf", "jpg-to-pdf", "png-to-pdf", "webp-to-pdf", "heic-to-pdf",
-  "pdf-to-jpg", "pdf-to-png",
-  "qr-generator", "url-shortener", "resume-builder", "webp-converter",
-  "json-formatter", "css-gradient-generator", "env-validator", "word-counter",
-  "case-converter", "lorem-ipsum-generator", "text-to-binary", "slug-generator",
-  "password-generator", "hash-sha256-generator", "diff-checker", "uuid-generator",
-  "markdown-preview", "css-minifier", "percentage-calculator", "bmi-calculator",
-  "age-calculator", "loan-calculator", "gst-calculator", "base64-encoder-decoder",
-  "url-encoder", "regex-tester", "heic-to-jpg", "svg-to-png",
-  "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
-  "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer"
-]);
 
 // Get unique categories from registry, plus "All", "PRO", and "Upcoming"
 const categories = ["All", "PRO", "Upcoming", ...Array.from(new Set(TOOL_REGISTRY.map(t => t.category)))];
@@ -155,10 +140,29 @@ function LocalToolCard({ tool, idx }: { tool: RegistryTool; idx: number }) {
   const catBadgeColor = categoryBadgeColors[tool.category] || "bg-indigo-500/10 text-indigo-600 border-indigo-500/20";
 
   const IconComponent = getToolIcon(tool.iconTag);
-  let status = "live";
-  if (!FUNCTIONAL_SLUGS.has(tool.slug)) status = "upcoming";
-  else if (tool.isPremium) status = "pro";
-  else if (tool.requiresAuth) status = "login required";
+  const isPremium = tool.isPremium;
+  const isLive = tool.status === "Live";
+
+  const getLifecycleBadge = (lifecycle: string) => {
+    switch (lifecycle) {
+      case "Live":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-md">🟢 Live</span>;
+      case "Testing":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md">🔵 Testing</span>;
+      case "In Progress":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded-md">🟠 Progress</span>;
+      case "Planned":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-purple-50 text-purple-600 border border-purple-200 px-2 py-0.5 rounded-md">🟣 Planned</span>;
+      case "Beta":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-cyan-50 text-cyan-600 border border-cyan-200 px-2 py-0.5 rounded-md">👑 Beta</span>;
+      case "Deprecated":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-zinc-50 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-md">⚠️ Depr</span>;
+      case "Broken":
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-md">🔴 Broken</span>;
+      default:
+        return <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase bg-zinc-50 text-zinc-600 border border-zinc-200 px-2 py-0.5 rounded-md">⚫ Hidden</span>;
+    }
+  };
 
   return (
     <motion.a
@@ -169,38 +173,54 @@ function LocalToolCard({ tool, idx }: { tool: RegistryTool; idx: number }) {
       }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group relative flex flex-col justify-between h-[260px] rounded-[20px] bg-white border border-[#ECECEC] p-5 hover:border-purple-500 hover:shadow-[0_16px_32px_rgba(99,102,241,0.06)] transition-all select-none overflow-hidden"
+      className="group relative flex flex-col justify-between h-[270px] rounded-[20px] bg-white border border-[#ECECEC] p-5 hover:border-purple-500 hover:shadow-[0_16px_32px_rgba(99,102,241,0.06)] transition-all select-none overflow-hidden"
     >
       <div className="flex justify-between items-center">
         <span className={cn("text-[9px] font-extrabold uppercase tracking-widest border rounded-md px-2.5 py-0.5", catBadgeColor)}>
           {tool.primaryTag}
         </span>
-        <span className={cn(
-          "text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border",
-          status === "live" && "bg-emerald-50 text-emerald-600 border-emerald-200",
-          status === "pro" && "bg-purple-50 text-purple-600 border-purple-200",
-          status === "login required" && "bg-amber-50 text-amber-600 border-amber-200",
-          status === "upcoming" && "bg-blue-50 text-blue-600 border-blue-200"
-        )}>
-          {status === "login required" ? "Auth Required" : status === "upcoming" ? "Coming Soon" : status}
-        </span>
+        <div className="flex items-center gap-1">
+          {isPremium && (
+            <span className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border bg-purple-50 text-purple-600 border-purple-200">
+              Pro
+            </span>
+          )}
+          {getLifecycleBadge(tool.status || "Planned")}
+        </div>
       </div>
 
       <div className="flex flex-col flex-1 justify-center pt-2 pb-2">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-1">
           <div className={cn("h-11 w-11 rounded-xl bg-gradient-to-tr flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform duration-300", gradientClass)}>
             <IconComponent className="h-5.5 w-5.5" />
           </div>
-          <h3 className="font-extrabold text-[16px] text-[#1A1A1A] leading-tight group-hover:text-purple-600 transition-colors">
-            {tool.name}
-          </h3>
+          <div className="flex flex-col">
+            <h3 className="font-extrabold text-[15px] text-[#1A1A1A] leading-tight group-hover:text-purple-600 transition-colors">
+              {tool.name}
+            </h3>
+          </div>
         </div>
-        <p className="text-[13px] text-[#71717A] leading-relaxed line-clamp-2">
+
+        {tool.completion !== undefined && tool.completion < 100 && (
+          <div className="w-full mt-1.5 mb-2 select-none">
+            <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground mb-0.5">
+              <span>{tool.completion}% Complete</span>
+            </div>
+            <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden border border-slate-200/50">
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                style={{ width: `${tool.completion}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <p className="text-[12px] text-[#71717A] leading-relaxed line-clamp-2 mt-1">
           {tool.description}
         </p>
       </div>
 
-      <div className="flex items-center justify-between border-t border-[#F4F4F5] pt-3.5 mt-auto text-[11px] font-bold text-[#71717A]">
+      <div className="flex items-center justify-between border-t border-[#F4F4F5] pt-3 mt-auto text-[11px] font-bold text-[#71717A]">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md text-[10px]">
             ⚡ Local
@@ -222,6 +242,7 @@ function ToolsGrid() {
   
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [toolOverrides, setToolOverrides] = useState<Record<string, any>>({});
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize filter from URL
@@ -233,6 +254,22 @@ function ToolsGrid() {
     }
   }, [filterParam]);
 
+  useEffect(() => {
+    // Fetch live statuses from API
+    fetch("/api/tools?limit=500")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.tools) {
+          const map: Record<string, any> = {};
+          data.tools.forEach((t: any) => {
+            map[t.slug] = t;
+          });
+          setToolOverrides(map);
+        }
+      })
+      .catch((err) => console.error("Error fetching tool statuses for marketplace:", err));
+  }, []);
+
   const setCategoryFilter = (cat: string) => {
     setActiveCategory(cat);
     if (cat === "All") {
@@ -242,22 +279,38 @@ function ToolsGrid() {
     }
   };
 
-  const filteredTools = TOOL_REGISTRY.filter((tool) => {
+  const filteredTools = TOOL_REGISTRY.map(tool => {
+    const override = toolOverrides[tool.slug] || {};
+    const status = override.status || (FUNCTIONAL_SLUGS.has(tool.slug) ? "Live" : "Planned");
+    const completion = override.completion !== undefined ? override.completion : (FUNCTIONAL_SLUGS.has(tool.slug) ? 100 : 0);
+
+    return {
+      ...tool,
+      status,
+      completion,
+      isPremium: override.isPremium !== undefined ? override.isPremium : tool.isPremium,
+    };
+  }).filter((tool) => {
     // Hide intent variants from the main catalog list to avoid repetition
     if (tool.intentVariant || tool.parentToolSlug) return false;
+
+    // Completely hide Hidden status tools from public view
+    if (tool.status === "Hidden") return false;
 
     const matchesSearch =
       tool.name.toLowerCase().includes(search.toLowerCase()) ||
       tool.description.toLowerCase().includes(search.toLowerCase());
       
-    const isFunctional = FUNCTIONAL_SLUGS.has(tool.slug);
+    const isFunctional = tool.status === "Live" || tool.status === "Beta";
 
     if (activeCategory === "Upcoming") {
       return !isFunctional && matchesSearch;
     }
 
-    // Hide upcoming tools from all other views
-    if (!isFunctional) return false;
+    // Hide upcoming tools from all other views (unless they are Beta/Live)
+    if (!isFunctional && activeCategory !== "All") {
+      return false;
+    }
 
     const matchesCategory =
       activeCategory === "All" ||

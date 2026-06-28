@@ -93,5 +93,30 @@ export interface RegistryTool {
 
   // Relationships
   relatedTools: string[];
+
+  // Dynamic Lifecycle Fields (stored in DB, merged at runtime)
+  status?: "Live" | "In Progress" | "Testing" | "Planned" | "Beta" | "Deprecated" | "Broken" | "Hidden";
+  priority?: "Critical" | "High" | "Medium" | "Low";
+  completion?: number; // 0-100
+  frontend?: boolean;
+  backend?: boolean;
+  api?: boolean;
+  mobile?: boolean;
+  seo?: boolean;
+  tested?: boolean;
+  productionReady?: boolean;
+  lastUpdated?: string;
+  estimatedCompletion?: string;
+  developerNotes?: string;
+  version?: string;
+  expectedFeatures?: { name: string; completed: boolean }[];
+  ext?: Record<string, any>;
+
+  // Additional Metadata
+  featured?: boolean;
+  popular?: boolean;
+  new?: boolean;
+  route?: string;
+  icon?: string;
 }
 

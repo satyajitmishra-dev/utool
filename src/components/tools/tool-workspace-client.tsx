@@ -45,6 +45,34 @@ const MediaWorkspaceClient = dynamic(
   () => import("@/components/tools/media/media-workspace-client").then((mod) => mod.MediaWorkspaceClient),
   { ssr: false }
 );
+const AgeCalculator = dynamic(
+  () => import("@/components/tools/age-calculator").then((mod) => mod.AgeCalculator),
+  { ssr: false }
+);
+const DiffChecker = dynamic(
+  () => import("@/components/tools/diff-checker").then((mod) => mod.DiffChecker),
+  { ssr: false }
+);
+const EmiCalculator = dynamic(
+  () => import("@/components/tools/emi-calculator").then((mod) => mod.EmiCalculator),
+  { ssr: false }
+);
+const GstCalculator = dynamic(
+  () => import("@/components/tools/gst-calculator").then((mod) => mod.GstCalculator),
+  { ssr: false }
+);
+const MarkdownPreview = dynamic(
+  () => import("@/components/tools/markdown-preview").then((mod) => mod.MarkdownPreview),
+  { ssr: false }
+);
+const PasswordGenerator = dynamic(
+  () => import("@/components/tools/password-generator").then((mod) => mod.PasswordGenerator),
+  { ssr: false }
+);
+const PercentageCalculator = dynamic(
+  () => import("@/components/tools/percentage-calculator").then((mod) => mod.PercentageCalculator),
+  { ssr: false }
+);
 const ImageResizerTool = dynamic(
   () => import("@/components/pro/image-resizer-tool").then((mod) => mod.ImageResizerTool),
   { ssr: false }
@@ -94,6 +122,20 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <ResumeBuilderPage hideHeader={true} />;
     case "webp-converter":
       return <WebPConverterPage hideHeader={true} />;
+    case "age-calculator":
+      return <AgeCalculator />;
+    case "diff-checker":
+      return <DiffChecker />;
+    case "loan-calculator":
+      return <EmiCalculator />;
+    case "gst-calculator":
+      return <GstCalculator />;
+    case "markdown-preview":
+      return <MarkdownPreview />;
+    case "password-generator":
+      return <PasswordGenerator />;
+    case "percentage-calculator":
+      return <PercentageCalculator />;
     case "json-formatter":
     case "css-gradient-generator":
     case "env-validator":
@@ -102,17 +144,10 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
     case "lorem-ipsum-generator":
     case "text-to-binary":
     case "slug-generator":
-    case "password-generator":
     case "hash-sha256-generator":
-    case "diff-checker":
     case "uuid-generator":
-    case "markdown-preview":
     case "css-minifier":
-    case "percentage-calculator":
     case "bmi-calculator":
-    case "age-calculator":
-    case "loan-calculator":
-    case "gst-calculator":
     case "base64-encoder-decoder":
     case "url-encoder":
     case "regex-tester":
@@ -122,11 +157,15 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
     case "meta-tag-generator":
       return <MetaTagGeneratorTool />;
     case "media-workspace":
-    case "audio-converter":
-    case "video-trimmer":
-    case "gif-to-mp4":
-    case "image-compressor":
       return <MediaWorkspaceClient />;
+    case "audio-converter":
+      return <MediaWorkspaceClient initialToolId="audio-converter" />;
+    case "video-trimmer":
+      return <MediaWorkspaceClient initialToolId="trim-video" />;
+    case "image-compressor":
+      return <MediaWorkspaceClient initialToolId="image-compressor" />;
+    case "gif-to-mp4":
+      return <MediaWorkspaceClient initialToolId="downloader" />;
     case "image-resizer":
       return <ImageResizerTool />;
     case "background-remover":
