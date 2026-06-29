@@ -81,7 +81,8 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/tools/pdf-ocr") ||
     pathname.startsWith("/tools/image-resize") ||
     pathname.startsWith("/tools/bg-remover") ||
-    pathname.startsWith("/tools/ai-writer");
+    pathname.startsWith("/tools/ai-writer") ||
+    pathname.startsWith("/tools/sign-pdf");
 
   const isApiRoute = pathname.startsWith("/api");
   const isApiToolRoute = pathname.startsWith("/api/tools");
@@ -96,8 +97,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // 1. Route Protection for Authenticated Views
-  if (isProtectedRoute && !isSessionValid) {
+  // 1. Route Protection for Authenticated Views & Premium Tools
+  if ((isProtectedRoute || isPremiumToolRoute) && !isSessionValid) {
     const currentPath = request.nextUrl.pathname + request.nextUrl.search;
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", currentPath);

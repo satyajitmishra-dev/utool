@@ -94,6 +94,35 @@ const DocumentConverterTool = dynamic(
   { ssr: false }
 );
 
+const JpgToPdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/jpg-to-pdf").then((mod) => mod.JpgToPdfTool),
+  { ssr: false }
+);
+const MergeScannedTool = dynamic(
+  () => import("@/components/tools/pdf/tools/merge-scanned").then((mod) => mod.MergeScannedTool),
+  { ssr: false }
+);
+const OrganizePdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/organize-pdf").then((mod) => mod.OrganizePdfTool),
+  { ssr: false }
+);
+const RedactPdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/redact-pdf").then((mod) => mod.RedactPdfTool),
+  { ssr: false }
+);
+const RepairPdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/repair-pdf").then((mod) => mod.RepairPdfTool),
+  { ssr: false }
+);
+const RotatePdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/rotate-pdf").then((mod) => mod.RotatePdfTool),
+  { ssr: false }
+);
+const SignPdfTool = dynamic(
+  () => import("@/components/tools/pdf/tools/sign-pdf").then((mod) => mod.SignPdfTool),
+  { ssr: false }
+);
+
 
 
 
@@ -110,11 +139,24 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
     case "unlock-pdf":
       return <RemovePasswordTool />;
     case "image-to-pdf":
-    case "jpg-to-pdf":
     case "png-to-pdf":
     case "webp-to-pdf":
     case "heic-to-pdf":
       return <ImageToPdfTool />;
+    case "jpg-to-pdf":
+      return <JpgToPdfTool />;
+    case "merge-scanned-pdfs":
+      return <MergeScannedTool />;
+    case "organize-pdf":
+      return <OrganizePdfTool />;
+    case "redact-pdf":
+      return <RedactPdfTool />;
+    case "repair-pdf":
+      return <RepairPdfTool />;
+    case "rotate-pdf":
+      return <RotatePdfTool />;
+    case "sign-pdf":
+      return <SignPdfTool />;
     case "pdf-to-jpg":
     case "pdf-to-png":
       return <PdfToJpgTool />;

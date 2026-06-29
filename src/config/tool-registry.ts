@@ -2041,6 +2041,7 @@ const DYNAMIC_TOOL_BASES: Array<{
   isConverter?: boolean;
   supportedInputFormats?: string[];
   supportedOutputFormats?: string[];
+  isPremium?: boolean;
 }> = [
   // PDF
   { id: "merge-multiple-pdfs", slug: "merge-multiple-pdfs", name: "Merge Multiple PDFs", description: "Combine multiple PDF documents together in any sequence.", primaryTag: "PDF", category: "PDF", iconTag: "Layers" },
@@ -2052,7 +2053,7 @@ const DYNAMIC_TOOL_BASES: Array<{
   { id: "delete-pdf-pages", slug: "delete-pdf-pages", name: "Delete PDF Pages", description: "Remove unwanted pages from your PDF file dynamically.", primaryTag: "PDF", category: "PDF", iconTag: "Trash2" },
   { id: "extract-pdf-pages", slug: "extract-pdf-pages", name: "Extract PDF Pages", description: "Isolate and save specific pages from any PDF document.", primaryTag: "PDF", category: "PDF", iconTag: "Maximize2" },
   { id: "repair-pdf", slug: "repair-pdf", name: "Repair PDF", description: "Fix corrupt PDF file headers and recover document elements.", primaryTag: "PDF", category: "PDF", iconTag: "Activity" },
-  { id: "sign-pdf", slug: "sign-pdf", name: "Sign PDF", description: "Add secure electronic signatures and initials to PDF contracts.", primaryTag: "PDF", category: "PDF", iconTag: "PenTool" },
+  { id: "sign-pdf", slug: "sign-pdf", name: "Sign PDF", description: "Add secure electronic signatures and initials to PDF contracts.", primaryTag: "PDF", category: "PDF", iconTag: "PenTool", isPremium: true },
   { id: "redact-pdf", slug: "redact-pdf", name: "Redact PDF", description: "Permanently black out and sanitize sensitive information in PDFs.", primaryTag: "PDF", category: "PDF", iconTag: "EyeOff" },
   { id: "organize-pdf", slug: "organize-pdf", name: "Organize PDF", description: "Rearrange, sort, and reorder pages in your PDF file visually.", primaryTag: "PDF", category: "PDF", iconTag: "Sliders" },
 
@@ -2285,7 +2286,8 @@ export const FUNCTIONAL_SLUGS = new Set([
   "age-calculator", "loan-calculator", "gst-calculator", "base64-encoder-decoder",
   "url-encoder", "regex-tester", "heic-to-jpg", "svg-to-png",
   "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
-  "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer"
+  "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer",
+  "organize-pdf", "redact-pdf", "repair-pdf", "rotate-pdf", "sign-pdf", "merge-scanned-pdfs"
 ]);
 
 export function getDefaultToolStatus(tool: RegistryTool): Partial<RegistryTool> {
