@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { getToolBySlug } from "@/config/tool-registry";
+import { ToolFeedback } from "@/components/support/tool-feedback";
 import {
   ArrowLeft,
   Play,
@@ -563,6 +564,13 @@ Net Price (Before Tax): $${(price / (1 + gstPercent / 100)).toFixed(2)}`);
           </div>
         </GlassCard>
       </div>
+
+      {/* Tool Feedback Hook */}
+      {output && (
+        <div className="mt-8 max-w-xl mx-auto animate-fade-in">
+          <ToolFeedback toolSlug={slug} />
+        </div>
+      )}
     </div>
   );
 }

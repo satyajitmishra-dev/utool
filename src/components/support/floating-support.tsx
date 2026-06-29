@@ -12,6 +12,7 @@ export function FloatingSupport() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [activeToolSlug, setActiveToolSlug] = useState("");
+  const [initialReviewRating, setInitialReviewRating] = useState<number>(0);
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
 
   React.useEffect(() => {
@@ -29,15 +30,25 @@ export function FloatingSupport() {
     const handleToolSuccess = (e: Event) => {
       const customEvent = e as CustomEvent;
       const slug = customEvent.detail?.toolSlug || "";
+      const ratingVal = customEvent.detail?.initialRating || 0;
       if (slug) {
         setTimeout(() => {
           setActiveToolSlug(slug);
+          setInitialReviewRating(ratingVal);
           setIsReviewOpen(true);
-        }, 1500);
+        }, ratingVal > 0 ? 100 : 1500); // Open immediately if rating selected, otherwise delay for normal completion toast
       }
     };
     window.addEventListener("tool-success", handleToolSuccess);
     return () => window.removeEventListener("tool-success", handleToolSuccess);
+  }, []);
+
+  React.useEffect(() => {
+    const handleOpenSupport = () => {
+      setIsFormOpen(true);
+    };
+    window.addEventListener("open-support-ticket", handleOpenSupport);
+    return () => window.removeEventListener("open-support-ticket", handleOpenSupport);
   }, []);
 
   return (
@@ -150,6 +161,7 @@ export function FloatingSupport() {
           </p>
           <ReviewForm 
             toolSlug={activeToolSlug} 
+            initialRating={initialReviewRating}
             onSuccess={() => setIsReviewOpen(false)} 
           />
         </div>
