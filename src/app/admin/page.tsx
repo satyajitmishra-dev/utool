@@ -63,11 +63,10 @@ export default async function AdminPortalPage() {
     {
       title: "User Quota Manager",
       desc: "Manage user profiles, override subscription tiers (Free, Pro, Enterprise), view daily credits usage logs, and apply manual limits.",
-      link: "#",
+      link: "/admin/quota",
       icon: Users,
-      status: "Planned (API Ready)",
-      statusColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-      isPlanned: true
+      status: "Active",
+      statusColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     },
     {
       title: "DB & Cache Health Monitor",
