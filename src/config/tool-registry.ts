@@ -2285,6 +2285,9 @@ export const FUNCTIONAL_SLUGS = new Set([
   "markdown-preview", "css-minifier", "percentage-calculator", "bmi-calculator",
   "age-calculator", "loan-calculator", "gst-calculator", "base64-encoder-decoder",
   "url-encoder", "regex-tester", "heic-to-jpg", "svg-to-png",
+  "calorie-calculator", "compound-interest", "date-calculator", "discount-calculator",
+  "fraction-calculator", "gpa-calculator", "tax-calculator", "matrix-calculator",
+  "mortgage-calculator", "scientific-calculator", "tip-calculator",
   "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
   "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer",
   "organize-pdf", "redact-pdf", "repair-pdf", "rotate-pdf", "sign-pdf", "merge-scanned-pdfs"

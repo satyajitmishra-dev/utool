@@ -14,7 +14,7 @@ interface SendMailParams {
 
 export async function sendEmail({ to, subject, html, replyTo }: SendMailParams) {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "support@utool.in";
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "healgodse@gmail.com";
   const fromName = process.env.RESEND_FROM_NAME || "Utool Workspace";
 
   if (!apiKey) {
@@ -222,7 +222,7 @@ function getEmailWrapper(contentHtml: string) {
       </div>
       <div class="footer">
         &copy; ${new Date().getFullYear()} Utool Workspace.<br>
-        This is an automated operational notification. Need help? Contact us at <a href="mailto:support@utool.in">support@utool.in</a>.
+        This is an automated operational notification. Need help? Contact us at <a href="mailto:healgodse@gmail.com">healgodse@gmail.com</a>.
       </div>
     </div>
   </div>
@@ -374,7 +374,7 @@ export async function sendAdminNotificationEmail({
   message: string;
 }) {
   const badgeClass = `badge-${priority.toLowerCase()}`;
-  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || "support@utool.in";
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || "healgodse@gmail.com";
   const adminUrl = `https://utool.in/admin/support`;
 
   const html = getEmailWrapper(`

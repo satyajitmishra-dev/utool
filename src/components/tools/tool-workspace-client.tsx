@@ -73,6 +73,50 @@ const PercentageCalculator = dynamic(
   () => import("@/components/tools/percentage-calculator").then((mod) => mod.PercentageCalculator),
   { ssr: false }
 );
+const CalorieCalculator = dynamic(
+  () => import("@/components/tools/calorie-calculator").then((mod) => mod.CalorieCalculator),
+  { ssr: false }
+);
+const CompoundInterestCalculator = dynamic(
+  () => import("@/components/tools/compound-interest-calculator").then((mod) => mod.CompoundInterestCalculator),
+  { ssr: false }
+);
+const DateCalculator = dynamic(
+  () => import("@/components/tools/date-calculator").then((mod) => mod.DateCalculator),
+  { ssr: false }
+);
+const DiscountCalculator = dynamic(
+  () => import("@/components/tools/discount-calculator").then((mod) => mod.DiscountCalculator),
+  { ssr: false }
+);
+const FractionCalculator = dynamic(
+  () => import("@/components/tools/fraction-calculator").then((mod) => mod.FractionCalculator),
+  { ssr: false }
+);
+const GpaCalculator = dynamic(
+  () => import("@/components/tools/gpa-calculator").then((mod) => mod.GpaCalculator),
+  { ssr: false }
+);
+const IncomeTaxCalculator = dynamic(
+  () => import("@/components/tools/income-tax-calculator").then((mod) => mod.IncomeTaxCalculator),
+  { ssr: false }
+);
+const MatrixCalculator = dynamic(
+  () => import("@/components/tools/matrix-calculator").then((mod) => mod.MatrixCalculator),
+  { ssr: false }
+);
+const MortgageCalculator = dynamic(
+  () => import("@/components/tools/mortgage-calculator").then((mod) => mod.MortgageCalculator),
+  { ssr: false }
+);
+const ScientificCalculator = dynamic(
+  () => import("@/components/tools/scientific-calculator").then((mod) => mod.ScientificCalculator),
+  { ssr: false }
+);
+const TipCalculator = dynamic(
+  () => import("@/components/tools/tip-calculator").then((mod) => mod.TipCalculator),
+  { ssr: false }
+);
 const ImageResizerTool = dynamic(
   () => import("@/components/pro/image-resizer-tool").then((mod) => mod.ImageResizerTool),
   { ssr: false }
@@ -182,6 +226,28 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
       return <PasswordGenerator />;
     case "percentage-calculator":
       return <PercentageCalculator />;
+    case "calorie-calculator":
+      return <CalorieCalculator />;
+    case "compound-interest":
+      return <CompoundInterestCalculator />;
+    case "date-calculator":
+      return <DateCalculator />;
+    case "discount-calculator":
+      return <DiscountCalculator />;
+    case "fraction-calculator":
+      return <FractionCalculator />;
+    case "gpa-calculator":
+      return <GpaCalculator />;
+    case "tax-calculator":
+      return <IncomeTaxCalculator />;
+    case "matrix-calculator":
+      return <MatrixCalculator />;
+    case "mortgage-calculator":
+      return <MortgageCalculator />;
+    case "scientific-calculator":
+      return <ScientificCalculator />;
+    case "tip-calculator":
+      return <TipCalculator />;
     case "json-formatter":
     case "css-gradient-generator":
     case "env-validator":

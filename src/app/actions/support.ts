@@ -350,7 +350,7 @@ export async function replyToTicketAction(ticketId: string, replyMessage: string
       });
     } else {
       // Notify admin
-      const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_MAIL || "support@utool.in";
+      const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_MAIL || "healgodse@gmail.com";
       await sendTicketReplyEmail({
         toEmail: adminEmail,
         toName: "Utool Admin",
@@ -542,7 +542,7 @@ export async function deleteTicketAction(ticketId: string) {
       .collection("ticketMessages")
       .where("ticketId", "==", ticketId)
       .get();
-    
+
     const batch = adminDb.batch();
     messagesSnapshot.docs.forEach((doc) => {
       batch.delete(doc.ref);

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.split('Bearer ')[1];
     let session: any = null;
-    
+
     if (token) {
       try {
         session = await adminAuth.verifyIdToken(token);
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         });
 
         try {
-          const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_MAIL || "support@utool.in";
+          const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_MAIL || "healgodse@gmail.com";
           await sendTicketReplyEmail({
             toEmail: adminEmail,
             toName: "Utool Admin",

@@ -75,7 +75,7 @@ export default function AboutPage() {
               <p className="text-xs text-muted-foreground leading-relaxed text-justify">
                 UTool is built on transparency. We do not run intrusive ad-trackers, we don't store your documents, and our tools run completely offline. Our goal is to own the most trusted, privacy-first workspace on the web."
               </p>
-              
+
               <div className="flex gap-4 pt-2">
                 <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" className="text-caption text-primary hover:underline font-semibold">LinkedIn Profile</a>
                 <a href={founder.github} target="_blank" rel="noopener noreferrer" className="text-caption text-primary hover:underline font-semibold">GitHub Profile</a>
@@ -128,7 +128,7 @@ export default function AboutPage() {
               We respond to all support tickets, feature requests, and business license inquiries under 24 hours. For account billing and cancellation support, reach our email.
             </p>
             <div className="text-xs font-bold text-primary flex flex-col gap-1.5 bg-card/40 p-4 border border-border rounded-xl">
-              <p>Email: support@utool.in</p>
+              <p>Email: healgodse@gmail.com</p>
               <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Typical Response Time: &lt; 24 Hours</p>
             </div>
           </div>

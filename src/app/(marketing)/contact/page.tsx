@@ -34,7 +34,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">General Support</h4>
-              <p className="text-xs text-primary font-bold mt-1.5">support@utool.in</p>
+              <p className="text-xs text-primary font-bold mt-1.5">healgodse@gmail.com</p>
               <p className="text-4xs text-muted-foreground mt-1">For account help, billing, and cancellations.</p>
             </div>
           </GlassCard>
