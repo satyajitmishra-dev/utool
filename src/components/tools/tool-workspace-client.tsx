@@ -138,6 +138,51 @@ const DocumentConverterTool = dynamic(
   { ssr: false }
 );
 
+const BinaryToText = dynamic(
+  () => import("@/components/tools/binary-to-text").then((mod) => mod.BinaryToText),
+  { ssr: false }
+);
+const MorseCodeEncoder = dynamic(
+  () => import("@/components/tools/morse-code-encoder").then((mod) => mod.MorseCodeEncoder),
+  { ssr: false }
+);
+const MorseCodeDecoder = dynamic(
+  () => import("@/components/tools/morse-code-decoder").then((mod) => mod.MorseCodeDecoder),
+  { ssr: false }
+);
+const CharacterCounter = dynamic(
+  () => import("@/components/tools/character-counter").then((mod) => mod.CharacterCounter),
+  { ssr: false }
+);
+const LineCounter = dynamic(
+  () => import("@/components/tools/line-counter").then((mod) => mod.LineCounter),
+  { ssr: false }
+);
+const FindAndReplace = dynamic(
+  () => import("@/components/tools/find-and-replace").then((mod) => mod.FindAndReplace),
+  { ssr: false }
+);
+const StripHtmlTags = dynamic(
+  () => import("@/components/tools/strip-html-tags").then((mod) => mod.StripHtmlTags),
+  { ssr: false }
+);
+const RemoveDuplicateLines = dynamic(
+  () => import("@/components/tools/remove-duplicate-lines").then((mod) => mod.RemoveDuplicateLines),
+  { ssr: false }
+);
+const TextReverser = dynamic(
+  () => import("@/components/tools/text-reverser").then((mod) => mod.TextReverser),
+  { ssr: false }
+);
+const TextSorter = dynamic(
+  () => import("@/components/tools/text-sorter").then((mod) => mod.TextSorter),
+  { ssr: false }
+);
+const RandomWordGenerator = dynamic(
+  () => import("@/components/tools/random-word-generator").then((mod) => mod.RandomWordGenerator),
+  { ssr: false }
+);
+
 const JpgToPdfTool = dynamic(
   () => import("@/components/tools/pdf/tools/jpg-to-pdf").then((mod) => mod.JpgToPdfTool),
   { ssr: false }
@@ -251,10 +296,8 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
     case "json-formatter":
     case "css-gradient-generator":
     case "env-validator":
-    case "word-counter":
     case "case-converter":
     case "lorem-ipsum-generator":
-    case "text-to-binary":
     case "slug-generator":
     case "hash-sha256-generator":
     case "uuid-generator":
@@ -266,6 +309,30 @@ export function ToolWorkspaceClient({ slug }: { slug: string }) {
     case "heic-to-jpg":
     case "svg-to-png":
       return <ToolExecutionClient hideHeader={true} />;
+    case "binary-to-text":
+    case "text-to-binary":
+      return <BinaryToText />;
+    case "morse-code-encoder":
+      return <MorseCodeEncoder />;
+    case "morse-code-decoder":
+      return <MorseCodeDecoder />;
+    case "character-counter":
+    case "word-counter":
+      return <CharacterCounter />;
+    case "line-counter":
+      return <LineCounter />;
+    case "find-and-replace":
+      return <FindAndReplace />;
+    case "strip-html-tags":
+      return <StripHtmlTags />;
+    case "remove-duplicate-lines":
+      return <RemoveDuplicateLines />;
+    case "text-reverser":
+      return <TextReverser />;
+    case "text-sorter":
+      return <TextSorter />;
+    case "random-word-generator":
+      return <RandomWordGenerator />;
     case "meta-tag-generator":
       return <MetaTagGeneratorTool />;
     case "media-workspace":

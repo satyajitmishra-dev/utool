@@ -43,11 +43,14 @@ let cache: {
   timestamp: 0,
 };
 
+let activePromise: Promise<Record<string, ToolMetadata>> | null = null;
+
 const CACHE_TTL = 30 * 1000; // 30 seconds cache TTL
 
 export function clearToolCache() {
   cache.data = null;
   cache.timestamp = 0;
+  activePromise = null;
 }
 
 /**
@@ -59,25 +62,41 @@ export async function getToolMetadataMap(): Promise<Record<string, ToolMetadata>
     return cache.data;
   }
 
-  const metadataMap: Record<string, ToolMetadata> = {};
-  try {
-    if (!adminDb) {
-      console.warn("adminDb is not initialized. Using default tool registry statuses.");
-      return {};
-    }
-    const snapshot = await adminDb.collection("tool_metadata").get();
-    snapshot.docs.forEach((doc) => {
-      metadataMap[doc.id] = doc.data() as ToolMetadata;
-    });
-
-    // Update cache
-    cache.data = metadataMap;
-    cache.timestamp = now;
-  } catch (error) {
-    console.error("Failed to fetch tool metadata from Firestore:", error);
+  if (activePromise) {
+    return activePromise;
   }
 
-  return metadataMap;
+  activePromise = (async () => {
+    const metadataMap: Record<string, ToolMetadata> = {};
+    try {
+      if (!adminDb) {
+        console.warn("adminDb is not initialized. Using default tool registry statuses.");
+        return {};
+      }
+      const snapshot = await adminDb.collection("tool_metadata").get();
+      snapshot.docs.forEach((doc) => {
+        metadataMap[doc.id] = doc.data() as ToolMetadata;
+      });
+
+      // Update cache
+      cache.data = metadataMap;
+      cache.timestamp = Date.now();
+    } catch (error: any) {
+      if (error?.message?.includes("Quota exceeded") || error?.code === 8) {
+        console.warn("[Lifecycle] Firestore quota exceeded. Falling back to default tool statuses.");
+      } else {
+        console.error("Failed to fetch tool metadata from Firestore:", error);
+      }
+      // Cache empty results (or keep previous cache data if present) to prevent spamming Firestore
+      cache.data = cache.data || {};
+      cache.timestamp = Date.now();
+    } finally {
+      activePromise = null;
+    }
+    return cache.data || metadataMap;
+  })();
+
+  return activePromise;
 }
 
 /**

@@ -2290,11 +2290,15 @@ export const FUNCTIONAL_SLUGS = new Set([
   "mortgage-calculator", "scientific-calculator", "tip-calculator",
   "meta-tag-generator", "media-workspace", "image-resizer", "background-remover",
   "subtitle-generator", "pdf-ocr", "image-compressor", "gif-to-mp4", "audio-converter", "video-trimmer",
-  "organize-pdf", "redact-pdf", "repair-pdf", "rotate-pdf", "sign-pdf", "merge-scanned-pdfs"
+  "organize-pdf", "redact-pdf", "repair-pdf", "rotate-pdf", "sign-pdf", "merge-scanned-pdfs",
+  "binary-to-text", "morse-code-encoder", "morse-code-decoder", "character-counter",
+  "line-counter", "find-and-replace", "strip-html-tags", "remove-duplicate-lines",
+  "text-reverser", "text-sorter", "random-word-generator"
 ]);
 
 export function getDefaultToolStatus(tool: RegistryTool): Partial<RegistryTool> {
-  const isLive = FUNCTIONAL_SLUGS.has(tool.slug);
+  const checkSlug = tool.parentToolSlug || tool.slug;
+  const isLive = FUNCTIONAL_SLUGS.has(checkSlug);
   const featuredSlugs = ["merge-pdf", "qr-generator", "resume-builder", "image-compressor", "pdf-ocr"];
   const popularSlugs = ["merge-pdf", "split-pdf", "image-compressor", "url-shortener", "password-generator"];
   const newSlugs = ["pdf-ocr", "background-remover", "subtitle-generator"];

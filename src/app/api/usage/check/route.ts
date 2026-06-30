@@ -18,12 +18,17 @@ export async function POST(req: NextRequest) {
       if (cachedTier === "pro" || cachedTier === "enterprise" || cachedTier === "free") {
         tier = cachedTier as any;
       } else {
-        const userDoc = await adminDb.collection("users").doc(identifier).get();
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          tier = userData?.subscriptionTier || "free";
+        try {
+          const userDoc = await adminDb.collection("users").doc(identifier).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            tier = userData?.subscriptionTier || "free";
+          }
+          await redis.set(`user:tier:${identifier}`, tier, { ex: 60 * 60 * 24 });
+        } catch (dbError) {
+          console.error("Firestore error fetching user tier, defaulting to free:", dbError);
+          tier = "free";
         }
-        await redis.set(`user:tier:${identifier}`, tier, { ex: 60 * 60 * 24 });
       }
     }
 
@@ -55,13 +60,18 @@ export async function POST(req: NextRequest) {
       count = cachedCount;
     } else {
       if (!isGuest) {
-        const userDoc = await adminDb.collection("users").doc(identifier).get();
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          const todayStr = now.toISOString().split("T")[0];
-          if (userData?.dailyUsageDate === todayStr) {
-            count = userData.dailyUsageCount || 0;
+        try {
+          const userDoc = await adminDb.collection("users").doc(identifier).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            const todayStr = now.toISOString().split("T")[0];
+            if (userData?.dailyUsageDate === todayStr) {
+              count = userData.dailyUsageCount || 0;
+            }
           }
+        } catch (dbError) {
+          console.error("Firestore error fetching daily usage, defaulting to 0:", dbError);
+          count = 0;
         }
       }
       await redis.set(redisKey, count, { ex: secondsUntilMidnight });
