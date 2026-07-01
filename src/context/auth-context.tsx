@@ -241,15 +241,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    const isMobile = typeof window !== "undefined" && 
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      setLoading(true);
-      await signInWithRedirect(auth, provider);
-      return new Promise<never>(() => {});
-    }
-
     try {
       setLoading(true);
       const credential = await signInWithPopup(auth, provider);
@@ -258,8 +249,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return credential;
     } catch (error: any) {
       console.error("[Auth] Google popup sign-in failed:", error);
-      if (error.code === "auth/popup-blocked" || error.code === "auth/cancelled-popup-request") {
-        console.log("[Auth] Popup blocked or cancelled, falling back to redirect...");
+      const isPopupBlocked = 
+        error.code === "auth/popup-blocked" || 
+        error.code === "auth/cancelled-popup-request" ||
+        error.code === "auth/popup-closed-by-user";
+
+      if (isPopupBlocked) {
+        console.log("[Auth] Popup failed/blocked, falling back to redirect...");
         await signInWithRedirect(auth, provider);
         return new Promise<never>(() => {});
       }
@@ -272,15 +268,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithFacebook = async () => {
     const provider = new FacebookAuthProvider();
 
-    const isMobile = typeof window !== "undefined" && 
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      setLoading(true);
-      await signInWithRedirect(auth, provider);
-      return new Promise<never>(() => {});
-    }
-
     try {
       setLoading(true);
       const credential = await signInWithPopup(auth, provider);
@@ -289,8 +276,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return credential;
     } catch (error: any) {
       console.error("[Auth] Facebook popup sign-in failed:", error);
-      if (error.code === "auth/popup-blocked" || error.code === "auth/cancelled-popup-request") {
-        console.log("[Auth] Popup blocked or cancelled, falling back to redirect...");
+      const isPopupBlocked = 
+        error.code === "auth/popup-blocked" || 
+        error.code === "auth/cancelled-popup-request" ||
+        error.code === "auth/popup-closed-by-user";
+
+      if (isPopupBlocked) {
+        console.log("[Auth] Popup failed/blocked, falling back to redirect...");
         await signInWithRedirect(auth, provider);
         return new Promise<never>(() => {});
       }
