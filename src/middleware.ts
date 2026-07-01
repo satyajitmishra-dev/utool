@@ -48,7 +48,7 @@ async function fetchUserFromFirestore(userId: string) {
   return null;
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
 

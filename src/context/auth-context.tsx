@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useRef } from "react";
 import {
   User as FirebaseUser,
   UserCredential,
@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
@@ -36,6 +37,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<UserCredential>;
   signUp: (email: string, password: string, name?: string) => Promise<UserCredential>;
   loginWithGoogle: () => Promise<UserCredential>;
+  loginWithFacebook: () => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
@@ -50,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdminState, setIsAdminState] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authInitializing, setAuthInitializing] = useState(true);
+  const lastSyncedUid = useRef<string | null | undefined>(undefined);
   const router = useRouter();
 
   // Listen to Firestore profile changes to sync membership details in real-time
@@ -114,13 +117,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         if (firebaseUser) {
           setUser(firebaseUser);
-          // Only sync if it's the initial load to prevent flicker/repeated syncs
-          if (authInitializing) {
+          if (lastSyncedUid.current !== firebaseUser.uid) {
+            lastSyncedUid.current = firebaseUser.uid;
             await syncSessionCookie(firebaseUser);
           }
         } else {
           setUser(null);
-          if (authInitializing) {
+          if (lastSyncedUid.current !== null) {
+            lastSyncedUid.current = null;
             await syncSessionCookie(null);
           }
         }
@@ -132,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [authInitializing]);
+  }, []);
 
   useEffect(() => {
     const handleRedirect = async () => {
@@ -142,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log("[Auth] Successfully signed in via redirect:", credential.user.uid);
           
           // 1. Sync session cookie
+          lastSyncedUid.current = credential.user.uid;
           await syncSessionCookie(credential.user);
           
           // 2. Perform guest merge if guestId exists
@@ -181,6 +186,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
+      lastSyncedUid.current = credential.user.uid;
       await syncSessionCookie(credential.user);
       return credential;
     } finally {
@@ -223,6 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         lastActiveAt: now,
       });
 
+      lastSyncedUid.current = credential.user.uid;
       await syncSessionCookie(credential.user);
       return credential;
     } finally {
@@ -246,6 +253,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       const credential = await signInWithPopup(auth, provider);
+      lastSyncedUid.current = credential.user.uid;
       await syncSessionCookie(credential.user);
       return credential;
     } catch (error: any) {
@@ -261,10 +269,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithFacebook = async () => {
+    const provider = new FacebookAuthProvider();
+
+    const isMobile = typeof window !== "undefined" && 
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      setLoading(true);
+      await signInWithRedirect(auth, provider);
+      return new Promise<never>(() => {});
+    }
+
+    try {
+      setLoading(true);
+      const credential = await signInWithPopup(auth, provider);
+      lastSyncedUid.current = credential.user.uid;
+      await syncSessionCookie(credential.user);
+      return credential;
+    } catch (error: any) {
+      console.error("[Auth] Facebook popup sign-in failed:", error);
+      if (error.code === "auth/popup-blocked" || error.code === "auth/cancelled-popup-request") {
+        console.log("[Auth] Popup blocked or cancelled, falling back to redirect...");
+        await signInWithRedirect(auth, provider);
+        return new Promise<never>(() => {});
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     setLoading(true);
     try {
       // 1. Clear session cookie via API
+      lastSyncedUid.current = null;
       await fetch("/api/auth/logout", { method: "POST" });
       
       // 2. Clear Firebase auth
@@ -299,6 +339,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         signUp,
         loginWithGoogle,
+        loginWithFacebook,
         logout,
         resetPassword,
         isAdmin: isAdminState,
