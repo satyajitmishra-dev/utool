@@ -30,6 +30,8 @@ import {
 import { ToolWorkspaceClient } from "@/components/tools/tool-workspace-client";
 import { ComingSoonWorkspace } from "@/components/tools/ComingSoonWorkspace";
 import { Button } from "@/components/ui/button";
+import { AdSlot } from "@/components/ads/AdSlot";
+
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -139,9 +141,11 @@ export default async function ProgrammaticToolPage({ params }: Props) {
               <h1 className="text-[32px] md:text-[38px] font-black tracking-tight text-foreground leading-tight">
                 {tool.seoMeta.h1 || tool.name}
               </h1>
+              <AdSlot placement="tool-top" />
               <p className="text-[14px] text-muted-foreground leading-relaxed">
                 {tool.intro || tool.description}
               </p>
+
             </div>
             <div className="lg:col-span-2 border border-border rounded-3xl p-6 bg-card space-y-4 shadow-sm">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -280,8 +284,10 @@ export default async function ProgrammaticToolPage({ params }: Props) {
             <section className="border-t border-border pt-10 space-y-6 max-w-4xl">
               <h2 className="text-xl font-bold tracking-tight text-foreground">Frequently Asked Questions</h2>
               <FaqAccordion faqs={tool.faqs.map(f => ({ q: f.question || (f as any).q, a: f.answer || (f as any).a }))} />
+              <AdSlot placement="faq-bottom" />
             </section>
           )}
+
 
           <section className="border-t border-border pt-10 space-y-6 flex justify-center">
             <Link href={`/dashboard/support?tool=${slug}&newTicket=true`}>

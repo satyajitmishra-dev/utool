@@ -3,6 +3,8 @@ import { RegistryTool } from '@/types/tool-registry';
 import { Uploader } from '@/components/upload/Uploader';
 import { Section } from '@/components/ui/section';
 import { FaqAccordion } from '@/components/ui/faq-accordion';
+import { AdSlot } from '@/components/ads/AdSlot';
+
 import { ToolCard } from '@/components/ui/tool-card';
 import { getToolBySlug } from '@/config/tool-registry';
 
@@ -22,9 +24,11 @@ export function ConverterLayout({ config }: ConverterLayoutProps) {
         <div className="absolute inset-0 bg-primary/5 -skew-y-3 transform origin-top-left -z-10" />
         <div className="max-w-4xl mx-auto text-center px-4">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-foreground">{config.name}</h1>
+          <AdSlot placement="tool-top" className="mb-6" />
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
             {config.heroContent}
           </p>
+
           
           {/* Uploader Component */}
           <Uploader config={config} />
@@ -66,8 +70,10 @@ export function ConverterLayout({ config }: ConverterLayoutProps) {
                 a: f.answer
               }))} 
             />
+            <AdSlot placement="faq-bottom" className="mt-8" />
           </div>
         </Section>
+
       )}
 
       {/* Related Tools */}

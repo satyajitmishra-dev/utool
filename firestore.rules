@@ -94,5 +94,17 @@ service cloud.firestore {
                     request.resource.data.votedUids.hasAll(resource.data.votedUids);
       allow delete: if isAdmin();
     }
+
+    // ==========================================
+    // 8. ADVERTISEMENT CONFIGURATION & LOGS
+    // ==========================================
+    match /settings/adConfig {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /ad_events/{eventId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

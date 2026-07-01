@@ -4,6 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
 import { ProProvider } from "@/context/pro-context";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AdProvider } from "@/components/ads/AdProvider";
+import { AdSlot } from "@/components/ads/AdSlot";
 
 import { Toaster } from "sonner";
 import Script from "next/script";
@@ -79,7 +81,10 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <ProProvider>
-              {children}
+              <AdProvider>
+                {children}
+                <AdSlot placement="bottom-mobile" />
+              </AdProvider>
               <FloatingSupport />
               <Toaster
                 position="top-center"

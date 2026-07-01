@@ -23,6 +23,8 @@ import fs from "fs/promises";
 import path from "path";
 import { marked } from "marked";
 import { ToolEmbed } from "@/components/tools/ToolEmbed";
+import { AdSlot } from "@/components/ads/AdSlot";
+
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -144,8 +146,12 @@ export default async function BlogPostReaderPage({ params }: Props) {
             </Link>
           </div>
 
+          {/* Top Banner Ad */}
+          <AdSlot placement="blog-top" />
+
           {/* Article Header */}
           <div className="space-y-4 border-b border-border pb-6">
+
             <div className="flex flex-wrap gap-3">
               <Badge variant="primary">{post.category}</Badge>
               <span className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
@@ -190,28 +196,60 @@ export default async function BlogPostReaderPage({ params }: Props) {
           <article className="space-y-6 text-sm text-neutral-300 leading-relaxed text-justify">
             {hasMarkdown ? (
               (() => {
-                const parts = markdownContent.split(/\[tool-embed:\s*([a-zA-Z0-9-]+)\s*\]/g);
-                return parts.map((part, idx) => {
-                  if (idx % 2 === 0) {
-                    const parsedHtml = marked.parse(part) as string;
-                    return (
-                      <div
-                        key={idx}
-                        className="prose prose-neutral dark:prose-invert max-w-none text-neutral-300 space-y-4"
-                        dangerouslySetInnerHTML={{ __html: parsedHtml }}
-                      />
-                    );
-                  } else {
-                    return <ToolEmbed key={idx} slug={part} />;
-                  }
-                });
+                const blocks = markdownContent.split(/\r?\n\r?\n/);
+                const N = blocks.length;
+                const mid30 = Math.round(N * 0.3);
+                const mid60 = Math.round(N * 0.6);
+                
+                return (
+                  <div className="space-y-6">
+                    {blocks.map((block, blockIdx) => {
+                      const trimBlock = block.trim();
+                      if (!trimBlock) return null;
+
+                      // Check if it's a tool-embed
+                      const embedMatch = trimBlock.match(/^\[tool-embed:\s*([a-zA-Z0-9-]+)\s*\]$/);
+                      let element;
+                      if (embedMatch) {
+                        element = <ToolEmbed key={blockIdx} slug={embedMatch[1]} />;
+                      } else {
+                        const parsedHtml = marked.parse(block) as string;
+                        element = (
+                          <div
+                            key={blockIdx}
+                            className="prose prose-neutral dark:prose-invert max-w-none text-neutral-300 space-y-4"
+                            dangerouslySetInnerHTML={{ __html: parsedHtml }}
+                          />
+                        );
+                      }
+
+                      return (
+                        <React.Fragment key={blockIdx}>
+                          {element}
+                          {blockIdx === mid30 && <AdSlot placement="blog-middle-30" />}
+                          {blockIdx === mid60 && <AdSlot placement="blog-middle-60" />}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                );
               })()
             ) : (
-              post.paragraphs.map((p, idx) => (
-                <p key={idx}>{p}</p>
-              ))
+              (() => {
+                const N = post.paragraphs.length;
+                const mid30 = Math.round(N * 0.3);
+                const mid60 = Math.round(N * 0.6);
+                return post.paragraphs.map((p, idx) => (
+                  <React.Fragment key={idx}>
+                    <p>{p}</p>
+                    {idx === mid30 && <AdSlot placement="blog-middle-30" />}
+                    {idx === mid60 && <AdSlot placement="blog-middle-60" />}
+                  </React.Fragment>
+                ));
+              })()
             )}
           </article>
+
 
           {/* Action CTA Widget (Internal Link Engine: Blog -> Tool) */}
           {toolData && (
@@ -279,8 +317,12 @@ export default async function BlogPostReaderPage({ params }: Props) {
               </div>
             </GlassCard>
           </footer>
+
+          {/* Bottom Banner Ad */}
+          <AdSlot placement="blog-bottom" />
         </main>
       </div>
+
     </>
   );
 }

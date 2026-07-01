@@ -85,6 +85,14 @@ export default async function AdminPortalPage() {
       status: "Planned",
       statusColor: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
       isPlanned: true
+    },
+    {
+      title: "Advertisement Control Manager",
+      desc: "Configure system-wide ad settings, GDPR/CCPA consent, placement capping rules, provider selections, and review real-time revenue analytics.",
+      link: "/admin/ads",
+      icon: Sliders,
+      status: "Active",
+      statusColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     }
   ];
 

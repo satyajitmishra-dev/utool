@@ -13,6 +13,8 @@ import { Section, SectionHeading, Container, fadeUp, stagger } from "@/component
 import { GlassCard } from "@/components/ui/glass-card";
 import { AnimatedHeroText } from "@/components/ui/animated-hero-text";
 import { cn } from "@/utils/cn";
+import { AdSlot } from "@/components/ads/AdSlot";
+
 import { detectCurrency, formatPrice, CurrencyCode, convertInrToCurrency } from "@/utils/currency";
 import { useRemoteConfig } from "@/services/remote-config.service";
 import QRCode from "qrcode";
@@ -78,6 +80,9 @@ export default function LandingPage() {
       {/* 2. Hero Section */}
       <HeroSection />
 
+      {/* Top Banner Ad */}
+      <AdSlot placement="home-top" />
+
       {/* 3. Trust Numbers (Metrics) */}
       <MetricsSection />
 
@@ -90,8 +95,12 @@ export default function LandingPage() {
       {/* 6. Featured Tools */}
       <FeaturedToolsSection />
 
+      {/* Native Sponsored Ad */}
+      <AdSlot placement="home-native" />
+
       {/* 7. Why UTool Section */}
       <WhyUToolSection />
+
 
       {/* 8. Privacy Section (Trust & Privacy Layer) */}
       <TrustLayerSection />
