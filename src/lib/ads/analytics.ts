@@ -31,10 +31,20 @@ export async function logAdEvent(event: Omit<AdEventLog, "id" | "timestamp">): P
   if (typeof window !== "undefined") {
     try {
       const colRef = collection(db, "ad_events");
-      await addDoc(colRef, {
+      
+      // Clean undefined values to prevent Firestore validation crashes
+      const cleanEvent: Record<string, any> = {
         ...fullEvent,
         timestamp: Timestamp.fromMillis(timestamp), // Use Firestore timestamp
+      };
+
+      Object.keys(cleanEvent).forEach((key) => {
+        if (cleanEvent[key] === undefined) {
+          delete cleanEvent[key];
+        }
       });
+
+      await addDoc(colRef, cleanEvent);
     } catch (err) {
       // Degrade gracefully without impacting the user
       console.warn("[Ad Analytics Service] Failed to log ad event to database:", err);
