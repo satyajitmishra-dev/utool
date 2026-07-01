@@ -171,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const params = new URLSearchParams(window.location.search);
             const redirectParam = params.get("redirect");
             const destination = safeRedirect(redirectParam);
-            router.push(destination);
+            window.location.href = destination;
           }
         }
       } catch (error: any) {
@@ -307,7 +307,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAdminState(false);
       
       // 4. Redirect home
-      router.push("/");
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout error", error);
     } finally {

@@ -47,9 +47,9 @@ export function SignupForm() {
 
   React.useEffect(() => {
     if (user && !authInitializing) {
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     }
-  }, [user, authInitializing, redirectUrl, router]);
+  }, [user, authInitializing, redirectUrl]);
 
   const {
     register,
@@ -77,7 +77,7 @@ export function SignupForm() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     }
@@ -102,7 +102,7 @@ export function SignupForm() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {
@@ -129,7 +129,7 @@ export function SignupForm() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {

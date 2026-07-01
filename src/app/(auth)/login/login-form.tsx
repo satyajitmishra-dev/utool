@@ -37,9 +37,9 @@ function LoginFormContent() {
 
   React.useEffect(() => {
     if (user && !authInitializing) {
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     }
-  }, [user, authInitializing, redirectUrl, router]);
+  }, [user, authInitializing, redirectUrl]);
 
   const {
     register,
@@ -67,7 +67,7 @@ function LoginFormContent() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     }
@@ -92,7 +92,7 @@ function LoginFormContent() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {
@@ -119,7 +119,7 @@ function LoginFormContent() {
         }
       }
 
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } catch (err) {
       toast.error(mapFirebaseError(err));
     } finally {
