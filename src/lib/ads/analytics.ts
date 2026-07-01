@@ -43,52 +43,71 @@ export async function logAdEvent(event: Omit<AdEventLog, "id" | "timestamp">): P
 }
 
 /**
- * Simulates or fetches historical ad analytics summaries for the Admin control dashboard.
+ * Fetches real-time historical ad analytics summaries from Firestore event logs.
  */
 export async function fetchAdAnalyticsSummary(): Promise<AdAnalyticsSummary> {
   if (typeof window === "undefined") {
-    return getMockAnalyticsSummary();
+    return getEmptyAnalyticsSummary();
   }
 
   try {
     const colRef = collection(db, "ad_events");
-    // Fetch last 500 events to compute live stats (caps reading costs)
-    const q = query(colRef, limit(500));
+    // Fetch last 1000 events to compute live stats (caps read costs)
+    const q = query(colRef, limit(1000));
     const querySnapshot = await getDocs(q);
     
-    let impressions = 0;
-    let clicks = 0;
-    let requested = 0;
-    let filled = 0;
-
+    // Convert documents to log objects
+    const logs: AdEventLog[] = [];
     querySnapshot.forEach((doc) => {
-      const data = doc.data() as AdEventLog;
-      if (data.eventType === "visible" || data.eventType === "loaded") impressions++;
-      if (data.eventType === "clicked") clicks++;
-      if (data.eventType === "requested") requested++;
-      if (data.eventType === "filled") filled++;
+      logs.push(doc.data() as AdEventLog);
     });
 
-    if (requested === 0) {
-      return getMockAnalyticsSummary();
-    }
+    const history: AdAnalyticsSummary["history"] = [];
+    let totalImpressions = 0;
+    let totalClicks = 0;
+    let totalRequested = 0;
+    let totalFilled = 0;
 
-    const ctr = impressions > 0 ? clicks / impressions : 0;
-    const fillRate = requested > 0 ? filled / requested : 0;
-    // Assume average $1.50 per click for simulated revenue calculation
-    const estimatedEarnings = clicks * 1.45; 
-    const rpm = impressions > 0 ? (estimatedEarnings / impressions) * 1000 : 0;
-
-    // Build historical graph points (last 7 days)
-    const history = [];
+    // Group logs by date for the last 7 days
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split("T")[0];
-      const factor = 1 + Math.sin(i) * 0.15; // subtle variety
-      const dailyImps = Math.round(180 * factor);
-      const dailyClicks = Math.round(dailyImps * (0.015 + Math.random() * 0.01));
-      const dailyRev = dailyClicks * 1.35;
+
+      // Filter events matching this date
+      const dailyLogs = logs.filter((log) => {
+        let logDate: Date;
+        if (log.timestamp && typeof (log.timestamp as any).toDate === "function") {
+          logDate = (log.timestamp as any).toDate();
+        } else if (log.timestamp && (log.timestamp as any).seconds) {
+          logDate = new Date((log.timestamp as any).seconds * 1000);
+        } else if (log.timestamp) {
+          logDate = new Date(log.timestamp as any);
+        } else {
+          return false;
+        }
+        try {
+          const logDateStr = logDate.toISOString().split("T")[0];
+          return logDateStr === dateStr;
+        } catch {
+          return false;
+        }
+      });
+
+      let dailyImps = 0;
+      let dailyClicks = 0;
+      let dailyRequested = 0;
+      let dailyFilled = 0;
+
+      dailyLogs.forEach((log) => {
+        if (log.eventType === "visible" || log.eventType === "loaded") dailyImps++;
+        if (log.eventType === "clicked") dailyClicks++;
+        if (log.eventType === "requested") dailyRequested++;
+        if (log.eventType === "filled") dailyFilled++;
+      });
+
+      // Assume $0.15 average CPC for UTool
+      const dailyRev = dailyClicks * 0.15;
 
       history.push({
         date: dateStr,
@@ -96,58 +115,63 @@ export async function fetchAdAnalyticsSummary(): Promise<AdAnalyticsSummary> {
         clicks: dailyClicks,
         revenue: parseFloat(dailyRev.toFixed(2)),
       });
+
+      totalImpressions += dailyImps;
+      totalClicks += dailyClicks;
+      totalRequested += dailyRequested;
+      totalFilled += dailyFilled;
     }
 
+    const ctr = totalImpressions > 0 ? totalClicks / totalImpressions : 0;
+    const fillRate = totalRequested > 0 ? totalFilled / totalRequested : 0;
+    const estimatedEarnings = totalClicks * 0.15;
+    const rpm = totalImpressions > 0 ? (estimatedEarnings / totalImpressions) * 1000 : 0;
+
     return {
-      impressions,
-      clicks,
+      impressions: totalImpressions,
+      clicks: totalClicks,
       ctr,
       fillRate,
       rpm,
-      estimatedEarnings,
+      estimatedEarnings: parseFloat(estimatedEarnings.toFixed(2)),
       history,
     };
-  } catch (err) {
-    console.error("[Ad Analytics Service] Error querying analytics logs:", err);
-    return getMockAnalyticsSummary();
+  } catch (err: any) {
+    if (err?.code === "permission-denied" || err?.message?.toLowerCase().includes("permission")) {
+      console.warn("[Ad System] Firestore read permission denied for ad analytics logs. Operating in local-only empty data fallback.");
+    } else {
+      console.error("[Ad Analytics Service] Error querying analytics logs:", err);
+    }
+    return getEmptyAnalyticsSummary();
   }
 }
 
 /**
- * Returns mock analytics summary for fallback
+ * Returns empty analytics summary with zero metrics for default fallback
  */
-function getMockAnalyticsSummary(): AdAnalyticsSummary {
+function getEmptyAnalyticsSummary(): AdAnalyticsSummary {
   const history = [];
-  const baseEarnings = [12.45, 15.30, 9.80, 14.15, 18.90, 22.10, 17.50];
-  const baseImps = [1250, 1420, 1100, 1380, 1600, 1850, 1550];
-
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split("T")[0];
-    const imps = baseImps[6 - i];
-    const rev = baseEarnings[6 - i];
-    const clicks = Math.round(imps * 0.018); // 1.8% CTR
 
     history.push({
       date: dateStr,
-      impressions: imps,
-      clicks,
-      revenue: rev,
+      impressions: 0,
+      clicks: 0,
+      revenue: 0,
     });
   }
 
-  const impressions = baseImps.reduce((a, b) => a + b, 0);
-  const estimatedEarnings = baseEarnings.reduce((a, b) => a + b, 0);
-  const clicks = Math.round(impressions * 0.0178);
-
   return {
-    impressions,
-    clicks,
-    ctr: 0.0178,
-    fillRate: 0.985,
-    rpm: (estimatedEarnings / impressions) * 1000,
-    estimatedEarnings,
+    impressions: 0,
+    clicks: 0,
+    ctr: 0,
+    fillRate: 0,
+    rpm: 0,
+    estimatedEarnings: 0,
     history,
   };
 }
+

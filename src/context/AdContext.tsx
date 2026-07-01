@@ -68,8 +68,12 @@ export function AdProviderWrapper({ children }: { children: React.ReactNode }) {
         }
         setIsLoading(false);
       },
-      (error) => {
-        console.warn("[Ad Context] Firestore subscribe failed, using defaults:", error);
+      (error: any) => {
+        if (error?.code === "permission-denied" || error?.message?.toLowerCase().includes("permission")) {
+          console.warn("[Ad System] Firestore configuration listener permission denied. Ensure your local firestore.rules are deployed to the cloud. Defaulting to local ad configurations.");
+        } else {
+          console.warn("[Ad Context] Firestore subscribe failed, using defaults:", error);
+        }
         setAdConfig(DEFAULT_GLOBAL_AD_CONFIG);
         setIsLoading(false);
       }

@@ -41,12 +41,12 @@ export function ConsentBanner() {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md z-45">
+      <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md z-[9999]">
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          className="rounded-3xl border border-white/[0.08] bg-neutral-900/90 p-6 shadow-2xl backdrop-blur-xl relative overflow-hidden"
+          className="rounded-3xl border border-border bg-card/95 p-6 shadow-2xl backdrop-blur-xl relative overflow-hidden"
         >
           {/* Subtle Ambient Glow */}
           <div className="absolute -top-16 -right-16 h-32 w-32 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
@@ -58,18 +58,18 @@ export function ConsentBanner() {
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-1.5">
                   Privacy Settings
                 </h4>
                 <button
                   onClick={handleDeclineAll}
-                  className="text-neutral-400 hover:text-white transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   aria-label="Close consent banner"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <p className="text-[11px] text-neutral-400 leading-relaxed text-justify">
+              <p className="text-[11px] text-muted-foreground leading-relaxed text-justify">
                 We use cookies and identifiers to analyze traffic, personalize advertisements, and enhance your workspace experience. Review our privacy policies for more information.
               </p>
             </div>
@@ -79,13 +79,16 @@ export function ConsentBanner() {
             <Button
               onClick={handleDeclineAll}
               variant="outline"
-              className="flex-1 h-9 rounded-xl text-xs bg-transparent border-neutral-800 hover:bg-neutral-800 text-neutral-300 font-semibold"
+              size="sm"
+              className="flex-1 h-9 rounded-xl text-xs font-semibold"
             >
               Essential Only
             </Button>
             <Button
               onClick={handleAcceptAll}
-              className="flex-1 h-9 rounded-xl text-xs bg-primary hover:bg-primary/95 text-white font-semibold flex items-center justify-center gap-1.5"
+              variant="primary"
+              size="sm"
+              className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
             >
               <ShieldCheck className="h-4 w-4" /> Accept All
             </Button>

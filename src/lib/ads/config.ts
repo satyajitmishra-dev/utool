@@ -42,8 +42,12 @@ export async function fetchAdConfig(): Promise<GlobalAdConfig> {
         },
       } as GlobalAdConfig;
     }
-  } catch (err) {
-    console.error("[Ad Config Service] Error fetching config from Firestore:", err);
+  } catch (err: any) {
+    if (err?.code === "permission-denied" || err?.message?.toLowerCase().includes("permission")) {
+      console.warn("[Ad System] Firestore permission denied. Ensure your local firestore.rules are deployed to the cloud. Using local default config.");
+    } else {
+      console.error("[Ad Config Service] Error fetching config from Firestore:", err);
+    }
   }
 
   return DEFAULT_GLOBAL_AD_CONFIG;
@@ -57,8 +61,14 @@ export async function saveAdConfig(config: GlobalAdConfig): Promise<void> {
     const docRef = doc(db, "settings", "adConfig");
     await setDoc(docRef, config);
     console.log("[Ad Config Service] Configuration saved successfully to Firestore.");
-  } catch (err) {
-    console.error("[Ad Config Service] Error saving configuration to Firestore:", err);
-    throw err;
+  } catch (err: any) {
+    if (err?.code === "permission-denied" || err?.message?.toLowerCase().includes("permission")) {
+      const errorMsg = "Permission denied. Please deploy firestore.rules to your Firebase project using: firebase deploy --only firestore:rules";
+      console.warn("[Ad System]", errorMsg);
+      throw new Error(errorMsg);
+    } else {
+      console.error("[Ad Config Service] Error saving configuration to Firestore:", err);
+      throw err;
+    }
   }
 }
