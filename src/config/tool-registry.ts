@@ -2207,16 +2207,18 @@ const DYNAMIC_TOOL_BASES: Array<{
   { id: "length-converter", slug: "length-converter", name: "Length Unit Converter", description: "Convert measurements between meters, feet, inches, and miles.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
   { id: "weight-converter", slug: "weight-converter", name: "Weight Unit Converter", description: "Convert weight scales between grams, kilograms, pounds, and ounces.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
   { id: "temperature-converter", slug: "temperature-converter", name: "Temperature Converter", description: "Convert values between Celsius, Fahrenheit, and Kelvin scales.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "area-converter", slug: "area-converter", name: "Area Unit Converter", description: "Convert surfaces sizes between square meters, feet, and acres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "area-converter", slug: "area-converter", name: "Area Unit Converter", description: "Convert surfaces sizes between square meters, feet, and acres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
   { id: "volume-converter", slug: "volume-converter", name: "Volume Unit Converter", description: "Convert volumes between liters, gallons, cups, and cubic units.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "speed-converter", slug: "speed-converter", name: "Speed Unit Converter", description: "Convert velocity between km/h, mph, knots, and m/s.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "speed-converter", slug: "speed-converter", name: "Speed Unit Converter", description: "Convert velocity between km/h, mph, knots, and m/s.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
   { id: "time-converter", slug: "time-converter", name: "Time Unit Converter", description: "Convert times between seconds, hours, days, and years.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "storage-converter", slug: "storage-converter", name: "Digital Storage Converter", description: "Convert byte arrays between MB, GB, TB, and KB blocks.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "currency-converter", slug: "currency-converter", name: "Currency Exchange Converter", description: "Estimate cross-rate valuations for global currencies.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "pressure-converter", slug: "pressure-converter", name: "Pressure Unit Converter", description: "Convert pressures between bar, psi, pascals, and atmospheres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "angle-converter", slug: "angle-converter", name: "Angle Unit Converter", description: "Convert degrees to radians, gradians, and standard circles.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "energy-converter", slug: "energy-converter", name: "Energy Unit Converter", description: "Convert joules to calories, watt-hours, and BTUs.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
-  { id: "power-converter", slug: "power-converter", name: "Power Unit Converter", description: "Convert horsepower to watts, kilowatts, and BTUs/hr.", primaryTag: "Converters", category: "Converters", iconTag: "Scale" },
+  { id: "storage-converter", slug: "storage-converter", name: "Digital Storage Converter", description: "Convert byte arrays between MB, GB, TB, and KB blocks.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "currency-converter", slug: "currency-converter", name: "Currency Exchange Converter", description: "Estimate cross-rate valuations for global currencies.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "pressure-converter", slug: "pressure-converter", name: "Pressure Unit Converter", description: "Convert pressures between bar, psi, pascals, and atmospheres.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "angle-converter", slug: "angle-converter", name: "Angle Unit Converter", description: "Convert degrees to radians, gradians, and standard circles.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "energy-converter", slug: "energy-converter", name: "Energy Unit Converter", description: "Convert joules to calories, watt-hours, and BTUs.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "power-converter", slug: "power-converter", name: "Power Unit Converter", description: "Convert horsepower to watts, kilowatts, and BTUs/hr.", primaryTag: "Converters", category: "Converters", iconTag: "Scale", isConverter: true },
+  { id: "csv-to-json-converter", slug: "csv-to-json-converter", name: "CSV ⇄ JSON Converter", description: "Convert spreadsheets CSV files to structured JSON outputs.", primaryTag: "Converter", category: "Converters", iconTag: "FileText", isConverter: true },
+  { id: "png-to-jpg-converter", slug: "png-to-jpg-converter", name: "PNG → JPG Converter Suite", description: "Convert PNG images to JPEG format client-side in batch.", primaryTag: "Converter", category: "Converters", iconTag: "Maximize2", isConverter: true },
 
   // Color Tools
   { id: "hex-to-rgb", slug: "hex-to-rgb", name: "Hex to RGB Converter", description: "Convert hexadecimal web colors to RGB coordinates.", primaryTag: "Color", category: "Color", iconTag: "Sliders" },
@@ -2293,7 +2295,10 @@ export const FUNCTIONAL_SLUGS = new Set([
   "organize-pdf", "redact-pdf", "repair-pdf", "rotate-pdf", "sign-pdf", "merge-scanned-pdfs",
   "binary-to-text", "morse-code-encoder", "morse-code-decoder", "character-counter",
   "line-counter", "find-and-replace", "strip-html-tags", "remove-duplicate-lines",
-  "text-reverser", "text-sorter", "random-word-generator"
+  "text-reverser", "text-sorter", "random-word-generator",
+  "angle-converter", "area-converter", "energy-converter", "power-converter",
+  "pressure-converter", "speed-converter", "storage-converter", "currency-converter",
+  "csv-to-json-converter", "png-to-jpg-converter"
 ]);
 
 export function getDefaultToolStatus(tool: RegistryTool): Partial<RegistryTool> {

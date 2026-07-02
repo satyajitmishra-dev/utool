@@ -7,7 +7,7 @@ import {
   getMergedToolRegistry,
 } from "@/services/tool-lifecycle.service";
 import { computeRelatedTools } from "@/lib/seo/internal-links";
-import { ConverterLayout } from "@/components/converter/ConverterLayout";
+import { ConverterLayout } from "@/components/tools/shared/converter/ConverterLayout";
 import { generateSoftwareSchema, generateFAQSchema, generateBreadcrumbSchema } from "@/lib/seo/engine";
 import { FaqAccordion } from "@/components/ui/faq-accordion";
 import { Badge } from "@/components/ui/badge";
